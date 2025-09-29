@@ -13,20 +13,21 @@
 
     <style>
         :root{
-            --char-drop: clamp(12px, 3vh, 40px);
+            /* негативний drop — підіймаємо персонажів на верхню кромку асфальту */
+            --char-drop: calc(-6vh);
             --cloud-h: 24%;
             --cloud-rise: 46vh;
             --header-h: 64px;
         }
 
         html,body{ margin:0; background:#0b1020; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; }
-        body{ padding-top:64px; }           /* щоб контент не залазив під хедер */
+        body{ padding-top:64px; }
         section,.stage{ scroll-margin-top: var(--header-h); }
 
-        /* СЦЕНА */
+        /* СЦЕНА ~200vh: верх — небо з хмарами, низ — земля з горами/будинками/вулицею/персонажами */
         .stage{
             position:relative;
-            height:200vh;                     /* перша половина — небо, друга — земля */
+            height:200vh;
             overflow:hidden;
         }
         .layer{ position:absolute; inset:0; pointer-events:none; }
@@ -34,6 +35,7 @@
             position:absolute; left:0; bottom:0; height:100%;
             width:auto; min-width:100%;
             display:flex; align-items:flex-end; will-change:transform;
+            white-space: nowrap; /* щоб у деяких браузерах не ламався ряд */
         }
         .band::after{ content:""; flex:0 0 12vw; }
 
@@ -58,6 +60,7 @@
             background:radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
             filter:blur(18px); opacity:.35; pointer-events:none;
         }
+
         /* псевдо-тінь землі */
         .stage::after{
             content:""; position:absolute; left:-5vw; right:-5vw; bottom:-6vh; height:22vh;
@@ -65,53 +68,61 @@
             pointer-events:none; z-index:3;
         }
 
-        /* ЛОГО */
+        /* ЛОГО поверх сцен */
         .stage-logo{
             position:absolute; top:calc(var(--header-h) + 8px); left:50%; transform:translateX(-50%);
-            z-index:9; pointer-events:none;   /* вище за персонажів/будинки */
+            z-index:9; pointer-events:none;
         }
-        .stage-logo img{ width:clamp(140px,32vw,360px); height:auto; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.25)); }
+        .stage-logo img{
+            width:clamp(140px,32vw,360px); height:auto; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));
+        }
 
-        /* СОНЦЕ */
+        /* СОНЦЕ — трішки вище, щоб не «влазило» під будинки на деяких екранах */
         #sun{ display:grid; place-items:center; }
         .sunImg{
             width:min(22vmax,420px); height:auto; position:absolute; left:50%; transform:translateX(-50%);
-            bottom:44%; filter:blur(.2px); opacity:.9;
+            bottom:48%; filter:blur(.2px); opacity:.9;
         }
 
-        /* ХМАРИ (верх сцени) */
+        /* ХМАРИ (видні лише у верхній половині сцени) */
         #clouds .cloudImg{
-            height:var(--cloud-h); width:auto; margin:0 8vw 64vh;
+            height:var(--cloud-h); width:auto; margin:0 8vw 60vh;
             flex:0 0 auto; opacity:.98; filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));
             will-change:transform,opacity;
         }
 
-        /* ГОРИ */
+        /* ГОРИ — позаду будинків */
         .mountainsImg{
-            height:52%; width:auto; margin:0 10vw 22vh; flex:0 0 auto;
+            height:34vh; width:auto; margin:0 8vw 16vh; flex:0 0 auto;
             filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));
         }
 
-        /* БУДИНКИ */
+        /* БУДИНКИ — реалістична висота */
         .houseImg{
-            height:68%; width:auto; margin:0 48px 18vh; flex:0 0 auto;
+            height:46vh; width:auto; margin:0 40px 12vh; flex:0 0 auto;
             filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));
         }
-        @media (max-width:780px){
-            .houseImg{ height:62%; margin-bottom:16vh; }
+
+        /* ВУЛИЦЯ (асфальт + верхня біла кромка у самому SVG) */
+        .streetImg{
+            height:28vh; width:auto; margin:0; flex:0 0 auto;
         }
 
-        /* ВУЛИЦЯ (асфальт + верхня біла кромка) */
-        .streetImg{ height:36%; width:auto; margin:0; flex:0 0 auto; }
-
-        /* ПЕРСОНАЖІ */
+        /* ПЕРСОНАЖІ — стоять на верхній кромці асфальту */
         .charImg{
-            width:240px; height:auto; margin:0 120px 0;
+            width:240px; height:auto; margin:0 100px 0;
             transform:translateY(var(--char-drop));
-            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35)); flex:0 0 auto;
+            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
+            flex:0 0 auto;
         }
         .charImg.sm{ width:200px; }
         .charImg.lg{ width:280px; }
+
+        @media (max-width:780px){
+            :root{ --char-drop: calc(-5vh); }
+            .houseImg{ height:42vh; margin-bottom:10vh; }
+            .streetImg{ height:26vh; }
+        }
 
         /* === Fixed Header === */
         .site-header{
@@ -139,9 +150,7 @@
         }
         .nav-toggle:focus-visible{ outline:2px solid #ffd400; outline-offset:2px; }
         .nav-toggle-bar{ display:block; width:22px; height:2px; background:#fff; border-radius:2px; position:relative; }
-        .nav-toggle-bar::before, .nav-toggle-bar::after{
-            content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px;
-        }
+        .nav-toggle-bar::before, .nav-toggle-bar::after{ content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px; }
         .nav-toggle-bar::before{ top:-7px; } .nav-toggle-bar::after{ top:7px; }
 
         @media (max-width:780px){
@@ -273,7 +282,9 @@
     const getShift = (sel, k = 1) => {
         const el = document.querySelector(sel);
         if (!el) return 0;
-        const full = Math.max(0, el.scrollWidth - window.innerWidth);
+        // страховка проти випадків, коли scrollWidth ~ clientWidth
+        const fullWidth = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
+        const full = Math.max(0, fullWidth - window.innerWidth);
         return -Math.round(full * k);
     };
 
@@ -285,8 +296,8 @@
             start: "top top",
             end: () => {
                 const el = document.getElementById('charsBand');
-                const full = el ? Math.max(0, el.scrollWidth - window.innerWidth) : window.innerWidth * 2.2;
-                return "+=" + Math.max(1800, Math.round(full * 1.25));  // трохи довше ніж необхідно
+                const width = el ? Math.max(el.scrollWidth, el.getBoundingClientRect().width) : window.innerWidth * 2.2;
+                return "+=" + Math.max(2200, Math.round((width - window.innerWidth) * 1.35)); // трохи довше ніж потрібно
             },
             pin: true,
             scrub: 1,
@@ -304,7 +315,7 @@
     // сонце: легкий рух для глибини
     tl.to(".sunImg", { yPercent:-10, scale:0.96, ease:"none" }, 0);
 
-    // ХМАРИ: в першій третині прогресу — роз’їжджаються й зникають
+    // ХМАРИ: у першій третині — роз’їжджаються й зникають
     const clouds = gsap.utils.toArray("#clouds .cloudImg");
     clouds.forEach((c, i) => {
         const dir = (i % 2 === 0) ? -1 : 1; // ліві вліво, праві вправо
@@ -315,7 +326,6 @@
             ease: "power1.inOut"
         }, 0);
     });
-    // одну мітку — один раз:
     tl.addLabel("cloudsGone", tl.duration() * 0.32)
         .add(() => gsap.set("#clouds", { pointerEvents:"none" }), "cloudsGone");
 
