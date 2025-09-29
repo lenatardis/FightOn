@@ -1,0 +1,142 @@
+<!-- ⭐ POP-ART / COMIC POPUP — ВИДИМИЙ ЗА ЗАМОВЧУВАННЯМ -->
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+    :root{
+        --ink:#0d0d0d;      /* товстий «чорнильний» контур */
+        --bg:#fff8f2;       /* фон попапа */
+        --accent:#ff1f3d;   /* основний акцент */
+        --accent2:#ffd400;  /* додатковий акцент */
+        --dot:7px;          /* розмір крапок (Ben Day dots) */
+        --r:22px;           /* радіус кутів */
+        --sh:10px;          /* тінь (зсув для комікс-ефекту) */
+    }
+
+    .comic-popup{
+        position:fixed; inset:auto 50% auto 50%;
+        transform:translate(-50%, -50%) rotate(-1.2deg);
+        top:50%; left:50%;
+        z-index:9999;
+        width:min(760px, calc(100% - 32px));
+        background:
+                radial-gradient(circle at 1px 1px, rgba(0,0,0,.16) 1px, transparent 1px) 0 0/var(--dot) var(--dot),
+                var(--bg);
+        border:4px solid var(--ink);
+        border-radius:var(--r);
+        box-shadow:var(--sh) var(--sh) 0 var(--ink);
+        color:#111;
+        padding:24px 22px 26px;
+    }
+    .comic-popup.hidden{display:none} /* якщо захочеш сховати */
+
+    /* Затемнення позаду (опційно — якщо не треба, прибери) */
+    .comic-backdrop{
+        position:fixed; inset:0;
+        background:rgba(0,0,0,.55);
+        z-index:9998;
+    }
+
+    /* «Хвіст» бульбашки */
+    .comic-popup::after{
+        content:""; position:absolute; left:84px; bottom:-16px; width:28px; height:28px;
+        background:inherit; border-left:4px solid var(--ink); border-bottom:4px solid var(--ink);
+        transform:rotate(45deg); box-shadow:8px 8px 0 var(--ink); border-bottom-left-radius:8px;
+    }
+
+    /* Декор WOW */
+    .burst{
+        position:absolute; right:-10px; top:-14px; z-index:1;
+        background:var(--accent2); color:#111; border:4px solid var(--ink);
+        box-shadow:6px 6px 0 var(--ink); padding:6px 10px; border-radius:999px;
+        font-family:"Bangers",cursive; font-size:22px; transform:rotate(8deg);
+    }
+
+    .comic-header{display:flex;align-items:flex-start;gap:12px;margin:4px 4px 12px}
+    .comic-title{
+        margin:0; font-family:"Bangers",cursive; font-size:40px; line-height:1;
+        letter-spacing:.5px; text-shadow:2px 2px 0 #fff, 4px 4px 0 var(--ink);
+    }
+    .comic-sub{margin:-4px 0 0 4px;font:600 14px/1.4 Inter,system-ui}
+
+    /* Хрестик (без JS; можеш привʼязати клік пізніше) */
+    .comic-close{
+        margin-left:auto; width:38px;height:38px; display:grid;place-items:center;
+        border:3px solid var(--ink); border-radius:50%; background:#fff; color:#111;
+        box-shadow:4px 4px 0 var(--ink); font-weight:800; font-family:"Bangers",cursive; font-size:18px;
+    }
+
+    /* Форма */
+    .comic-form{margin-top:10px; display:grid; grid-template-columns:1fr 1fr; gap:12px; font-family:Inter,system-ui}
+    .full{grid-column:1 / -1}
+    .field{display:grid; gap:6px}
+    .label{font-weight:800; text-transform:uppercase; letter-spacing:.5px; font-size:12px; display:flex; align-items:center; gap:6px}
+    .tag{border:3px solid var(--ink); background:#fff; padding:2px 8px; border-radius:999px; box-shadow:3px 3px 0 var(--ink); font-weight:800; font-size:11px}
+
+    .input, .textarea{
+        border:3px solid var(--ink); border-radius:14px; background:#fff;
+        padding:12px 14px; font-size:15px; outline:none; box-shadow:4px 4px 0 var(--ink);
+    }
+    .textarea{min-height:120px; resize:vertical}
+
+    .row{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+    .checkbox{
+        display:flex; align-items:center; gap:8px; font-size:13px;
+        border:3px solid var(--ink); border-radius:12px; padding:8px 10px; background:#fff;
+        box-shadow:4px 4px 0 var(--ink);
+    }
+
+    .actions{margin-top:6px; display:flex; gap:12px; align-items:center}
+    .btn{
+        border:3px solid var(--ink); border-radius:14px; padding:12px 16px;
+        box-shadow:4px 4px 0 var(--ink); font-weight:800; text-transform:uppercase; letter-spacing:.5px; cursor:pointer;
+    }
+    .btn.primary{background:var(--accent); color:#fff}
+    .btn.secondary{background:#fff; color:#111}
+
+    /* Адаптив */
+    @media (max-width:640px){
+        .comic-form{grid-template-columns:1fr}
+        .comic-title{font-size:34px}
+    }
+</style>
+
+<!-- ОПЦІЙНИЙ ФОН-ПІДЛОЖКА (можеш видалити, якщо не треба затемнення) -->
+<div class="comic-backdrop"></div>
+
+<!-- САМ ПОПАП (видимий) -->
+<section class="comic-popup" role="dialog" aria-modal="true" aria-labelledby="comic-title" aria-describedby="comic-sub">
+    <span class="burst">WOW!</span>
+
+    <header class="comic-header">
+        <h2 id="comic-title" class="comic-title">Напиши мені 🗯️</h2>
+        <button type="button" class="comic-close" aria-label="Закрити">×</button>
+    </header>
+    <p id="comic-sub" class="comic-sub">Питання, співпраця чи ідея? Заповни форму — відповім максимально швидко.</p>
+
+    <form class="comic-form" action="#" method="post" novalidate>
+        <div class="field">
+            <label class="label" for="c-name"><span class="tag">NAME</span> Ім’я</label>
+            <input class="input" id="c-name" name="name" type="text" placeholder="Твоє ім’я" autocomplete="name" required>
+        </div>
+
+        <div class="field">
+            <label class="label" for="c-email"><span class="tag">MAIL</span> Email</label>
+            <input class="input" id="c-email" name="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+        </div>
+
+        <div class="field full">
+            <label class="label" for="c-msg"><span class="tag">MSG</span> Повідомлення</label>
+            <textarea class="textarea" id="c-msg" name="message" placeholder="Коротко про суть" required></textarea>
+        </div>
+
+        <div class="row full">
+            <label class="checkbox"><input type="checkbox" name="newsletter"> Хочу отримувати оновлення</label>
+            <label class="checkbox"><input type="checkbox" name="telegram_ok"> Можна зв’язатися в Telegram</label>
+        </div>
+
+        <div class="actions full">
+            <button class="btn secondary" type="reset">Очистити</button>
+            <button class="btn primary" type="submit">Надіслати 🚀</button>
+            <span class="label" style="margin-left:auto"><span class="tag">SAFE</span> Дані не зберігаються у демо</span>
+        </div>
+    </form>
+</section>

@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="uk">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width,initial-scale=1"/>
+    <title>FightON</title>
+
+    <!-- Swiper -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+
+    <!-- Шрифти для попапа -->
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;800&display=swap"
+          rel="stylesheet">
+
+    <style>
+        :root {
+            --char-drop: clamp(28px, 5vh, 72px);
+            --cloud-h: 24%;
+            --cloud-rise: 46vh;
+            --header-h: 64px;
+        }
+
+        html, body {
+            margin: 0;
+            background: #0b1020;
+            color: #fff;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+        }
+
+        /* універсальна секція-фон */
+        section {
+            height: calc(100vh - var(--header-h));
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(1100px 520px at 30% 20%, #2a3a80 0%, #0b1020 62%);
+            color: #fff;
+            opacity: .95;
+        }
+
+        section::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(2px 2px at 10% 20%, #fff8 60%, transparent 61%),
+            radial-gradient(2px 2px at 30% 70%, #fff8 60%, transparent 61%),
+            radial-gradient(1.5px 1.5px at 60% 30%, #fff6 60%, transparent 61%),
+            radial-gradient(1.5px 1.5px at 80% 60%, #fff6 60%, transparent 61%);
+            background-repeat: repeat;
+            background-size: 600px 400px;
+            opacity: .18;
+            mix-blend-mode: screen;
+        }
+
+        /* Сцена паралаксу */
+        .stage {
+            position: relative;
+            /*    height: calc(100vh - var(--header-h));*/
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .band {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 100%;
+         /*   width: 300vw;*/
+            width: auto;
+            min-width: 100%;
+            display: flex;
+            align-items: flex-end;
+            will-change: transform;
+        }
+
+        .band::after {
+            content: "";
+            flex: 0 0 12vw;
+        }
+
+        #sky {
+            z-index: 1;
+        }
+
+        #clouds {
+            z-index: 2;
+        }
+
+        #trees {
+            z-index: 3;
+        }
+
+        #chars {
+            z-index: 4;
+        }
+
+        #sky {
+            background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 60%),
+            linear-gradient(180deg, #00E5FF 0%, #22DAFF 30%, #5FE6FF 60%, #C4F7FF 85%, #F2FEFF 100%);
+        }
+
+        #sky::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 8vh;
+            transform: translateX(-50%);
+            width: 70vmin;
+            height: 70vmin;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, #ffffff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
+            filter: blur(18px);
+            opacity: .35;
+            pointer-events: none;
+        }
+
+        .stage::after {
+            content: "";
+            position: absolute;
+            left: -5vw;
+            right: -5vw;
+            bottom: -6vh;
+            height: 22vh;
+            background: radial-gradient(120% 150% at 50% 115%, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, .18) 38%, rgba(0, 0, 0, 0) 72%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        #clouds .cloudImg {
+            height: var(--cloud-h);
+            width: auto;
+            margin: 0 64px var(--cloud-rise);
+            flex: 0 0 auto;
+            opacity: .95;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .10));
+            transform-origin: bottom center;
+            will-change: transform;
+        }
+
+        #clouds .cloudImg.sm {
+            height: calc(var(--cloud-h) - 6%);
+            opacity: .92;
+        }
+
+        #clouds .cloudImg.lg {
+            height: calc(var(--cloud-h) + 6%);
+        }
+
+        #clouds .flip {
+            transform: scaleX(-1);
+        }
+
+        #trees .treeImg {
+            height: 60%;
+            width: auto;
+            margin: 0 48px;
+            flex: 0 0 auto;
+            filter: drop-shadow(0 14px 28px rgba(0, 0, 0, .30));
+            transform-origin: bottom center;
+        }
+
+        #trees .treeImg.xs {
+            height: 25%;
+        }
+
+        #trees .treeImg.sm {
+            height: 48%;
+        }
+
+        #trees .treeImg.lg {
+            height: 72%;
+        }
+
+        #trees .flip {
+            transform: scaleX(-1);
+        }
+
+        .charImg {
+            width: 240px;
+            height: auto;
+            margin: 0 120px 0;
+            transform: translateY(var(--char-drop));
+            filter: drop-shadow(0 12px 34px rgba(0, 0, 0, .35));
+            flex: 0 0 auto;
+        }
+
+        .charImg.sm {
+            width: 200px;
+        }
+
+        .charImg.lg {
+            width: 280px;
+        }
+
+        /*правки (додати більше неба і зафіксувати лого */
+
+        /* трохи «неба» зверху у першій сцені */
+      /*  #stage { --sky-top-space: clamp(40px, 1vh, 180px); }*/
+
+        /* зсуваємо всі паралакс-стрічки сцени #stage вниз на однакову величину */
+        #skyBand     { transform: translateY(var(--sky-top-space)); }
+        #cloudsBand  { transform: translateY(calc(var(--sky-top-space) * 0.6)); }
+        #treesBand   { transform: translateY(calc(var(--sky-top-space) * 0.15)); } /* за бажанням: 0 */
+
+        /* піднімаємо героїв у ПЕРШІЙ сцені (щоб не обрізались) */
+        #stage { --char-drop: clamp(12px, 3vh, 40px); }
+
+        /* логотип у небі (поверх шарів) */
+        .stage-logo{
+            position: absolute;
+            top: calc(var(--header-h) + 8px);
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 6;                /* вище за #chars (z-index:4) і псевдо-тінь сцени (z-index:3) */
+            pointer-events: none;      /* щоб не заважав свайпам/клікам */
+        }
+        .stage-logo img{
+            width: clamp(140px, 32vw, 360px);
+            height: auto;
+            display: block;
+            filter: drop-shadow(0 6px 14px rgba(0,0,0,.25));
+        }
+
+        /* === Fixed Header === */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 10000;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 18px;
+            backdrop-filter: blur(10px);
+            background: linear-gradient(180deg, rgba(10, 14, 30, .72), rgba(10, 14, 30, .46));
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .site-header .logo {
+            font-family: "Bangers", cursive;
+            font-size: 26px;
+            letter-spacing: .6px;
+            color: #fff;
+            text-decoration: none;
+            text-shadow: 2px 2px 0 #111;
+        }
+
+        .main-nav {
+            margin-left: auto;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 10px;
+            color: #e9f2ff;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: .2px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .10);
+            transition: transform .15s ease, background .15s ease, border-color .15s ease;
+        }
+
+        .nav-link:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, .10);
+        }
+
+        .nav-link.active {
+            background: #ffd400;
+            color: #111;
+            border-color: #111;
+            box-shadow: 4px 4px 0 #111;
+        }
+
+        /* щоб контент не залазив під хедер */
+        body {
+            padding-top: 64px;
+        }
+
+        /* щоб якір ставав нижче хедера при нативному scrollIntoView */
+        section, .stage {
+            scroll-margin-top: var(--header-h);
+        }
+
+        @media (max-width: 780px) {
+            .site-header {
+                height: 58px;
+                padding: 0 12px;
+            }
+
+            body {
+                padding-top: 58px;
+            }
+
+            .nav-link {
+                height: 34px;
+                padding: 0 10px;
+                font-size: 14px;
+            }
+        }
+
+        /* === Hamburger button (десктоп: ховаємо) === */
+        .nav-toggle {
+            display: none;
+            margin-left: auto;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .06);
+            border-radius: 10px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-toggle:focus-visible {
+            outline: 2px solid #ffd400;
+            outline-offset: 2px;
+        }
+
+        .nav-toggle-bar {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .nav-toggle-bar::before, .nav-toggle-bar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        .nav-toggle-bar::before {
+            top: -7px;
+        }
+
+        .nav-toggle-bar::after {
+            top: 7px;
+        }
+
+
+        @media (max-width: 780px) {
+            .site-header {
+                height: 58px;
+                padding: 0 12px;
+            }
+
+            body {
+                padding-top: 58px;
+            }
+
+            .nav-link {
+                height: 34px;
+                padding: 0 10px;
+                font-size: 14px;
+            }
+
+            .site-header {
+                height: 58px;
+                padding: 0 12px;
+            }
+
+            body {
+                padding-top: 58px;
+            }
+
+            .nav-link {
+                height: 44px;
+                padding: 0 12px;
+                font-size: 15px;
+            }
+
+            /* показуємо кнопку, а саму навігацію робимо випадаючою */
+            .nav-toggle {
+                display: inline-grid;
+            }
+
+            .main-nav {
+                position: fixed;
+                top: var(--header-h);
+                left: 0;
+                right: 0;
+                display: grid;
+                gap: 8px;
+                padding: 10px;
+                background: linear-gradient(180deg, rgba(10, 14, 30, .92), rgba(10, 14, 30, .82));
+                border: 1px solid rgba(255, 255, 255, .10);
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+                transform-origin: top right;
+                transform: translateY(-8px) scale(.98);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform .18s ease, opacity .18s ease;
+                z-index: 10001;
+            }
+
+            /* відкритий стан — додається клас на <html> */
+            .nav-open .main-nav {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0) scale(1);
+            }
+
+            /* щоб лінки виглядали як пункти списку */
+            .main-nav .nav-link {
+                width: 100%;
+                justify-content: flex-start;
+                box-sizing: border-box;
+            }
+        }
+
+        .nav-open #navToggle .nav-toggle-bar {
+            background: transparent;
+        }
+
+        .nav-open #navToggle .nav-toggle-bar::before {
+            top: 0;
+            transform: rotate(45deg);
+        }
+
+        .nav-open #navToggle .nav-toggle-bar::after {
+            top: 0;
+            transform: rotate(-45deg);
+        }
+
+        /* Ховати хедер при відкритому попапі (тільки мобілка) */
+        @media (max-width:780px){
+            .site-header{
+                transition: transform .22s ease; /* щоб з'їжджав плавно */
+            }
+            html.popup-open .site-header{
+                transform: translateY(-100%);
+            }
+            /* на всякий випадок блокуємо випадаюче меню */
+            html.popup-open .main-nav{
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- === FIXED HEADER === -->
+<header class="site-header" id="siteHeader">
+    <a class="logo" href="#stage">CyberGame</a>
+    <!-- КНОПКА ГАМБУРГЕР ДЛЯ МОБІЛКИ -->
+    <button class="nav-toggle" id="navToggle"
+            aria-label="Відкрити меню"
+            aria-controls="primaryNav"
+            aria-expanded="false">
+        <span class="nav-toggle-bar" aria-hidden="true"></span>
+    </button>
+    <nav class="main-nav" id="primaryNav" aria-label="Main">
+        <a class="nav-link" href="#stage" data-target="#stage">Початок</a>
+        <a class="nav-link" href="#phone" data-target="#phone">Телефон</a>
+        <a class="nav-link" href="#gorilla" data-target="#gorilla">Горіла</a>
+        <a class="nav-link" href="#char-2" data-target="#char-2">Кібер бой</a>
+        <a class="nav-link" href="#billboard" data-target="#billboard">Відео</a>
+        <a class="nav-link" href="#faq" data-target="#faq">FAQ</a>
+    </nav>
+</header>
+
+
+<div class="stage" id="stage">
+    <div class="stage-logo">
+        <img src="./assets/fighton.png" alt="FightTON logo">
+    </div>
+
+    <!-- Небо -->
+    <div class="layer" id="sky">
+        <div class="band" id="skyBand"></div>
+    </div>
+
+    <!-- Хмари -->
+    <div class="layer" id="clouds">
+        <div class="band" id="cloudsBand">
+            <img class="cloudImg sm" src="./assets/clouds.svg" alt="Cloud" style="margin-left:8vw">
+            <img class="cloudImg" src="./assets/clouds.svg" alt="Cloud">
+            <img class="cloudImg lg flip" src="./assets/clouds.svg" alt="Cloud">
+            <img class="cloudImg" src="./assets/clouds.svg" alt="Cloud">
+            <img class="cloudImg sm" src="./assets/clouds.svg" alt="Cloud">
+            <img class="cloudImg lg" src="./assets/clouds.svg" alt="Cloud">
+            <img class="cloudImg flip" src="./assets/clouds.svg" alt="Cloud">
+            <img class="cloudImg" src="./assets/clouds.svg" alt="Cloud" style="margin-right:10vw">
+        </div>
+    </div>
+
+    <!-- Дерева -->
+    <div class="layer" id="trees">
+        <div class="band" id="treesBand">
+            <img class="treeImg sm" src="./assets/tree.svg" alt="Tree" style="margin-left:6vw">
+            <img class="treeImg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg flip" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg sm" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg lg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg flip sm" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg lg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg sm" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg" src="./assets/tree.svg" alt="Tree">
+            <img class="treeImg lg" src="./assets/tree.svg" alt="Tree" style="margin-right:8vw">
+        </div>
+    </div>
+
+    <!-- Персонажі -->
+    <div class="layer" id="chars">
+        <div class="band" id="charsBand">
+            <img class="charImg sm" src="./assets/Gorilla.svg" alt="Hero Gorilla" style="margin-left:6vw">
+            <img class="charImg" src="./assets/character2.svg" alt="Hero 2">
+            <img class="charImg lg" src="./assets/Gorilla.svg" alt="Hero Gorilla">
+            <img class="charImg" src="./assets/character2.svg" alt="Hero 2">
+            <img class="charImg" src="./assets/Gorilla.svg" alt="Hero Gorilla">
+            <img class="charImg sm" src="./assets/character2.svg" alt="Hero 2">
+            <img class="charImg" src="./assets/Gorilla.svg" alt="Hero Gorilla">
+            <img class="charImg lg" src="./assets/character2.svg" alt="Hero 2">
+            <img class="charImg sm" src="./assets/Gorilla.svg" alt="Hero Gorilla">
+            <img class="charImg" src="./assets/character2.svg" alt="Hero 2">
+            <img class="charImg" src="./assets/Gorilla.svg" alt="Hero Gorilla">
+            <img class="charImg lg" src="./assets/character2.svg" alt="Hero 2">
+            <img class="charImg sm" src="./assets/Gorilla.svg" alt="Hero Gorilla">
+            <img class="charImg" src="./assets/character2.svg" alt="Hero 2">
+            <img class="charImg lg" src="./assets/Gorilla.svg" alt="Hero Gorilla" style="margin-right:8vw">
+        </div>
+    </div>
+</div>
+
+<!-- ===== GSAP ===== -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script>
+    gsap.registerPlugin(ScrollTrigger);
+
+    // === довжина сцени: desktop як було, mobile — довше ===
+    function stageScrollEnd(){
+        // десктоп — як було
+        if (!window.matchMedia('(max-width:780px)').matches) return "+=3050";
+
+        // ширина доріжки з персонажами у px (≈ 300vw)
+        const w = window.innerWidth;
+        const charsW = document.getElementById('charsBand')?.scrollWidth || Math.round(w * 3);
+
+        // скільки треба «проїхати», щоб показати ВСЕ: (ширина доріжки - ширина екрана)
+        let fullSpan = Math.max(charsW - w, Math.round(w * 2.4)); // запас якщо scrollWidth не віддався
+        console.log(fullSpan);
+
+        // множимо, щоб швидкість була комфортна і точно доїхали до поштової скриньки
+        return "+=" + Math.round(fullSpan * 1.8); // за потреби підніми 1.6 → 1.8
+    }
+
+
+    // функція: повний зсув для конкретної стрічки (scrollWidth - ширина екрана)
+    const getShift = (sel, k = 1) => {
+        const el = document.querySelector(sel);
+        if (!el) return 0;
+        const full = Math.max(0, el.scrollWidth - window.innerWidth);
+        return -Math.round(full * k);
+    };
+
+    const tl = gsap.timeline({
+        scrollTrigger: {
+            id: "stageParallax",
+            trigger: "#stage",
+            start: "top top",
+            end: () => {
+                // довжина прокрутки: орієнтуємось на ширину стрічки персонажів
+                const el = document.getElementById('charsBand');
+                const full = el ? Math.max(0, el.scrollWidth - window.innerWidth) : window.innerWidth * 2.5;
+                return "+=" + Math.max(2000, Math.round(full * 1.3)); // хочеш довше — постав 1.5–1.8
+            },
+            pin: true,
+            scrub: 1,
+            anticipatePin: 1,
+            invalidateOnRefresh: true
+        }
+    });
+
+    // парралакс: кожен шар їде часткою від свого максимуму
+    tl.to("#skyBand",    { x: () => getShift("#skyBand",    0.25), ease: "none" }, 0)
+        .to("#cloudsBand", { x: () => getShift("#cloudsBand", 0.45), ease: "none" }, 0)
+        .to("#treesBand",  { x: () => getShift("#treesBand",  0.75), ease: "none" }, 0)
+        .to("#charsBand",  { x: () => getShift("#charsBand",  1.00), ease: "none" }, 0);
+
+    // при зміні розміру все перерахувати
+    addEventListener('resize', () => ScrollTrigger.refresh());
+
+
+    // Плавний в’їзд телефону (твоє, як було)
+    gsap.timeline({
+        scrollTrigger: {
+            trigger: '.phone-section',
+            start: 'top 80%',
+            toggleActions: 'play none none reverse'
+        }
+    })
+        .from(['.hand', '.phone-wrap'], {
+            y: 160,
+            opacity: 0,
+            duration: 1.1,
+            ease: 'back.out(1.4)',
+            stagger: 0.12
+        });
+</script>
+<script>
+    // свайп по сцені #stage: ліворуч = скрол вниз (вперед), праворуч = скрол вгору (назад)
+    (function(){
+        if (!window.matchMedia('(max-width:780px)').matches) return;
+
+        const stage = document.getElementById('stage');
+        let x0 = null, y0 = null;
+
+        function headerH(){
+            const h = document.getElementById('siteHeader');
+            return h ? Math.round(h.getBoundingClientRect().height) : 0;
+        }
+
+        function start(e){
+            const t = e.touches && e.touches[0]; if(!t) return;
+            x0 = t.clientX; y0 = t.clientY;
+        }
+        function end(e){
+            if (x0==null) return;
+            const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
+            if(!t){ x0=y0=null; return; }
+
+            const dx = t.clientX - x0;
+            const dy = Math.abs(t.clientY - y0 || 0);
+
+            // жест саме горизонтальний
+            if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2){
+                const ST = ScrollTrigger.getById('stageParallax');
+                const curr = window.scrollY;
+                const step = Math.max(innerHeight*0.45, Math.min(innerHeight*0.9, Math.abs(dx)*8));
+
+                // НОВА логіка: ліворуч (dx < 0) — вниз/вперед, праворуч — вгору/назад
+                const delta = dx < 0 ? step : -step;
+                let target = curr + delta;
+
+                // Якщо просимося «далі за кінець» сцени свайпом ліворуч — переходимо на наступну секцію
+                if (dx < 0 && curr >= (ST.end - 4)) {
+                    gsap.to(window, {
+                        duration: 0.65,
+                        ease: "power2.out",
+                        scrollTo: { y: "#phone", offsetY: headerH() }
+                    });
+                } else {
+                    target = gsap.utils.clamp(ST.start, ST.end, target);
+                    gsap.to(window, { duration:.55, ease:"power2.out", scrollTo: target });
+                }
+            }
+            x0 = y0 = null;
+        }
+
+        stage.addEventListener('touchstart', start, {passive:true});
+        stage.addEventListener('touchend',   end,   {passive:true});
+    })();
+</script>
+<script>
+    // Легке «плавання» хмар
+    (function () {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+        gsap.utils.toArray("#clouds .cloudImg").forEach((el, i) => {
+            // вертикальне похитування
+            gsap.to(el, {
+                y: () => gsap.utils.random(-10, -4),
+                duration: () => gsap.utils.random(3.2, 5.2),
+                ease: "sine.inOut",
+                repeat: -1,
+                yoyo: true,
+                delay: i * 0.18
+            });
+        });
+    })();
+</script>
+
+
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
+<script>
+    gsap.registerPlugin(ScrollToPlugin, ScrollTrigger);
+
+    // додай після registerPlugin(...)
+    gsap.config({nullTargetWarn: false});
+
+    // хелпер — увімкнути active на потрібному пункті
+    function setActiveById(id) {
+        document.querySelectorAll('.nav-link').forEach(a => {
+            const target = a.dataset.target || a.getAttribute('href');
+            a.classList.toggle('active', target === id);
+        });
+    }
+
+    // висота хедера
+    const header = document.getElementById('siteHeader');
+    const headerH = () => Math.round(header.getBoundingClientRect().height);
+
+    // тримаємо CSS-змінну в синхроні
+    function syncHeaderVar() {
+        document.documentElement.style.setProperty('--header-h', headerH() + 'px');
+    }
+
+    syncHeaderVar();
+    addEventListener('resize', () => {
+        syncHeaderVar();
+        ScrollTrigger.refresh();
+    });
+
+    // плавний скрол + миттєве підсвічування
+    document.querySelectorAll('.nav-link').forEach(a => {
+        a.addEventListener('click', (e) => {
+            e.preventDefault();
+            const sel = a.dataset.target || a.getAttribute('href');
+            setActiveById(sel); // підсвітити одразу
+            gsap.to(window, {
+                duration: 0.8,
+                ease: 'power2.out',
+                scrollTo: {y: sel, offsetY: headerH()}
+            });
+        });
+    });
+    document.querySelector('.logo')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        setActiveById('#stage');
+        gsap.to(window, {
+            duration: 0.8,
+            ease: 'power2.out',
+            scrollTo: {y: '#stage', offsetY: headerH()}
+        });
+    });
+
+    // секції для спостереження
+    const sections = ['#stage', '#phone', '#gorilla', '#char-2', '#billboard', '#faq'];
+
+    // головний горизонтальний паралакс — додай anticipatePin, щоб інші тригери не «глючили»
+
+
+    // підсвічування активного пункту у процесі скролу
+    // --- НАЙСТАБІЛЬНІШИЙ СПОСІБ АКТИВУ ---
+    // що впритул під хедером – те активне (незалежно від pin/transform)
+
+    const SECTIONS = ['#stage', '#phone', '#gorilla', '#char-2', '#billboard', '#faq'];
+    let currentActive = null;
+    let rafRunning = false;
+
+    function updateActive() {
+        rafRunning = false;
+        const y = headerH();             // "лінія перевірки" – низ хедера
+        const hysteresis = 10;           // щоб не тремтіло на межі
+
+        let winner = null;
+
+        for (const id of SECTIONS) {
+            const el = document.querySelector(id);
+            if (!el) continue;
+            const r = el.getBoundingClientRect();
+
+            // активна секція: її top <= лінія, а bottom > лінії (з невеликим гістерезисом)
+            if (r.top <= y + hysteresis && r.bottom > y + hysteresis) {
+                winner = id;
+                break;
+            }
+        }
+
+        // Якщо жодна не перекриває лінію (наприклад, інерція скролу),
+        // вибираємо ту, чий top найближчий до лінії знизу/зверху.
+        if (!winner) {
+            let bestDist = Infinity;
+            for (const id of SECTIONS) {
+                const r = document.querySelector(id).getBoundingClientRect();
+                const dist = Math.abs(r.top - y);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    winner = id;
+                }
+            }
+        }
+
+        if (winner && winner !== currentActive) {
+            currentActive = winner;
+            setActiveById(winner);
+        }
+    }
+
+    // тротлимо скрол: рахуємо один раз на кадр
+    function onScroll() {
+        if (!rafRunning) {
+            rafRunning = true;
+            requestAnimationFrame(updateActive);
+        }
+    }
+
+    addEventListener('scroll', onScroll, {passive: true});
+    addEventListener('resize', () => {
+        syncHeaderVar();
+        updateActive();
+    });
+
+    // ініціалізація
+    addEventListener('load', () => {
+        updateActive();
+        ScrollTrigger.refresh(); // залишаємо для GSAP-анімацій
+    });
+
+
+    // стартова ініціалізація під новий підхід
+    addEventListener('load', () => {
+        const hash = window.location.hash;
+        // якщо відкрились одразу з #якорем — доскролимо з відступом під хедер
+        if (hash && document.querySelector(hash)) {
+            gsap.set(window, {scrollTo: {y: hash, offsetY: headerH(), autoKill: false}});
+        }
+        updateActive();          // порахувати й підсвітити актуальний пункт
+        ScrollTrigger.refresh(); // для GSAP-анімацій
+    });
+
+
+</script>
+<script>
+    // === Mobile hamburger ===
+    const navToggle = document.getElementById('navToggle');
+    const primaryNav = document.getElementById('primaryNav');
+
+    function closeNav() {
+        document.documentElement.classList.remove('nav-open');
+        navToggle?.setAttribute('aria-expanded', 'false');
+    }
+
+    function openNav() {
+        document.documentElement.classList.add('nav-open');
+        navToggle?.setAttribute('aria-expanded', 'true');
+    }
+
+    function toggleNav() {
+        if (document.documentElement.classList.contains('nav-open')) closeNav();
+        else openNav();
+    }
+
+    navToggle?.addEventListener('click', toggleNav);
+
+    // закривати після кліку на пункт меню (і зберегти плавний скрол)
+    document.querySelectorAll('.main-nav .nav-link').forEach(a => {
+        a.addEventListener('click', () => closeNav(), {capture: true});
+    });
+
+    // Esc — закрити
+    addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeNav();
+    });
+
+    // при ресайзі на десктоп — прибираємо відкритий стан
+    addEventListener('resize', () => {
+        if (window.matchMedia('(min-width: 781px)').matches) closeNav();
+    });
+</script>
+
+</body>
+</html>
