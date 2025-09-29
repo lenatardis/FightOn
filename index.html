@@ -66,14 +66,32 @@
         #sun{display:grid;place-items:center;}
         .sunImg{
             width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);
-            bottom:40%;opacity:.93;filter:blur(.2px);
+            bottom:36%;opacity:.93;filter:blur(.2px);
         }
 
         /* CLOUDS */
-        #clouds .cloudImg{
-            height:22%;width:auto;margin:0 7vw 42vh;flex:0 0 auto;opacity:.98;
-            filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));
+        /* CLOUDS — 4 штуки, фіксовані позиції у верхній половині сцени */
+        #clouds{ z-index:3; pointer-events:none; }
+        #clouds .cloud{
+            position:absolute;
+            /* хмари сидять у ВЕРХНІЙ половині сцени */
+            top:0; left:0; right:0; bottom:50%;
+            display:grid; place-items:center;
         }
+        #clouds .cloud img{
+            height:24vh; width:auto;
+            filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));
+            will-change:transform,opacity;
+        }
+        #clouds .sm img{ height:18vh; }
+        #clouds .lg img{ height:28vh; }
+
+        /* початкові позиції (як у макеті) */
+        .cloud--lt{ transform: translate( -34vw,  8vh); }  /* ліва верхня */
+        .cloud--rt{ transform: translate(  34vw, 10vh); }  /* права верхня */
+        .cloud--lb{ transform: translate( -26vw, 28vh); }  /* ліва нижня (велика) */
+        .cloud--rb{ transform: translate(  28vw, 30vh); }  /* права нижня (велика) */
+
 
         /* MOUNTAINS / HOUSES — ближче до низу */
         .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));}
@@ -126,13 +144,12 @@
 
     <!-- CLOUDS -->
     <div class="layer" id="clouds">
-        <div class="band" id="cloudsBand">
-            <img class="cloudImg" src="./assets/cloud_left_top.svg" alt="">
-            <img class="cloudImg" src="./assets/cloud_right_top.svg" alt="">
-            <img class="cloudImg" src="./assets/cloud_left_bottom.svg" alt="">
-            <img class="cloudImg" src="./assets/cloud_right_bottom.svg" alt="">
-        </div>
+        <div class="cloud cloud--lt sm"><img src="./assets/cloud_left_top.svg" alt=""></div>
+        <div class="cloud cloud--rt sm"><img src="./assets/cloud_right_top.svg" alt=""></div>
+        <div class="cloud cloud--lb lg"><img src="./assets/cloud_left_bottom.svg" alt=""></div>
+        <div class="cloud cloud--rb lg"><img src="./assets/cloud_right_bottom.svg" alt=""></div>
     </div>
+
 
     <!-- MOUNTAINS -->
     <div class="layer" id="mountains">
@@ -200,6 +217,9 @@
     };
 
     function init(){
+        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth*3;
+        const spacer = document.querySelector('.streetSpacer');
+        if (spacer) spacer.style.width = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5)) + 'px';
         /* коротка фаза неба (18%), далі земля (82%) */
         const tl = gsap.timeline({
             scrollTrigger:{
@@ -218,11 +238,31 @@
         /* ФАЗА 1: НЕБО (швидка) */
         tl.add('skyPhase', 0);
         tl.to('.sunImg', {yPercent:-8, scale:0.97, ease:'none', duration:18}, 'skyPhase');
-        gsap.utils.toArray('#clouds .cloudImg').forEach((c,i)=>{
-            const dir = (i%2===0)?-1:1;
-            tl.to(c, {x: () => dir*(innerWidth*0.45), y:(i%3===0)?-18:6, opacity:0, ease:'power1.inOut', duration:18}, 'skyPhase');
-        });
-        tl.add(()=>gsap.set('#clouds',{display:'none',pointerEvents:'none'}), 'skyPhase+=17.6');
+        // --- ХМАРИ: розлітаються вбоки та зникають у першій чверті скролу ---
+        tl.add('cloudsPhase', 0);
+
+// наскільки розлітатися від початкової позиції (у бік від центру)
+        const cloudPush = () => Math.max(innerWidth * 0.22, 220);
+
+// helper: анімувати конкретну хмару вліво/вправо
+        function flyOut(sel, dir){ // dir: -1 (вліво) / +1 (вправо)
+            tl.to(sel, {
+                x: `+=${dir * cloudPush()}`,
+                y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=10' : '+=6',
+                opacity: 0,
+                ease: 'power1.inOut',
+                duration: 20   // ця “20” — відносна до всього TL; ми групуємо міткою
+            }, 'cloudsPhase');
+        }
+
+// послідовність: верхні трохи швидше, нижні трохи повільніше (легкий екстра-рух)
+        flyOut('.cloud--lt', -1);
+        flyOut('.cloud--rt',  1);
+        flyOut('.cloud--lb', -1);
+        flyOut('.cloud--rb',  1);
+
+// прибрати їх з потоку після фази
+        tl.add(()=> gsap.set('#clouds', {display:'none'}), 'cloudsPhase+=19.6');
 
         /* ФАЗА 2: ЗЕМЛЯ — відразу з ПЕРШИМ персонажем */
         tl.add('groundPhase', '+=0');
