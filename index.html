@@ -7,14 +7,14 @@
 
     <style>
         :root{
-            --char-drop: calc(-6vh);
+            --char-drop: calc(-4vh);
             --header-h: 64px;
         }
         html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
         body{padding-top:var(--header-h);}
         .stage,section{scroll-margin-top:var(--header-h);}
 
-        /* HEADER (мінімально) */
+        /* HEADER */
         .site-header{
             position:fixed;inset:0 0 auto 0;height:var(--header-h);z-index:10000;
             display:flex;align-items:center;gap:16px;padding:0 18px;
@@ -24,20 +24,21 @@
         }
         .logo{color:#fff;text-decoration:none;font-weight:800;}
 
-        /* SCENE */
-        .stage{position:relative;height:200vh;overflow:hidden;}
+        /* SCENE — КОРОТША */
+        .stage{position:relative;height:120vh;overflow:hidden;}
+        @media (max-width:780px){ .stage{height:110vh;} }
+
         .layer{position:absolute;inset:0;pointer-events:none;}
         .band{
             position:absolute;left:0;bottom:0;height:100%;
             width:auto;min-width:100%;
             display:flex;align-items:flex-end;will-change:transform;white-space:nowrap;
         }
-        /* прибираємо «хвости», що давали порожнечі */
-        .band::after{content:"";flex:0 0 0;}
+        .band::after{content:"";flex:0 0 0;} /* без «хвостів»-порожнеч */
 
         /* порядок шарів */
         #sky{z-index:1}
-        #sun{z-index:2}            /* сонце ПІД горами */
+        #sun{z-index:2}        /* сонце під горами */
         #clouds{z-index:3}
         #mountains{z-index:4}
         #houses{z-index:5}
@@ -51,64 +52,64 @@
                     linear-gradient(180deg,#7A8CF1 0%,#6FA2FA 28%,#79C3FF 62%,#CFEFFF 88%,#F6FDFF 100%);
         }
         #sky::before{
-            content:"";position:absolute;left:50%;top:8vh;transform:translateX(-50%);
-            width:70vmin;height:70vmin;border-radius:50%;
+            content:"";position:absolute;left:50%;top:6vh;transform:translateX(-50%);
+            width:64vmin;height:64vmin;border-radius:50%;
             background:radial-gradient(circle at 50% 50%,#fff 0 10%,#fff8 10% 26%,#fff3 26% 42%,transparent 60%);
-            filter:blur(18px);opacity:.28;
+            filter:blur(16px);opacity:.26;
         }
 
         /* логотип */
-        .stage-logo{position:absolute;top:calc(var(--header-h) + 8px);left:50%;transform:translateX(-50%);z-index:9;pointer-events:none;}
-        .stage-logo img{width:clamp(140px,32vw,360px);height:auto;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));}
+        .stage-logo{position:absolute;top:calc(var(--header-h) + 6px);left:50%;transform:translateX(-50%);z-index:9;pointer-events:none;}
+        .stage-logo img{width:clamp(140px,28vw,320px);height:auto;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));}
 
-        /* SUN — нижче, щоб визирало з-за гір */
+        /* SUN — визирає ЗА горами */
         #sun{display:grid;place-items:center;}
         .sunImg{
             width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);
-            bottom:42%;opacity:.93;filter:blur(.2px);
+            bottom:40%;opacity:.93;filter:blur(.2px);
         }
 
-        /* CLOUDS (верх сцени) */
+        /* CLOUDS */
         #clouds .cloudImg{
-            height:24%;width:auto;margin:0 8vw 60vh;flex:0 0 auto;opacity:.98;
+            height:22%;width:auto;margin:0 7vw 42vh;flex:0 0 auto;opacity:.98;
             filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));
         }
 
-        /* MOUNTAINS / HOUSES */
-        .mountainsImg{height:34vh;width:auto;margin:0 8vw 16vh;filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));}
-        .houseImg{height:46vh;width:auto;margin:0 40px 12vh;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
+        /* MOUNTAINS / HOUSES — ближче до низу */
+        .mountainsImg{height:32vh;width:auto;margin:0 7vw 10vh;filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));}
+        .houseImg{height:44vh;width:auto;margin:0 36px 7vh;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
 
-        /* STREET — без дірок (repeat-x) */
+        /* STREET — repeat-x, нижче */
         #street .band{
             background:url("./assets/street.svg") repeat-x left bottom;
-            background-size:auto 28vh;
+            background-size:auto 22vh;
         }
-        .streetSpacer{width:600vw;height:28vh;} /* довгу «дорогу» далі прокрутимо gsap'ом */
+        .streetSpacer{width:600vw;height:22vh;}
 
-        /* CHARS */
+        /* CHARS — видно швидше */
         .charImg{
-            width:240px;height:auto;margin:0 100px 0;
+            width:240px;height:auto;margin:0 90px 0;
             transform:translateY(var(--char-drop));
             filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));flex:0 0 auto;
         }
         .charImg.sm{width:200px}.charImg.lg{width:280px}
 
         @media (max-width:780px){
-            :root{--char-drop:calc(-5vh);}
-            .houseImg{height:42vh;margin-bottom:10vh}
-            #street .band{background-size:auto 26vh}
-            .streetSpacer{height:26vh}
+            :root{--char-drop:calc(-3vh);}
+            .houseImg{height:40vh;margin-bottom:6vh}
+            #street .band{background-size:auto 20vh}
+            .streetSpacer{height:20vh}
         }
 
-        /* невелика тінь «землі» */
+        /* легка «тінь землі» */
         .stage::after{
-            content:"";position:absolute;left:-5vw;right:-5vw;bottom:-6vh;height:22vh;
+            content:"";position:absolute;left:-5vw;right:-5vw;bottom:-6vh;height:18vh;
             background:radial-gradient(120% 150% at 50% 115%,rgba(0,0,0,.35) 0%,rgba(0,0,0,.18) 38%,rgba(0,0,0,0) 72%);
             pointer-events:none;z-index:3;
         }
 
-        /* секція після сцени, щоб зняти pin */
-        .tail{min-height:80vh;display:grid;place-items:center;background:radial-gradient(1100px 520px at 70% 15%,#1d2a66 0%,#0b1020 62%);color:#cfd6ff;}
+        /* хвіст після сцени (щоб зняти pin) */
+        .tail{min-height:70vh;display:grid;place-items:center;background:radial-gradient(1100px 520px at 70% 15%,#1d2a66 0%,#0b1020 62%);color:#cfd6ff;}
     </style>
 </head>
 <body>
@@ -136,15 +137,15 @@
     <!-- MOUNTAINS -->
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
-            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-left:8vw">
-            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-right:8vw">
+            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-left:6vw">
+            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-right:6vw">
         </div>
     </div>
 
     <!-- HOUSES -->
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png" alt="" style="margin-left:6vw">
+            <img class="houseImg" src="./assets/house1.png" alt="" style="margin-left:5vw">
             <img class="houseImg" src="./assets/house2.png" alt="">
             <img class="houseImg" src="./assets/house3.png" alt="">
             <img class="houseImg" src="./assets/house4.png" alt="">
@@ -152,17 +153,17 @@
             <img class="houseImg" src="./assets/house6.png" alt="">
             <img class="houseImg" src="./assets/house7.png" alt="">
             <img class="houseImg" src="./assets/house8.png" alt="">
-            <img class="houseImg" src="./assets/house9.png" alt="" style="margin-right:8vw">
+            <img class="houseImg" src="./assets/house9.png" alt="" style="margin-right:6vw">
         </div>
     </div>
 
-    <!-- STREET (repeat-x фон) -->
+    <!-- STREET -->
     <div class="layer" id="street"><div class="band" id="streetBand"><div class="streetSpacer"></div></div></div>
 
     <!-- CHARS -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg"    src="./assets/Sniper.svg"     alt="" style="margin-left:6vw">
+            <img class="charImg"    src="./assets/Sniper.svg"     alt="" style="margin-left:5vw">
             <img class="charImg"    src="./assets/Gorilla.svg"    alt="">
             <img class="charImg"    src="./assets/Mobster.svg"    alt="">
             <img class="charImg"    src="./assets/Snap.svg"       alt="">
@@ -170,7 +171,7 @@
             <img class="charImg"    src="./assets/Shelldren.svg"  alt="">
             <img class="charImg"    src="./assets/Pistolero.svg"  alt="">
             <img class="charImg"    src="./assets/Machetero.svg"  alt="">
-            <img class="charImg lg" src="./assets/Golfer.svg"     alt="" style="margin-right:8vw">
+            <img class="charImg lg" src="./assets/Golfer.svg"     alt="" style="margin-right:6vw">
         </div>
     </div>
 </div>
@@ -185,22 +186,21 @@
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
     gsap.config({nullTargetWarn:false});
 
-    /* чекаємо поки всі картинки сцени завантажаться */
-    function whenStageImagesReady(){
+    /* дочекаймося картинок у сцені */
+    function waitStageImgs(){
         const imgs = Array.from(document.querySelectorAll('#stage img'));
-        return Promise.all(imgs.map(img => img.complete ? Promise.resolve()
-            : new Promise(res => img.addEventListener('load', res, {once:true}))));
+        return Promise.all(imgs.map(img => img.complete ? 1 : new Promise(r=>img.addEventListener('load',r,{once:true}))));
     }
 
-    function bandShift(sel, k=1){
+    const bandShift = (sel,k=1)=>{
         const el = document.querySelector(sel);
-        if (!el) return 0;
-        const width = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
-        return -Math.max(0, width - innerWidth) * k;
-    }
+        if(!el) return 0;
+        const w = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
+        return -Math.max(0, w - innerWidth) * k;
+    };
 
-    function initParallax(){
-        /* двофазний таймлайн: 35% — небо/хмари, 65% — земля */
+    function init(){
+        /* коротка фаза неба (18%), далі земля (82%) */
         const tl = gsap.timeline({
             scrollTrigger:{
                 id:"stageParallax",
@@ -208,31 +208,25 @@
                 start:"top top",
                 end: () => {
                     const el = document.getElementById('charsBand');
-                    const w = el ? Math.max(el.scrollWidth, el.getBoundingClientRect().width) : innerWidth*3;
-                    return "+=" + Math.max(2400, Math.round((w - innerWidth) * 1.35));
+                    const w  = el ? Math.max(el.scrollWidth, el.getBoundingClientRect().width) : innerWidth*3;
+                    return "+=" + Math.max(1600, Math.round((w - innerWidth) * 1.15));
                 },
                 pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
             }
         });
 
-        /* --- ФАЗА 1: НЕБО (0 → 35) --- */
+        /* ФАЗА 1: НЕБО (швидка) */
         tl.add('skyPhase', 0);
-
-        // легкий рух сонця, але воно за горами
-        tl.to('.sunImg', {yPercent:-10, scale:0.96, ease:'none', duration:35}, 'skyPhase');
-
-        // хмари розʼїжджаються і ЗНИКАЮТЬ
-        const clouds = gsap.utils.toArray('#clouds .cloudImg');
-        clouds.forEach((c,i)=>{
+        tl.to('.sunImg', {yPercent:-8, scale:0.97, ease:'none', duration:18}, 'skyPhase');
+        gsap.utils.toArray('#clouds .cloudImg').forEach((c,i)=>{
             const dir = (i%2===0)?-1:1;
-            tl.to(c, {x: () => dir*(innerWidth*0.45), y:(i%3===0)?-20:8, opacity:0, ease:'power1.inOut', duration:35}, 'skyPhase');
+            tl.to(c, {x: () => dir*(innerWidth*0.45), y:(i%3===0)?-18:6, opacity:0, ease:'power1.inOut', duration:18}, 'skyPhase');
         });
-        tl.add(()=>gsap.set('#clouds',{display:'none',pointerEvents:'none'}), 'skyPhase+=34.5'); // повністю прибрали
+        tl.add(()=>gsap.set('#clouds',{display:'none',pointerEvents:'none'}), 'skyPhase+=17.6');
 
-        /* --- ФАЗА 2: ЗЕМЛЯ (35 → 100) --- */
-        tl.add('groundPhase', '+=0'); // позиція — після 1-ї фази
-        const groundDur = 65;
-
+        /* ФАЗА 2: ЗЕМЛЯ — відразу з ПЕРШИМ персонажем */
+        tl.add('groundPhase', '+=0');
+        const groundDur = 82;
         tl.to('#mountainsBand', {x: () => bandShift('#mountainsBand', .28), ease:'none', duration:groundDur}, 'groundPhase')
             .to('#housesBand',    {x: () => bandShift('#housesBand',    .72), ease:'none', duration:groundDur}, 'groundPhase')
             .to('#streetBand',    {x: () => bandShift('#streetBand',    .90), ease:'none', duration:groundDur}, 'groundPhase')
@@ -241,12 +235,8 @@
         addEventListener('resize', () => ScrollTrigger.refresh());
     }
 
-    whenStageImagesReady().then(()=>{
-        initParallax();
-        ScrollTrigger.refresh();
-    });
-
-    addEventListener('load', () => setTimeout(()=>ScrollTrigger.refresh(),0));
+    waitStageImgs().then(()=>{ init(); ScrollTrigger.refresh(); });
+    addEventListener('load', ()=>setTimeout(()=>ScrollTrigger.refresh(),0));
 </script>
 </body>
 </html>
