@@ -41,8 +41,8 @@
         #sun{z-index:2}        /* сонце під горами */
         #clouds{z-index:3}
         #mountains{z-index:4}
-        #houses{z-index:5}
-        #street{z-index:6}
+        #houses{z-index:6}
+        #street{z-index:5}
         #chars{z-index:7}
 
         /* SKY */
@@ -76,7 +76,7 @@
         }
 
         /* MOUNTAINS / HOUSES — ближче до низу */
-        .mountainsImg{height:32vh;width:auto;margin:0 7vw 10vh;filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));}
+        .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));}
         .houseImg{height:44vh;width:auto;margin:0 36px 7vh;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
 
         /* STREET — repeat-x, нижче */
@@ -137,8 +137,8 @@
     <!-- MOUNTAINS -->
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
-            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-left:6vw">
-            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-right:6vw">
+            <img class="mountainsImg" src="./assets/mountains.svg" alt="">
+            <img class="mountainsImg" src="./assets/mountains.svg" alt="">
         </div>
     </div>
 
@@ -171,7 +171,7 @@
             <img class="charImg"    src="./assets/Shelldren.svg"  alt="">
             <img class="charImg"    src="./assets/Pistolero.svg"  alt="">
             <img class="charImg"    src="./assets/Machetero.svg"  alt="">
-            <img class="charImg lg" src="./assets/Golfer.svg"     alt="" style="margin-right:6vw">
+            <img class="charImg" src="./assets/Golfer.svg"     alt="" style="margin-right:6vw">
         </div>
     </div>
 </div>
