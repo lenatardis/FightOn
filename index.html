@@ -3,25 +3,18 @@
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <title>FightON — перший екран</title>
-
-    <!-- GSAP -->
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
+    <title>FightON</title>
 
     <style>
         :root{
-            /* персонажі трохи підняті — рівно на край дороги */
             --char-drop: calc(-6vh);
             --header-h: 64px;
         }
-
         html,body{ margin:0; background:#0b1020; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; }
         body{ padding-top:var(--header-h); }
-        .stage, section{ scroll-margin-top: var(--header-h); }
+        .stage,section{ scroll-margin-top: var(--header-h); }
 
-        /* ===== Header ===== */
+        /* HEADER */
         .site-header{
             position:fixed; inset:0 0 auto 0; height:var(--header-h); z-index:10000;
             display:flex; align-items:center; gap:16px; padding:0 18px;
@@ -29,29 +22,30 @@
             background:linear-gradient(180deg, rgba(10,14,30,.72), rgba(10,14,30,.46));
             border-bottom:1px solid rgba(255,255,255,.08);
         }
-        .logo-link{ font-family: system-ui; font-weight:800; color:#fff; text-decoration:none; }
+        .logo{ color:#fff; text-decoration:none; font-weight:800; }
 
-        /* ===== Сцена (≈200vh: верх — небо/хмари/сонце; низ — земля) ===== */
-        .stage{
-            position:relative;
-            height:200vh;
-            overflow:hidden;
-        }
+        /* SCENE */
+        .stage{ position:relative; height:200vh; overflow:hidden; }
         .layer{ position:absolute; inset:0; pointer-events:none; }
         .band{
             position:absolute; left:0; bottom:0; height:100%;
             width:auto; min-width:100%;
-            display:flex; align-items:flex-end;
-            will-change:transform;
-            white-space:nowrap; /* не давати переносити елементи в деяких браузерах */
+            display:flex; align-items:flex-end; will-change:transform;
+            white-space:nowrap;
         }
-        .band::after{ content:""; flex:0 0 12vw; }
+        /* прибрав хвости, які давали порожнечі */
+        .band::after{ content:""; flex:0 0 0; }
 
-        /* порядок шарів */
-        #sky{z-index:1;} #sun{z-index:2;} #clouds{z-index:3;}
-        #mountains{z-index:4;} #houses{z-index:5;} #street{z-index:6;} #chars{z-index:7;}
+        /* stacking order */
+        #sky{z-index:1}
+        #clouds{z-index:3}
+        #mountains{z-index:4}
+        #houses{z-index:5}
+        #street{z-index:6}
+        #chars{z-index:7}
+        #sun{z-index:8} /* ← сонце над горами/будинками */
 
-        /* Небо + «аура» */
+        /* SKY */
         #sky{
             background:
                     radial-gradient(900px 520px at 65% 10%, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 60%),
@@ -63,245 +57,182 @@
             background:radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
             filter:blur(18px); opacity:.35;
         }
-        /* тінь землі */
+
+        /* ground shadow */
         .stage::after{
             content:""; position:absolute; left:-5vw; right:-5vw; bottom:-6vh; height:22vh;
             background: radial-gradient(120% 150% at 50% 115%, rgba(0,0,0,.35) 0%, rgba(0,0,0,.18) 38%, rgba(0,0,0,0) 72%);
             pointer-events:none; z-index:3;
         }
 
-        /* Логотип у небі */
-        .stage-logo{
-            position:absolute; top:calc(var(--header-h) + 8px); left:50%; transform:translateX(-50%);
-            z-index:9; pointer-events:none;
-        }
-        .stage-logo img{
-            width:clamp(140px, 32vw, 360px);
-            height:auto; display:block;
-            filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));
-        }
+        /* LOGO */
+        .stage-logo{ position:absolute; top:calc(var(--header-h) + 8px); left:50%; transform:translateX(-50%); z-index:9; pointer-events:none; }
+        .stage-logo img{ width:clamp(140px,32vw,360px); height:auto; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.25)); }
 
-        /* Сонце */
+        /* SUN */
         #sun{ display:grid; place-items:center; }
-        .sunImg{
-            width:min(22vmax,420px); height:auto; position:absolute; left:50%; transform:translateX(-50%);
-            bottom:48%; filter:blur(.2px); opacity:.9;
-        }
+        .sunImg{ width:min(22vmax,420px); height:auto; position:absolute; left:50%; transform:translateX(-50%); bottom:60%; filter:blur(.2px); opacity:.9; }
 
-        /* Хмари — видимі у верхній половині сцени */
-        #clouds .cloudImg{
-            height:24%; width:auto; margin:0 8vw 60vh;
-            flex:0 0 auto; opacity:.98;
-            filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));
-            will-change:transform,opacity;
-        }
+        /* CLOUDS */
+        #clouds .cloudImg{ height:24%; width:auto; margin:0 8vw 60vh; flex:0 0 auto; opacity:.98; filter:drop-shadow(0 6px 14px rgba(0,0,0,.12)); }
 
-        /* Гори / будинки / вулиця */
+        /* MOUNTAINS / HOUSES */
         .mountainsImg{ height:34vh; width:auto; margin:0 8vw 16vh; filter:drop-shadow(0 10px 24px rgba(0,0,0,.25)); }
-        .houseImg{     height:46vh; width:auto; margin:0 40px 12vh; filter:drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
-        .streetImg{    height:28vh; width:auto; margin:0; }
+        .houseImg{ height:46vh; width:auto; margin:0 40px 12vh; filter:drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
 
-        /* Персонажі */
+        /* STREET — робимо фон, який повторюється по X (без img) */
+        #street .band{
+            background: url("./assets/street.svg") repeat-x left bottom;
+            background-size: auto 28vh;  /* висота дороги */
+        }
+        .streetSpacer{ width: 500vw; height:28vh; } /* даємо стартову ширину; далі GSAP тягне скільки треба */
+
+        /* CHARS */
         .charImg{
             width:240px; height:auto; margin:0 100px 0;
             transform:translateY(var(--char-drop));
             filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
             flex:0 0 auto;
         }
-        .charImg.sm{ width:200px; }
-        .charImg.lg{ width:280px; }
-
-        /* Після сцени — простий блок, щоб відпінитись */
-        .tail{
-            min-height:80vh; display:grid; place-items:center;
-            background:radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%);
-            color:#cfd6ff; padding:40px 16px;
-        }
+        .charImg.sm{ width:200px; } .charImg.lg{ width:280px; }
 
         @media (max-width:780px){
             :root{ --char-drop: calc(-5vh); }
-            .houseImg{ height:42vh; margin-bottom:10vh; }
-            .streetImg{ height:26vh; }
         }
+
+        /* tail content just to unpin */
+        .tail{ min-height:80vh; display:grid; place-items:center; background:radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%); color:#cfd6ff; }
     </style>
 </head>
 <body>
-
-<header class="site-header" id="siteHeader">
-    <a class="logo-link" href="#stage">CyberGame</a>
-</header>
+<header class="site-header"><a class="logo" href="#stage">CyberGame</a></header>
 
 <div class="stage" id="stage">
-    <!-- ЛОГО над небом -->
-    <div class="stage-logo">
-        <img src="./assets/fighton.png" alt="FightTON logo">
-    </div>
+    <div class="stage-logo"><img src="./assets/fighton.png" alt="FightTON logo"></div>
 
-    <!-- НЕБО -->
+    <!-- SKY -->
     <div class="layer" id="sky"><div class="band" id="skyBand"></div></div>
 
-    <!-- СОНЦЕ -->
-    <div class="layer" id="sun">
-        <img class="sunImg" src="./assets/sun.svg" alt="Sun">
-    </div>
+    <!-- SUN -->
+    <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
 
-    <!-- ХМАРИ -->
+    <!-- CLOUDS -->
     <div class="layer" id="clouds">
         <div class="band" id="cloudsBand">
-            <img class="cloudImg" src="./assets/cloud_left_top.svg"    alt="Cloud">
-            <img class="cloudImg" src="./assets/cloud_right_top.svg"   alt="Cloud">
-            <img class="cloudImg" src="./assets/cloud_left_bottom.svg" alt="Cloud">
-            <img class="cloudImg" src="./assets/cloud_right_bottom.svg"alt="Cloud">
+            <img class="cloudImg" src="./assets/cloud_left_top.svg" alt="">
+            <img class="cloudImg" src="./assets/cloud_right_top.svg" alt="">
+            <img class="cloudImg" src="./assets/cloud_left_bottom.svg" alt="">
+            <img class="cloudImg" src="./assets/cloud_right_bottom.svg" alt="">
         </div>
     </div>
 
-    <!-- ГОРИ -->
+    <!-- MOUNTAINS -->
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
-            <img class="mountainsImg" src="./assets/mountains.svg" alt="Mountains" style="margin-left:8vw">
-            <img class="mountainsImg" src="./assets/mountains.svg" alt="Mountains" style="margin-right:8vw">
+            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-left:8vw">
+            <img class="mountainsImg" src="./assets/mountains.svg" alt="" style="margin-right:8vw">
         </div>
     </div>
 
-    <!-- БУДИНКИ -->
+    <!-- HOUSES -->
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png" alt="House 1" style="margin-left:6vw">
-            <img class="houseImg" src="./assets/house2.png" alt="House 2">
-            <img class="houseImg" src="./assets/house3.png" alt="House 3">
-            <img class="houseImg" src="./assets/house4.png" alt="House 4">
-            <img class="houseImg" src="./assets/house5.png" alt="House 5">
-            <img class="houseImg" src="./assets/house6.png" alt="House 6">
-            <img class="houseImg" src="./assets/house7.png" alt="House 7">
-            <img class="houseImg" src="./assets/house8.png" alt="House 8">
-            <img class="houseImg" src="./assets/house9.png" alt="House 9" style="margin-right:8vw">
+            <img class="houseImg" src="./assets/house1.png" alt="" style="margin-left:6vw">
+            <img class="houseImg" src="./assets/house2.png" alt="">
+            <img class="houseImg" src="./assets/house3.png" alt="">
+            <img class="houseImg" src="./assets/house4.png" alt="">
+            <img class="houseImg" src="./assets/house5.png" alt="">
+            <img class="houseImg" src="./assets/house6.png" alt="">
+            <img class="houseImg" src="./assets/house7.png" alt="">
+            <img class="houseImg" src="./assets/house8.png" alt="">
+            <img class="houseImg" src="./assets/house9.png" alt="" style="margin-right:8vw">
         </div>
     </div>
 
-    <!-- ВУЛИЦЯ -->
-    <div class="layer" id="street">
-        <div class="band" id="streetBand">
-            <img class="streetImg" src="./assets/street.svg" alt="Street" style="margin-left:6vw">
-            <img class="streetImg" src="./assets/street.svg" alt="Street" style="margin-right:8vw">
-        </div>
-    </div>
+    <!-- STREET (фон, що повторюється) -->
+    <div class="layer" id="street"><div class="band" id="streetBand"><div class="streetSpacer"></div></div></div>
 
-    <!-- ПЕРСОНАЖІ -->
+    <!-- CHARS -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper"    style="margin-left:6vw">
-            <img class="charImg"    src="./assets/Gorilla.svg"    alt="Gorilla">
-            <img class="charImg"    src="./assets/Mobster.svg"    alt="Mobster">
-            <img class="charImg"    src="./assets/Snap.svg"       alt="Snap">
-            <img class="charImg"    src="./assets/Cuadrilla.svg"  alt="Cuadrilla">
-            <img class="charImg"    src="./assets/Shelldren.svg"  alt="Shelldren">
-            <img class="charImg"    src="./assets/Pistolero.svg"  alt="Pistolero">
-            <img class="charImg"    src="./assets/Machetero.svg"  alt="Machetero">
-            <img class="charImg lg" src="./assets/Golfer.svg"     alt="Golfer"    style="margin-right:8vw">
+            <img class="charImg"    src="./assets/Sniper.svg"     alt="" style="margin-left:6vw">
+            <img class="charImg"    src="./assets/Gorilla.svg"    alt="">
+            <img class="charImg"    src="./assets/Mobster.svg"    alt="">
+            <img class="charImg"    src="./assets/Snap.svg"       alt="">
+            <img class="charImg"    src="./assets/Cuadrilla.svg"  alt="">
+            <img class="charImg"    src="./assets/Shelldren.svg"  alt="">
+            <img class="charImg"    src="./assets/Pistolero.svg"  alt="">
+            <img class="charImg"    src="./assets/Machetero.svg"  alt="">
+            <img class="charImg lg" src="./assets/Golfer.svg"     alt="" style="margin-right:8vw">
         </div>
     </div>
 </div>
 
-<!-- простий блок після сцени -->
-<section class="tail">
-    <h2 style="margin:0;font:800 clamp(24px,4vw,44px)/1.1 system-ui">Далі контент сторінки</h2>
-    <p style="max-width:720px;text-align:center">Цей блок лише для того, щоб сцена могла відпінитись. Можеш прибрати/замінити на реальні секції.</p>
-</section>
+<section class="tail"><h2>Далі контент</h2></section>
 
+<!-- GSAP -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
 <script>
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
     gsap.config({ nullTargetWarn:false });
 
-    /* Надійне обчислення повного зміщення (ширина доріжки − ширина екрана) */
-    const getShift = (sel, k = 1) => {
+    /* дочекатись ВСІХ картинок у сцені — тоді ініт */
+    function whenStageImagesReady(){
+        const imgs = Array.from(document.querySelectorAll('#stage img'));
+        return Promise.all(imgs.map(img => img.complete ? Promise.resolve()
+            : new Promise(res => img.addEventListener('load', res, {once:true}))));
+    }
+
+    function getShift(sel, k=1){
         const el = document.querySelector(sel);
         if (!el) return 0;
         const width = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
-        const full  = Math.max(0, width - window.innerWidth);
+        const full  = Math.max(0, width - innerWidth);
         return -Math.round(full * k);
-    };
+    }
 
-    /* Pinned-таймлайн головного паралаксу */
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            id: "stageParallax",
-            trigger: "#stage",
-            start: "top top",
-            end: () => {
-                const el = document.getElementById('charsBand');
-                const width = el ? Math.max(el.scrollWidth, el.getBoundingClientRect().width) : window.innerWidth * 2.2;
-                return "+=" + Math.max(2200, Math.round((width - window.innerWidth) * 1.35));
-            },
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true
-        }
-    });
-
-    /* Паралакс шарів: задні повільні, передні швидкі */
-    tl.to("#mountainsBand", { x: () => getShift("#mountainsBand", 0.28), ease:"none" }, 0)
-        .to("#housesBand",    { x: () => getShift("#housesBand",    0.72), ease:"none" }, 0)
-        .to("#streetBand",    { x: () => getShift("#streetBand",    0.90), ease:"none" }, 0)
-        .to("#charsBand",     { x: () => getShift("#charsBand",     1.00), ease:"none" }, 0)
-        .to(".sunImg",        { yPercent:-10, scale:0.96, ease:"none" }, 0);
-
-    /* Хмари: роз’їзд і ПОВНЕ зникнення */
-    const clouds = gsap.utils.toArray("#clouds .cloudImg");
-    clouds.forEach((c, i) => {
-        const dir = (i % 2 === 0) ? -1 : 1; // ліві вліво, праві вправо
-        tl.to(c, {
-            x: () => dir * (window.innerWidth * 0.45),
-            y: (i % 3 === 0) ? -20 : 8,
-            opacity: 0,              // ← повністю зникають
-            ease: "power1.inOut"
-        }, 0);
-    });
-    // коли "хмари пішли" — вимикаємо їм pointer-events (про всяк)
-    tl.addLabel("cloudsGone", tl.duration() * 0.32)
-        .add(() => gsap.set("#clouds", { pointerEvents:"none" }), "cloudsGone");
-
-    /* Легке «плавання» хмар (поки вони не зникли) */
-    (function(){
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        gsap.utils.toArray("#clouds .cloudImg").forEach((el, i) => {
-            gsap.to(el, {
-                y: () => gsap.utils.random(-10, -4),
-                duration: () => gsap.utils.random(3.2, 5.2),
-                ease: "sine.inOut",
-                repeat: -1,
-                yoyo: true,
-                delay: i * 0.18
-            });
-        });
-    })();
-
-    /* Рефреш після завантаження всіх зображень */
-    window.addEventListener('load', () => ScrollTrigger.refresh());
-
-    /* (Необов’язково) свайп на мобілці: ліворуч — вперед, праворуч — назад */
-    (function(){
-        if (!window.matchMedia('(max-width:780px)').matches) return;
-        const stage = document.getElementById('stage');
-        let x0 = null, y0 = null;
-        function start(e){ const t=e.touches&&e.touches[0]; if(!t) return; x0=t.clientX; y0=t.clientY; }
-        function end(e){
-            if (x0==null) return;
-            const t=(e.changedTouches&&e.changedTouches[0])||e.touches?.[0]; if(!t){ x0=y0=null; return; }
-            const dx=t.clientX-x0, dy=Math.abs((t.clientY-y0)||0);
-            if (Math.abs(dx)>40 && Math.abs(dx)>dy*1.2){
-                const ST=ScrollTrigger.getById('stageParallax'); const curr=window.scrollY;
-                const step=Math.max(innerHeight*0.45, Math.min(innerHeight*0.9, Math.abs(dx)*8));
-                const delta = dx<0 ? step : -step;
-                let target = curr + delta;
-                target = gsap.utils.clamp(ST.start, ST.end, target);
-                gsap.to(window, { duration:.55, ease:"power2.out", scrollTo: target });
+    function initParallax(){
+        const tl = gsap.timeline({
+            scrollTrigger:{
+                id:"stageParallax",
+                trigger:"#stage",
+                start:"top top",
+                end: () => {
+                    const el = document.getElementById('charsBand');
+                    const width = el ? Math.max(el.scrollWidth, el.getBoundingClientRect().width) : innerWidth * 3;
+                    return "+=" + Math.max(2400, Math.round((width - innerWidth) * 1.35));
+                },
+                pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
             }
-            x0=y0=null;
-        }
-        stage.addEventListener('touchstart', start, {passive:true});
-        stage.addEventListener('touchend',   end,   {passive:true});
-    })();
+        });
+
+        tl.to("#mountainsBand", { x:() => getShift("#mountainsBand", .28), ease:"none" }, 0)
+            .to("#housesBand",    { x:() => getShift("#housesBand",    .72), ease:"none" }, 0)
+            .to("#streetBand",    { x:() => getShift("#streetBand",    .90), ease:"none" }, 0)
+            .to("#charsBand",     { x:() => getShift("#charsBand",     1.00), ease:"none" }, 0)
+            .to(".sunImg",        { yPercent:-10, scale:.96, ease:"none" }, 0);
+
+        /* Хмари — роз’їхались і ПОВНІСТЮ зникли */
+        const clouds = gsap.utils.toArray("#clouds .cloudImg");
+        clouds.forEach((c, i) => {
+            const dir = (i % 2 === 0) ? -1 : 1;
+            tl.to(c, { x:() => dir * (innerWidth * 0.45), y:(i%3===0)?-20:8, opacity:0, ease:"power1.inOut" }, 0);
+        });
+        tl.add(() => gsap.set("#clouds", { pointerEvents:"none" }), tl.duration() * 0.32);
+
+        addEventListener('resize', () => ScrollTrigger.refresh());
+    }
+
+    // запуск строго після завантаження картинок
+    whenStageImagesReady().then(() => {
+        initParallax();
+        ScrollTrigger.refresh();
+    });
+
+    // підстрахуємось на випадок повільних iframes тощо
+    addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 0));
 </script>
 </body>
 </html>
