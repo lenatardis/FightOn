@@ -5,188 +5,156 @@
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>FightON</title>
 
-    <!-- Swiper (як і було) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-
-    <!-- Шрифти для попапа -->
     <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 
     <style>
         :root{
-            /* негативний drop — підіймаємо персонажів на верхню кромку асфальту */
-            --char-drop: calc(-6vh);
-            --cloud-h: 24%;
-            --cloud-rise: 46vh;
+            /* підняти персонажів на верхню кромку асфальту */
+            --char-drop: -5.5vh;
             --header-h: 64px;
         }
 
-        html,body{ margin:0; background:#0b1020; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; }
-        body{ padding-top:64px; }
-        section,.stage{ scroll-margin-top: var(--header-h); }
+        /* базове */
+        html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+        body{padding-top:64px}
+        section,.stage{scroll-margin-top:var(--header-h)}
 
-        /* СЦЕНА ~200vh: верх — небо з хмарами, низ — земля з горами/будинками/вулицею/персонажами */
-        .stage{
-            position:relative;
-            height:200vh;
-            overflow:hidden;
-        }
-        .layer{ position:absolute; inset:0; pointer-events:none; }
+        /* Сцена ~200vh */
+        .stage{position:relative;height:200vh;overflow:hidden}
+        .layer{position:absolute;inset:0;pointer-events:none}
         .band{
-            position:absolute; left:0; bottom:0; height:100%;
-            width:auto; min-width:100%;
-            display:flex; align-items:flex-end; will-change:transform;
-            white-space: nowrap; /* щоб у деяких браузерах не ламався ряд */
+            position:absolute;left:0;bottom:0;height:100%;
+            display:flex;align-items:flex-end;gap:0;
+            width:max-content; /* ключ! дозволяє ширині дорівнятись контенту */
+            will-change:transform;
+            white-space:nowrap;
         }
-        .band::after{ content:""; flex:0 0 12vw; }
+        .band::after{content:"";flex:0 0 10vw}
 
         /* порядок шарів */
-        #sky       { z-index:1; }
-        #sun       { z-index:2; }
-        #clouds    { z-index:3; }
-        #mountains { z-index:4; }
-        #houses    { z-index:5; }
-        #street    { z-index:6; }
-        #chars     { z-index:7; }
+        #sky{z-index:1} #sun{z-index:2} #clouds{z-index:3}
+        #mountains{z-index:4} #houses{z-index:5} #street{z-index:6} #chars{z-index:7}
 
-        /* НЕБО */
+        /* Небо */
         #sky{
             background:
                     radial-gradient(900px 520px at 65% 10%, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 60%),
-                    linear-gradient(180deg, #00E5FF 0%, #22DAFF 30%, #5FE6FF 60%, #C4F7FF 85%, #F2FEFF 100%);
+                    linear-gradient(180deg,#00E5FF 0%,#22DAFF 30%,#5FE6FF 60%,#C4F7FF 85%,#F2FEFF 100%);
         }
         #sky::before{
-            content:""; position:absolute; left:50%; top:8vh; transform:translateX(-50%);
-            width:70vmin; height:70vmin; border-radius:50%;
-            background:radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
-            filter:blur(18px); opacity:.35; pointer-events:none;
+            content:"";position:absolute;left:50%;top:8vh;transform:translateX(-50%);
+            width:70vmin;height:70vmin;border-radius:50%;
+            background:radial-gradient(circle at 50% 50%,#fff 0 10%,#fff8 10% 26%,#fff3 26% 42%,transparent 60%);
+            filter:blur(18px);opacity:.35
         }
-
-        /* псевдо-тінь землі */
+        /* тінь землі */
         .stage::after{
-            content:""; position:absolute; left:-5vw; right:-5vw; bottom:-6vh; height:22vh;
-            background: radial-gradient(120% 150% at 50% 115%, rgba(0,0,0,.35) 0%, rgba(0,0,0,.18) 38%, rgba(0,0,0,0) 72%);
-            pointer-events:none; z-index:3;
+            content:"";position:absolute;left:-5vw;right:-5vw;bottom:-6vh;height:22vh;
+            background:radial-gradient(120% 150% at 50% 115%,rgba(0,0,0,.35) 0%,rgba(0,0,0,.18) 38%,rgba(0,0,0,0) 72%);
+            z-index:3;pointer-events:none
         }
 
-        /* ЛОГО поверх сцен */
-        .stage-logo{
-            position:absolute; top:calc(var(--header-h) + 8px); left:50%; transform:translateX(-50%);
-            z-index:9; pointer-events:none;
-        }
-        .stage-logo img{
-            width:clamp(140px,32vw,360px); height:auto; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));
-        }
+        /* Лого поверх усього */
+        .stage-logo{position:absolute;top:calc(var(--header-h) + 8px);left:50%;transform:translateX(-50%);z-index:9;pointer-events:none}
+        .stage-logo img{width:clamp(140px,32vw,360px);height:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25))}
 
-        /* СОНЦЕ — трішки вище, щоб не «влазило» під будинки на деяких екранах */
-        #sun{ display:grid; place-items:center; }
+        /* Сонце — трохи нижче й позаду гір */
+        #sun{display:grid;place-items:center}
         .sunImg{
-            width:min(22vmax,420px); height:auto; position:absolute; left:50%; transform:translateX(-50%);
-            bottom:48%; filter:blur(.2px); opacity:.9;
+            width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);
+            bottom:39%; /* було занадто високо */
+            filter:blur(.25px);opacity:.92
         }
 
-        /* ХМАРИ (видні лише у верхній половині сцени) */
+        /* Хмари — видно у верхній половині сцени */
         #clouds .cloudImg{
-            height:var(--cloud-h); width:auto; margin:0 8vw 60vh;
-            flex:0 0 auto; opacity:.98; filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));
-            will-change:transform,opacity;
+            height:24vh;width:auto;margin:0 8vw 58vh;opacity:.98;
+            filter:drop-shadow(0 6px 14px rgba(0,0,0,.12))
         }
 
-        /* ГОРИ — позаду будинків */
+        /* Гори (позаду будинків) */
         .mountainsImg{
-            height:34vh; width:auto; margin:0 8vw 16vh; flex:0 0 auto;
-            filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));
+            height:32vh;width:auto;margin:0 8vw 14vh;
+            filter:drop-shadow(0 10px 24px rgba(0,0,0,.25))
         }
 
-        /* БУДИНКИ — реалістична висота */
+        /* Будинки (реальна висота) */
         .houseImg{
-            height:46vh; width:auto; margin:0 40px 12vh; flex:0 0 auto;
-            filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));
+            height:44vh;width:auto;margin:0 40px 11vh;
+            filter:drop-shadow(0 10px 26px rgba(0,0,0,.28))
         }
 
-        /* ВУЛИЦЯ (асфальт + верхня біла кромка у самому SVG) */
-        .streetImg{
-            height:28vh; width:auto; margin:0; flex:0 0 auto;
-        }
+        /* Вулиця (асфальт + верхня біла кромка у самому SVG) */
+        .streetImg{height:26vh;width:auto;margin:0}
 
-        /* ПЕРСОНАЖІ — стоять на верхній кромці асфальту */
+        /* Персонажі — встають на верхню кромку асфальту */
         .charImg{
-            width:240px; height:auto; margin:0 100px 0;
-            transform:translateY(var(--char-drop));
-            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
-            flex:0 0 auto;
+            width:240px;height:auto;margin:0 96px 0;transform:translateY(var(--char-drop));
+            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35))
         }
-        .charImg.sm{ width:200px; }
-        .charImg.lg{ width:280px; }
+        .charImg.sm{width:200px}.charImg.lg{width:280px}
 
         @media (max-width:780px){
-            :root{ --char-drop: calc(-5vh); }
-            .houseImg{ height:42vh; margin-bottom:10vh; }
-            .streetImg{ height:26vh; }
+            :root{--char-drop:-5vh}
+            .houseImg{height:40vh;margin-bottom:10vh}
+            .streetImg{height:25vh}
         }
 
-        /* === Fixed Header === */
+        /* Header */
         .site-header{
-            position:fixed; top:0; left:0; right:0; z-index:10000; height:64px;
-            display:flex; align-items:center; gap:16px; padding:0 18px;
+            position:fixed;top:0;left:0;right:0;z-index:10000;height:64px;
+            display:flex;align-items:center;gap:16px;padding:0 18px;
             backdrop-filter:blur(10px);
-            background:linear-gradient(180deg, rgba(10,14,30,.72), rgba(10,14,30,.46));
-            border-bottom:1px solid rgba(255,255,255,.08);
+            background:linear-gradient(180deg,rgba(10,14,30,.72),rgba(10,14,30,.46));
+            border-bottom:1px solid rgba(255,255,255,.08)
         }
-        .site-header .logo{ font-family:"Bangers",cursive; font-size:26px; letter-spacing:.6px; color:#fff; text-decoration:none; text-shadow:2px 2px 0 #111; }
-        .main-nav{ margin-left:auto; display:flex; gap:12px; flex-wrap:wrap; }
+        .site-header .logo{font-family:"Bangers",cursive;font-size:26px;letter-spacing:.6px;color:#fff;text-decoration:none;text-shadow:2px 2px 0 #111}
+        .main-nav{margin-left:auto;display:flex;gap:12px;flex-wrap:wrap}
         .nav-link{
-            position:relative; display:inline-flex; align-items:center; height:36px; padding:0 12px; border-radius:10px;
-            color:#e9f2ff; text-decoration:none; font-weight:700; letter-spacing:.2px;
-            background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
-            transition:transform .15s ease, background .15s ease, border-color .15s ease;
+            display:inline-flex;align-items:center;height:36px;padding:0 12px;border-radius:10px;
+            color:#e9f2ff;text-decoration:none;font-weight:700;letter-spacing:.2px;
+            background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);
+            transition:transform .15s, background .15s, border-color .15s
         }
-        .nav-link:hover{ transform:translateY(-1px); background:rgba(255,255,255,.10); }
-        .nav-link.active{ background:#ffd400; color:#111; border-color:#111; box-shadow:4px 4px 0 #111; }
+        .nav-link:hover{transform:translateY(-1px);background:rgba(255,255,255,.10)}
+        .nav-link.active{background:#ffd400;color:#111;border-color:#111;box-shadow:4px 4px 0 #111}
 
         /* Hamburger */
-        .nav-toggle{
-            display:none; margin-left:auto; width:40px; height:40px; border:1px solid rgba(255,255,255,.12);
-            background:rgba(255,255,255,.06); border-radius:10px; cursor:pointer; align-items:center; justify-content:center;
-        }
-        .nav-toggle:focus-visible{ outline:2px solid #ffd400; outline-offset:2px; }
-        .nav-toggle-bar{ display:block; width:22px; height:2px; background:#fff; border-radius:2px; position:relative; }
-        .nav-toggle-bar::before, .nav-toggle-bar::after{ content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px; }
-        .nav-toggle-bar::before{ top:-7px; } .nav-toggle-bar::after{ top:7px; }
-
+        .nav-toggle{display:none;margin-left:auto;width:40px;height:40px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);border-radius:10px;cursor:pointer;align-items:center;justify-content:center}
+        .nav-toggle-bar{display:block;width:22px;height:2px;background:#fff;border-radius:2px;position:relative}
+        .nav-toggle-bar::before,.nav-toggle-bar::after{content:"";position:absolute;left:0;right:0;height:2px;background:#fff;border-radius:2px}
+        .nav-toggle-bar::before{top:-7px}.nav-toggle-bar::after{top:7px}
         @media (max-width:780px){
-            .site-header{ height:58px; padding:0 12px; }
-            body{ padding-top:58px; }
-            .nav-link{ height:44px; padding:0 12px; font-size:15px; }
-            .nav-toggle{ display:inline-grid; }
-
+            .site-header{height:58px;padding:0 12px} body{padding-top:58px}
+            .nav-link{height:44px;padding:0 12px;font-size:15px}
+            .nav-toggle{display:inline-grid}
             .main-nav{
-                position:fixed; top:var(--header-h); left:0; right:0; display:grid; gap:8px; padding:10px;
-                background:linear-gradient(180deg, rgba(10,14,30,.92), rgba(10,14,30,.82));
-                border:1px solid rgba(255,255,255,.10); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.45);
-                transform-origin:top right; transform:translateY(-8px) scale(.98); opacity:0; pointer-events:none;
-                transition:transform .18s ease, opacity .18s ease; z-index:10001;
+                position:fixed;top:var(--header-h);left:0;right:0;display:grid;gap:8px;padding:10px;
+                background:linear-gradient(180deg,rgba(10,14,30,.92),rgba(10,14,30,.82));
+                border:1px solid rgba(255,255,255,.10);border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.45);
+                transform-origin:top right;transform:translateY(-8px) scale(.98);opacity:0;pointer-events:none;
+                transition:transform .18s, opacity .18s;z-index:10001
             }
-            .main-nav .nav-link{ width:100%; justify-content:flex-start; box-sizing:border-box; }
+            .main-nav .nav-link{width:100%;justify-content:flex-start}
         }
-        .nav-open .main-nav{ opacity:1; pointer-events:auto; transform:translateY(0) scale(1); }
-        .nav-open #navToggle .nav-toggle-bar{ background:transparent; }
-        .nav-open #navToggle .nav-toggle-bar::before{ top:0; transform:rotate(45deg); }
-        .nav-open #navToggle .nav-toggle-bar::after{ top:0; transform:rotate(-45deg); }
-
-        /* Ховати хедер при відкритому попапі (тільки мобілка) */
+        .nav-open .main-nav{opacity:1;pointer-events:auto;transform:translateY(0) scale(1)}
+        .nav-open #navToggle .nav-toggle-bar{background:transparent}
+        .nav-open #navToggle .nav-toggle-bar::before{top:0;transform:rotate(45deg)}
+        .nav-open #navToggle .nav-toggle-bar::after{top:0;transform:rotate(-45deg)}
         @media (max-width:780px){
-            .site-header{ transition:transform .22s ease; }
-            html.popup-open .site-header{ transform:translateY(-100%); }
-            html.popup-open .main-nav{ opacity:0 !important; pointer-events:none !important; }
+            .site-header{transition:transform .22s ease}
+            html.popup-open .site-header{transform:translateY(-100%)}
+            html.popup-open .main-nav{opacity:0 !important;pointer-events:none !important}
         }
     </style>
 </head>
 <body>
-<!-- === FIXED HEADER === -->
+
 <header class="site-header" id="siteHeader">
-    <a class="logo" href="#stage">CyberGame</a>
+    <a class="logo" href="#stage">CYBERGAME</a>
     <button class="nav-toggle" id="navToggle" aria-label="Відкрити меню" aria-controls="primaryNav" aria-expanded="false">
-        <span class="nav-toggle-bar" aria-hidden="true"></span>
+        <span class="nav-toggle-bar"></span>
     </button>
     <nav class="main-nav" id="primaryNav" aria-label="Main">
         <a class="nav-link" href="#stage" data-target="#stage">Початок</a>
@@ -199,21 +167,17 @@
 </header>
 
 <div class="stage" id="stage">
-    <div class="stage-logo">
-        <img src="./assets/fighton.png" alt="FightTON logo">
-    </div>
+    <div class="stage-logo"><img src="./assets/fighton.png" alt="FightTON logo"></div>
 
-    <!-- НЕБО -->
-    <div class="layer" id="sky">
-        <div class="band" id="skyBand"></div>
-    </div>
+    <!-- Небо -->
+    <div class="layer" id="sky"><div class="band" id="skyBand"></div></div>
 
-    <!-- СОНЦЕ -->
+    <!-- Сонце -->
     <div class="layer" id="sun">
         <img class="sunImg" src="./assets/sun.svg" alt="Sun">
     </div>
 
-    <!-- ХМАРИ (верх сцени) -->
+    <!-- Хмари -->
     <div class="layer" id="clouds">
         <div class="band" id="cloudsBand">
             <img class="cloudImg" src="./assets/cloud_left_top.svg" alt="Cloud">
@@ -223,7 +187,7 @@
         </div>
     </div>
 
-    <!-- ГОРИ -->
+    <!-- Гори -->
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
             <img class="mountainsImg" src="./assets/mountains.svg" alt="Mountains" style="margin-left:8vw">
@@ -231,22 +195,22 @@
         </div>
     </div>
 
-    <!-- БУДИНКИ (1..9) -->
+    <!-- Будинки -->
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png" alt="House 1" style="margin-left:6vw">
-            <img class="houseImg" src="./assets/house2.png" alt="House 2">
-            <img class="houseImg" src="./assets/house3.png" alt="House 3">
-            <img class="houseImg" src="./assets/house4.png" alt="House 4">
-            <img class="houseImg" src="./assets/house5.png" alt="House 5">
-            <img class="houseImg" src="./assets/house6.png" alt="House 6">
-            <img class="houseImg" src="./assets/house7.png" alt="House 7">
-            <img class="houseImg" src="./assets/house8.png" alt="House 8">
-            <img class="houseImg" src="./assets/house9.png" alt="House 9" style="margin-right:8vw">
+            <img class="houseImg" src="./assets/house1.png" alt="House1" style="margin-left:6vw">
+            <img class="houseImg" src="./assets/house2.png" alt="House2">
+            <img class="houseImg" src="./assets/house3.png" alt="House3">
+            <img class="houseImg" src="./assets/house4.png" alt="House4">
+            <img class="houseImg" src="./assets/house5.png" alt="House5">
+            <img class="houseImg" src="./assets/house6.png" alt="House6">
+            <img class="houseImg" src="./assets/house7.png" alt="House7">
+            <img class="houseImg" src="./assets/house8.png" alt="House8">
+            <img class="houseImg" src="./assets/house9.png" alt="House9" style="margin-right:8vw">
         </div>
     </div>
 
-    <!-- ВУЛИЦЯ -->
+    <!-- Вулиця -->
     <div class="layer" id="street">
         <div class="band" id="streetBand">
             <img class="streetImg" src="./assets/street.svg" alt="Street" style="margin-left:6vw">
@@ -254,7 +218,7 @@
         </div>
     </div>
 
-    <!-- ПЕРСОНАЖІ (9) -->
+    <!-- Персонажі -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
             <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" style="margin-left:6vw">
@@ -270,221 +234,166 @@
     </div>
 </div>
 
-<!-- ===== GSAP ===== -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
 <script>
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-    gsap.config({ nullTargetWarn: false });
+    gsap.config({nullTargetWarn:false});
 
-    // скільки максимально може зсунутись стрічка (її scrollWidth − ширина екрана)
-    const getShift = (sel, k = 1) => {
+    /* чекаємо, поки ВСІ зображення в #stage завантажаться — тільки тоді рахуємо ширини */
+    function waitImages(root){
+        const imgs = Array.from(root.querySelectorAll('img'));
+        const pending = imgs.filter(i => !i.complete || i.naturalWidth === 0);
+        return Promise.all(pending.map(img => new Promise(res => {
+            img.addEventListener('load', res, {once:true});
+            img.addEventListener('error', res, {once:true});
+        })));
+    }
+
+    function getShift(sel, k=1){
         const el = document.querySelector(sel);
-        if (!el) return 0;
-        // страховка проти випадків, коли scrollWidth ~ clientWidth
+        if(!el) return 0;
         const fullWidth = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
         const full = Math.max(0, fullWidth - window.innerWidth);
         return -Math.round(full * k);
-    };
+    }
 
-    // головний pinned timeline
-    const tl = gsap.timeline({
-        scrollTrigger: {
-            id: "stageParallax",
-            trigger: "#stage",
-            start: "top top",
-            end: () => {
-                const el = document.getElementById('charsBand');
-                const width = el ? Math.max(el.scrollWidth, el.getBoundingClientRect().width) : window.innerWidth * 2.2;
-                return "+=" + Math.max(2200, Math.round((width - window.innerWidth) * 1.35)); // трохи довше ніж потрібно
-            },
-            pin: true,
-            scrub: 1,
-            anticipatePin: 1,
-            invalidateOnRefresh: true
-        }
-    });
+    async function initParallax(){
+        await waitImages(document.getElementById('stage')); // важливо!
+        ScrollTrigger.killAll(false); // не чіпаємо нативний скрол
 
-    // паралакс: повільні ззаду, швидкі попереду
-    tl.to("#mountainsBand", { x: () => getShift("#mountainsBand", 0.28), ease:"none" }, 0)
-        .to("#housesBand",    { x: () => getShift("#housesBand",    0.72), ease:"none" }, 0)
-        .to("#streetBand",    { x: () => getShift("#streetBand",    0.90), ease:"none" }, 0)
-        .to("#charsBand",     { x: () => getShift("#charsBand",     1.00), ease:"none" }, 0);
-
-    // сонце: легкий рух для глибини
-    tl.to(".sunImg", { yPercent:-10, scale:0.96, ease:"none" }, 0);
-
-    // ХМАРИ: у першій третині — роз’їжджаються й зникають
-    const clouds = gsap.utils.toArray("#clouds .cloudImg");
-    clouds.forEach((c, i) => {
-        const dir = (i % 2 === 0) ? -1 : 1; // ліві вліво, праві вправо
-        tl.to(c, {
-            x: () => dir * (window.innerWidth * 0.45),
-            y: (i % 3 === 0) ? -20 : 8,
-            opacity: 0,
-            ease: "power1.inOut"
-        }, 0);
-    });
-    tl.addLabel("cloudsGone", tl.duration() * 0.32)
-        .add(() => gsap.set("#clouds", { pointerEvents:"none" }), "cloudsGone");
-
-    // Легке «плавання» хмар (поки вони є)
-    (function(){
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        gsap.utils.toArray("#clouds .cloudImg").forEach((el, i) => {
-            gsap.to(el, {
-                y: () => gsap.utils.random(-10, -4),
-                duration: () => gsap.utils.random(3.2, 5.2),
-                ease: "sine.inOut",
-                repeat: -1,
-                yoyo: true,
-                delay: i * 0.18
-            });
+        const tl = gsap.timeline({
+            scrollTrigger:{
+                id:"stageParallax",
+                trigger:"#stage",
+                start:"top top",
+                end:() => {
+                    const el = document.getElementById('charsBand');
+                    const width = el ? Math.max(el.scrollWidth, el.getBoundingClientRect().width) : window.innerWidth*3;
+                    return "+=" + Math.max(2200, Math.round((width - innerWidth) * 1.35));
+                },
+                pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
+            }
         });
-    })();
 
-    // refresh при зміні розміру
+        tl.to("#mountainsBand",{x:() => getShift("#mountainsBand",0.28), ease:"none"},0)
+            .to("#housesBand",   {x:() => getShift("#housesBand",   0.72), ease:"none"},0)
+            .to("#streetBand",   {x:() => getShift("#streetBand",   0.90), ease:"none"},0)
+            .to("#charsBand",    {x:() => getShift("#charsBand",    1.00), ease:"none"},0)
+            .to(".sunImg",{yPercent:-8, scale:0.97, ease:"none"},0);
+
+        // Хмари: роз’їхались і зникли у першій третині
+        const clouds = gsap.utils.toArray("#clouds .cloudImg");
+        clouds.forEach((c,i)=>{
+            const dir = (i%2===0)?-1:1;
+            tl.to(c,{
+                x:() => dir * (innerWidth * 0.45),
+                y:(i%3===0)?-20:8,
+                opacity:0, ease:"power1.inOut"
+            },0);
+        });
+        tl.addLabel("cloudsGone", tl.duration()*0.32)
+            .add(()=> gsap.set("#clouds",{pointerEvents:"none"}), "cloudsGone");
+
+        ScrollTrigger.refresh(); // після побудови
+    }
+
+    initParallax();
     addEventListener('resize', () => ScrollTrigger.refresh());
-</script>
 
-<!-- свайп по сцені: ліворуч = вперед, праворуч = назад -->
-<script>
+    /* ——— Свайп (мобілка) ——— */
     (function(){
-        if (!window.matchMedia('(max-width:780px)').matches) return;
-
+        if (!matchMedia('(max-width:780px)').matches) return;
         const stage = document.getElementById('stage');
-        let x0 = null, y0 = null;
+        let x0=null, y0=null;
 
-        function headerH(){
-            const h = document.getElementById('siteHeader');
-            return h ? Math.round(h.getBoundingClientRect().height) : 0;
-        }
-
-        function start(e){
-            const t = e.touches && e.touches[0]; if(!t) return;
-            x0 = t.clientX; y0 = t.clientY;
-        }
-        function end(e){
-            if (x0==null) return;
-            const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
-            if(!t){ x0=y0=null; return; }
-
-            const dx = t.clientX - x0;
-            const dy = Math.abs(t.clientY - y0 || 0);
-
-            if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2){
-                const ST = ScrollTrigger.getById('stageParallax');
-                const curr = window.scrollY;
-                const step = Math.max(innerHeight*0.45, Math.min(innerHeight*0.9, Math.abs(dx)*8));
-
-                const delta = dx < 0 ? step : -step;
+        function headerH(){ const h=document.getElementById('siteHeader'); return h?Math.round(h.getBoundingClientRect().height):0; }
+        stage.addEventListener('touchstart', e => { const t=e.touches?.[0]; if(!t) return; x0=t.clientX; y0=t.clientY; }, {passive:true});
+        stage.addEventListener('touchend', e => {
+            if(x0==null) return;
+            const t = e.changedTouches?.[0]; if(!t){x0=y0=null;return;}
+            const dx=t.clientX-x0, dy=Math.abs(t.clientY-(y0||0));
+            if(Math.abs(dx)>40 && Math.abs(dx)>dy*1.2){
+                const ST=ScrollTrigger.getById('stageParallax');
+                const curr=scrollY, step=Math.max(innerHeight*0.45, Math.min(innerHeight*0.9, Math.abs(dx)*8));
+                const delta = dx<0 ? step : -step;
                 let target = curr + delta;
-
-                if (dx < 0 && curr >= (ST.end - 4)) {
-                    gsap.to(window, {
-                        duration: 0.65, ease: "power2.out",
-                        scrollTo: { y: "#phone", offsetY: headerH() }
-                    });
-                } else {
+                if(dx<0 && curr>=(ST.end-4)){
+                    gsap.to(window,{duration:.65,ease:"power2.out",scrollTo:{y:"#phone",offsetY:headerH()}});
+                }else{
                     target = gsap.utils.clamp(ST.start, ST.end, target);
-                    gsap.to(window, { duration:.55, ease:"power2.out", scrollTo: target });
+                    gsap.to(window,{duration:.55,ease:"power2.out",scrollTo:target});
                 }
             }
-            x0 = y0 = null;
-        }
-
-        stage.addEventListener('touchstart', start, {passive:true});
-        stage.addEventListener('touchend',   end,   {passive:true});
+            x0=y0=null;
+        }, {passive:true});
     })();
-</script>
 
-<!-- ScrollTo + активні лінки/меню -->
-<script>
-    // хелпер — увімкнути active на потрібному пункті
-    function setActiveById(id) {
-        document.querySelectorAll('.nav-link').forEach(a => {
-            const target = a.dataset.target || a.getAttribute('href');
-            a.classList.toggle('active', target === id);
+    /* ——— Меню/Активні лінки/ScrollTo ——— */
+    function setActiveById(id){
+        document.querySelectorAll('.nav-link').forEach(a=>{
+            const target=a.dataset.target||a.getAttribute('href');
+            a.classList.toggle('active', target===id);
         });
     }
-
-    // висота хедера
-    const header = document.getElementById('siteHeader');
-    const headerH = () => Math.round(header.getBoundingClientRect().height);
-
-    // тримаємо CSS-змінну в синхроні
-    function syncHeaderVar() {
-        document.documentElement.style.setProperty('--header-h', headerH() + 'px');
-    }
+    const header=document.getElementById('siteHeader');
+    const headerH=()=>Math.round(header.getBoundingClientRect().height);
+    function syncHeaderVar(){ document.documentElement.style.setProperty('--header-h', headerH()+'px'); }
     syncHeaderVar();
-    addEventListener('resize', () => { syncHeaderVar(); ScrollTrigger.refresh(); });
 
-    // плавний скрол + миттєве підсвічування
-    document.querySelectorAll('.nav-link').forEach(a => {
-        a.addEventListener('click', (e) => {
+    document.querySelectorAll('.nav-link').forEach(a=>{
+        a.addEventListener('click', e=>{
             e.preventDefault();
-            const sel = a.dataset.target || a.getAttribute('href');
+            const sel=a.dataset.target||a.getAttribute('href');
             setActiveById(sel);
-            gsap.to(window, { duration:.8, ease:'power2.out', scrollTo:{ y: sel, offsetY: headerH() } });
+            gsap.to(window,{duration:.8,ease:'power2.out',scrollTo:{y:sel,offsetY:headerH()}});
         });
     });
-    document.querySelector('.logo')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        setActiveById('#stage');
-        gsap.to(window, { duration:.8, ease:'power2.out', scrollTo:{ y:'#stage', offsetY: headerH() } });
+    document.querySelector('.logo')?.addEventListener('click', e=>{
+        e.preventDefault(); setActiveById('#stage');
+        gsap.to(window,{duration:.8,ease:'power2.out',scrollTo:{y:'#stage',offsetY:headerH()}});
     });
 
-    // Активний пункт меню під час скролу
-    const SECTIONS = ['#stage', '#phone', '#gorilla', '#char-2', '#billboard', '#faq'];
-    let currentActive = null, rafRunning = false;
-
-    function updateActive() {
-        rafRunning = false;
-        const y = headerH(), hysteresis = 10;
-        let winner = null;
-
-        for (const id of SECTIONS) {
-            const el = document.querySelector(id); if (!el) continue;
-            const r = el.getBoundingClientRect();
-            if (r.top <= y + hysteresis && r.bottom > y + hysteresis) { winner = id; break; }
+    const SECTIONS=['#stage','#phone','#gorilla','#char-2','#billboard','#faq'];
+    let currentActive=null, rafRun=false;
+    function updateActive(){
+        rafRun=false; const y=headerH(), H=10; let win=null;
+        for(const id of SECTIONS){
+            const el=document.querySelector(id); if(!el) continue;
+            const r=el.getBoundingClientRect();
+            if(r.top<=y+H && r.bottom>y+H){win=id;break;}
         }
-        if (!winner) {
-            let bestDist = Infinity;
-            for (const id of SECTIONS) {
-                const el = document.querySelector(id); if (!el) continue;
-                const r = el.getBoundingClientRect();
-                const dist = Math.abs(r.top - y);
-                if (dist < bestDist) { bestDist = dist; winner = id; }
+        if(!win){
+            let best=Infinity;
+            for(const id of SECTIONS){
+                const el=document.querySelector(id); if(!el) continue;
+                const r=el.getBoundingClientRect(); const d=Math.abs(r.top-y);
+                if(d<best){best=d;win=id;}
             }
         }
-        if (winner && winner !== currentActive) {
-            currentActive = winner; setActiveById(winner);
-        }
+        if(win&&win!==currentActive){currentActive=win;setActiveById(win);}
     }
-    function onScroll(){ if (!rafRunning){ rafRunning = true; requestAnimationFrame(updateActive); } }
-
-    addEventListener('scroll', onScroll, {passive:true});
-    addEventListener('resize', () => { syncHeaderVar(); updateActive(); });
-
-    addEventListener('load', () => {
-        const hash = window.location.hash;
-        if (hash && document.querySelector(hash)) {
-            gsap.set(window, { scrollTo:{ y: hash, offsetY: headerH(), autoKill:false } });
+    addEventListener('scroll', ()=>{ if(!rafRun){rafRun=true;requestAnimationFrame(updateActive);} }, {passive:true});
+    addEventListener('resize', ()=>{ syncHeaderVar(); updateActive(); ScrollTrigger.refresh(); });
+    addEventListener('load', ()=>{
+        const hash=location.hash;
+        if(hash && document.querySelector(hash)){
+            gsap.set(window,{scrollTo:{y:hash,offsetY:headerH(),autoKill:false}});
         }
         updateActive();
         ScrollTrigger.refresh();
     });
 
-    // === Mobile hamburger ===
-    const navToggle = document.getElementById('navToggle');
+    /* ——— Mobile hamburger ——— */
+    const navToggle=document.getElementById('navToggle');
     function closeNav(){ document.documentElement.classList.remove('nav-open'); navToggle?.setAttribute('aria-expanded','false'); }
-    function openNav(){ document.documentElement.classList.add('nav-open');  navToggle?.setAttribute('aria-expanded','true'); }
-    function toggleNav(){ document.documentElement.classList.contains('nav-open') ? closeNav() : openNav(); }
+    function openNav(){ document.documentElement.classList.add('nav-open'); navToggle?.setAttribute('aria-expanded','true'); }
+    function toggleNav(){ document.documentElement.classList.contains('nav-open')?closeNav():openNav(); }
     navToggle?.addEventListener('click', toggleNav);
-    document.querySelectorAll('.main-nav .nav-link').forEach(a => a.addEventListener('click', () => closeNav(), {capture:true}));
-    addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
-    addEventListener('resize', () => { if (window.matchMedia('(min-width: 781px)').matches) closeNav(); });
+    document.querySelectorAll('.main-nav .nav-link').forEach(a=>a.addEventListener('click', ()=>closeNav(), {capture:true}));
+    addEventListener('keydown', e=>{ if(e.key==='Escape') closeNav(); });
+    addEventListener('resize', ()=>{ if(matchMedia('(min-width:781px)').matches) closeNav(); });
 </script>
 </body>
 </html>
