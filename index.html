@@ -14,10 +14,15 @@
 
             /* дорога */
             --snow-h: 50px;
-            --ground-h: 40vh; /* залишив як у тебе; можна змінити в 1 рядку */
+            --ground-h: 40vh; /* висота асфальту */
 
-            --mountains-k: 0.85;   /* наскільки "йдуть вгору" гори відносно асфальту (0…1) */
-            --sun-k: 0.9;
+            /* позиційні коефіцієнти */
+            --mountains-k: 0.85; /* 0..1: наскільки гори підняті відносно асфальту */
+            --sun-k: 0.9;        /* 0..1: база сонця відносно асфальту */
+
+            /* керування скрол-сценарієм */
+            --stage-h: 130vh;    /* загальна висота сцени (менше — менше «неба») */
+            --sky-overlap: .55;  /* 0..0.9: наскільки рано стартує земля під час вильоту хмар */
         }
 
         html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
@@ -33,7 +38,7 @@
         }
         .logo{color:#fff;text-decoration:none;font-weight:800;}
 
-        .stage{position:relative;height:150vh;overflow:hidden;}
+        .stage{position:relative;height:var(--stage-h);overflow:hidden;}
         @media (max-width:780px){ .stage{height:110vh;} }
 
         .layer{position:absolute;inset:0;pointer-events:none;}
@@ -69,7 +74,9 @@
         .stage-logo img{width:clamp(140px,28vw,320px);height:auto;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));}
 
         #sun{display:grid;place-items:center;}
-        .sunImg{width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);bottom:8vh;opacity:.93;filter:blur(.2px);}
+        .sunImg{width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);opacity:.93;filter:blur(.2px);}
+        /* Сонце: трохи вище гір + запас 8vh */
+        .sunImg{ bottom: calc(var(--ground-h) * var(--sun-k) + 8vh); }
 
         #clouds{pointer-events:none;}
         #clouds .cloud{position:absolute;top:0;left:0;right:0;bottom:50%;display:grid;place-items:center;}
@@ -82,12 +89,7 @@
 
         .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;}
         #mountains .mountainsImg:first-child{ margin-left: calc(0px + var(--mountains-lead)); }
-        /* піднімаємо гори рівно на висоту асфальту */
         #mountainsBand{ bottom: calc(var(--ground-h) * var(--mountains-k)); }
-
-        /* Сонце трохи вище гір + твій базовий запас 8vh */
-        .sunImg{ bottom: calc(var(--ground-h) * var(--sun-k) + 8vh); }
-
 
         /* БУДИНКИ */
         .houseImg{height:44vh;width:auto;margin:0 36px 0;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
@@ -148,8 +150,8 @@
             padding:12px 18px;
             border-radius:14px;
             box-shadow:
-                    0 0 0 3px #fff,                 /* білий кант */
-                    0 8px 18px rgba(0,0,0,.35);     /* тінь */
+                    0 0 0 3px #fff,
+                    0 8px 18px rgba(0,0,0,.35);
             display:none;
         }
         .charPlate__inner{
@@ -206,16 +208,16 @@
 
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png"  alt="">
-            <img class="houseImg" src="./assets/house2.png"  alt="">
-            <img class="houseImg" src="./assets/house3.png"  alt="">
-            <img class="houseImg" src="./assets/house4.png"  alt="">
-            <img class="houseImg" src="./assets/house5.png"  alt="">
-            <img class="houseImg" src="./assets/house6.png"  alt="">
-            <img class="houseImg" src="./assets/house7.png"  alt="">
-            <img class="houseImg" src="./assets/house8.png"  alt="">
-            <img class="houseImg" src="./assets/house9.png"  alt="">
-            <img class="houseImg" src="./assets/house10.png" alt="">
+            <img class="houseImg" src="./assets/house1.png"  alt="House 1">
+            <img class="houseImg" src="./assets/house2.png"  alt="House 2">
+            <img class="houseImg" src="./assets/house3.png"  alt="House 3">
+            <img class="houseImg" src="./assets/house4.png"  alt="House 4">
+            <img class="houseImg" src="./assets/house5.png"  alt="House 5">
+            <img class="houseImg" src="./assets/house6.png"  alt="House 6">
+            <img class="houseImg" src="./assets/house7.png"  alt="House 7">
+            <img class="houseImg" src="./assets/house8.png"  alt="House 8">
+            <img class="houseImg" src="./assets/house9.png"  alt="House 9">
+            <img class="houseImg" src="./assets/house10.png" alt="House 10">
         </div>
     </div>
 
@@ -234,29 +236,20 @@
     <!-- персонажі -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <!-- тексти для plate через data-атрибути -->
             <img class="charImg" src="./assets/Sniper.svg"  alt="Sniper"
                  data-plate-title="SNIPER"
                  data-plate-text="Я можу все і навіть трохи більше!">
-
             <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla"
                  data-plate-title="GORILLA"
                  data-plate-text="Я можу все і навіть трохи більше!">
-
             <img class="charImg" src="./assets/Mobster.svg" alt="Mobster"
                  data-plate-title="MOBSTER"
                  data-plate-text="Я можу все і навіть трохи більше!">
-
-            <img class="charImg" src="./assets/Snap.svg"      alt="Snap"
-                 data-plate-title="SNAP" data-plate-text="...">
-            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla"
-                 data-plate-title="CUADRILLA" data-plate-text="...">
-            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren"
-                 data-plate-title="SHELLDREN" data-plate-text="...">
-            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero"
-                 data-plate-title="PISTOLERO" data-plate-text="...">
-            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero"
-                 data-plate-title="MACHETERO" data-plate-text="...">
+            <img class="charImg" src="./assets/Snap.svg"      alt="Snap"       data-plate-title="SNAP"       data-plate-text="...">
+            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla"  data-plate-title="CUADRILLA"  data-plate-text="...">
+            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren"  data-plate-title="SHELLDREN"  data-plate-text="...">
+            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero"  data-plate-title="PISTOLERO"  data-plate-text="...">
+            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero"  data-plate-title="MACHETERO"  data-plate-text="...">
             <img class="charImg lg" src="./assets/Golfer.svg" alt="Golfer" style="margin-right:6vw"
                  data-plate-title="GOLFER" data-plate-text="...">
         </div>
@@ -288,6 +281,12 @@
     const endOffset   = (sel)     => -(bandFull(sel));
     const leadPaddingPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
+    const cssVar = (name, def=0.55) => {
+        const v = getComputedStyle(document.documentElement).getPropertyValue(name);
+        const n = parseFloat((v || "").trim());
+        return Number.isFinite(n) ? n : def;
+    };
+
     function init(){
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
 
@@ -307,32 +306,47 @@
                 start:"top top",
                 end: () => {
                     const w = bandFull('#charsBand');
-                    return "+=" + Math.max(1600, Math.round(w * 1.15));
+                    return "+=" + Math.max(1200, Math.round(w * 0.95)); // трішки коротше
                 },
                 pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
             }
         });
 
-        tl.add('skyPhase', 0);
-        tl.to('.sunImg', {yPercent:-8, scale:0.97, ease:'none', duration:18}, 'skyPhase');
+        tl.add('sky', 0);
+
+        // НЕБО — коротше
+        const SKY_LEN = 10;
+        tl.to('.sunImg', { yPercent:-6, scale:0.985, ease:'none', duration:SKY_LEN }, 'sky');
 
         const cloudPush = () => Math.max(innerWidth * 0.22, 220);
         function flyOut(sel, dir){
-            tl.to(sel, { x: `+=${dir * cloudPush()}`, y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=10' : '+=6', opacity: 0, ease: 'power1.inOut', duration: 20 }, 'skyPhase');
+            tl.to(sel, {
+                x: `+=${dir * cloudPush()}`,
+                y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=8' : '+=6',
+                opacity: 0,
+                ease: 'power1.inOut',
+                duration: SKY_LEN
+            }, 'sky');
         }
         flyOut('.cloud--lt', -1); flyOut('.cloud--rt', 1); flyOut('.cloud--lb', -1); flyOut('.cloud--rb', 1);
-        tl.add(() => gsap.set('#clouds', {display:'none'}), 'skyPhase+=19.6');
+        tl.add(() => gsap.set('#clouds', {display:'none'}), `sky+=${SKY_LEN * 0.96}`);
 
-        tl.add('ground', '+=0');
-        const groundDur = 82;
+        // ЗЕМЛЯ стартує раніше — перекриття фаз
+        const overlap = cssVar('--sky-overlap', .55);
+        tl.add('ground', `sky+=${SKY_LEN * (1 - overlap)}`);
 
-        tl.fromTo('#mountainsBand',{ x: () => startOffset('#mountainsBand', 0.28) },{ x: () => endOffset('#mountainsBand'), ease:'none', duration:groundDur },'ground');
-        tl.fromTo('#housesBand',   { x: () => startOffset('#housesBand',    0.72) },{ x: () => endOffset('#housesBand'),    ease:'none', duration:groundDur },'ground');
+        const groundDur = 78;
 
-        tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },{ x: () => endOffset('#streetGroundBand'), ease:'none', duration:groundDur },'ground');
-        tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },{ x: () => endOffset('#streetSnowBand'),   ease:'none', duration:groundDur },'ground');
-
-        tl.fromTo('#charsBand',    { x: () => startOffset('#charsBand',     1.00) },{ x: () => endOffset('#charsBand'),     ease:'none', duration:groundDur },'ground');
+        tl.fromTo('#mountainsBand',{ x: () => startOffset('#mountainsBand', 0.28) },
+            { x: () => endOffset('#mountainsBand'), ease:'none', duration:groundDur }, 'ground');
+        tl.fromTo('#housesBand',   { x: () => startOffset('#housesBand',    0.72) },
+            { x: () => endOffset('#housesBand'),    ease:'none', duration:groundDur }, 'ground');
+        tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },
+            { x: () => endOffset('#streetGroundBand'), ease:'none', duration:groundDur }, 'ground');
+        tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },
+            { x: () => endOffset('#streetSnowBand'),   ease:'none', duration:groundDur }, 'ground');
+        tl.fromTo('#charsBand',    { x: () => startOffset('#charsBand',     1.00) },
+            { x: () => endOffset('#charsBand'),     ease:'none', duration:groundDur }, 'ground');
 
         addEventListener('resize', () => ScrollTrigger.refresh());
     }
@@ -363,7 +377,7 @@
             hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
             hoverImg.src = hoverSrc;
 
-            /* === нижній plate із дата-атрибутів === */
+            /* нижній plate із дата-атрибутів */
             const plate = document.createElement('div');
             plate.className = 'charPlate';
             const title = baseImg.dataset.plateTitle || baseImg.alt || '';
