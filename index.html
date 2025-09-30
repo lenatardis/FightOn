@@ -6,198 +6,409 @@
     <title>FightON</title>
 
     <style>
-        :root{
-            --char-drop: calc(-25vh);
+        :root {
+            /* висоти секцій */
             --header-h: 64px;
+            --intro-h: 120vh; /* скільки «неба» перед сценою */
+
+            /* pinned-сцена з героями */
+            --stage-h: 108vh; /* одразу видно героїв */
+
+            /* земля / паретаж */
+            --ground-h: 40vh;
+            --snow-h: 50px;
+            --mountains-k: 0.85;
+            --sun-k: 0.90;
+
+            /* позиція героїв */
+            --char-drop: -25vh;
+
+            /* лід-відступи (рахуються в JS) */
             --mountains-lead: 0px;
             --houses-lead: 0px;
-
-            /* дорога */
-            --snow-h: 50px;
-            --ground-h: 40vh; /* висота асфальту */
-
-            /* позиційні коефіцієнти */
-            --mountains-k: 0.85; /* 0..1: наскільки гори підняті відносно асфальту */
-            --sun-k: 0.9;        /* 0..1: база сонця відносно асфальту */
-
-            /* керування скрол-сценарієм */
-            --stage-h: 130vh;    /* загальна висота сцени (менше — менше «неба») */
-            --sky-overlap: .55;  /* 0..0.9: наскільки рано стартує земля під час вильоту хмар */
         }
 
-        html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-        body{padding-top:var(--header-h);}
-        .stage,section{scroll-margin-top:var(--header-h);}
-
-        .site-header{
-            position:fixed;inset:0 0 auto 0;height:var(--header-h);z-index:10000;
-            display:flex;align-items:center;gap:16px;padding:0 18px;
-            backdrop-filter:blur(10px);
-            background:linear-gradient(180deg,rgba(10,14,30,.72),rgba(10,14,30,.46));
-            border-bottom:1px solid rgba(255,255,255,.08);
-        }
-        .logo{color:#fff;text-decoration:none;font-weight:800;}
-
-        .stage{position:relative;height:var(--stage-h);overflow:hidden;}
-        @media (max-width:780px){ .stage{height:110vh;} }
-
-        .layer{position:absolute;inset:0;pointer-events:none;}
-        .band{
-            position:absolute;left:0;bottom:0;height:100%;
-            width:auto;min-width:100%;
-            display:flex;align-items:flex-end;will-change:transform;white-space:nowrap;
-        }
-        .band::after{content:"";flex:0 0 0;}
-
-        #sky{z-index:1}
-        #sun{z-index:2}
-        #clouds{z-index:3}
-        #mountains{z-index:4}
-        #streetGround{z-index:5}
-        #streetSnow{z-index:6}
-        #houses{z-index:7}
-        #chars{z-index:8; pointer-events:auto;}
-
-        #sky{
-            background:
-                    radial-gradient(900px 520px at 65% 10%,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 60%),
-                    linear-gradient(180deg,#7A8CF1 0%,#6FA2FA 28%,#79C3FF 62%,#CFEFFF 88%,#F6FDFF 100%);
-        }
-        #sky::before{
-            content:"";position:absolute;left:50%;top:6vh;transform:translateX(-50%);
-            width:64vmin;height:64vmin;border-radius:50%;
-            background:radial-gradient(circle at 50% 50%,#fff 0 10%,#fff8 10% 26%,#fff3 26% 42%,transparent 60%);
-            filter:blur(16px);opacity:.26;
+        html, body {
+            margin: 0;
+            background: #0b1020;
+            color: #fff;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
         }
 
-        .stage-logo{position:absolute;top:calc(var(--header-h) + 6px);left:50%;transform:translateX(-50%);z-index:9;pointer-events:none;}
-        .stage-logo img{width:clamp(140px,28vw,320px);height:auto;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));}
-
-        #sun{display:grid;place-items:center;}
-        .sunImg{width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);opacity:.93;filter:blur(.2px);}
-        /* Сонце: трохи вище гір + запас 8vh */
-        .sunImg{ bottom: calc(var(--ground-h) * var(--sun-k) + 8vh); }
-
-        #clouds{pointer-events:none;}
-        #clouds .cloud{position:absolute;top:0;left:0;right:0;bottom:50%;display:grid;place-items:center;}
-        #clouds .cloud img{height:24vh;width:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));will-change:transform,opacity;}
-        #clouds .sm img{height:18vh;}  #clouds .lg img{height:28vh;}
-        .cloud--lt{ transform: translate(-34vw,  8vh); }
-        .cloud--rt{ transform: translate( 34vw, 10vh); }
-        .cloud--lb{ transform: translate(-26vw, 28vh); }
-        .cloud--rb{ transform: translate( 28vw, 30vh); }
-
-        .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;}
-        #mountains .mountainsImg:first-child{ margin-left: calc(0px + var(--mountains-lead)); }
-        #mountainsBand{ bottom: calc(var(--ground-h) * var(--mountains-k)); }
-
-        /* БУДИНКИ */
-        .houseImg{height:44vh;width:auto;margin:0 36px 0;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
-        #houses .houseImg:first-child{ margin-left: calc(5vw + var(--houses-lead)); }
-        #housesBand{ bottom: var(--ground-h); }
-
-        /* ===== ВУЛИЦЯ ===== */
-        #streetGround .band{
-            background:url("./assets/street_ground.jpg") repeat-x left bottom;
-            background-size:auto var(--ground-h);
+        body {
+            padding-top: var(--header-h);
         }
-        .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
 
-        #streetSnow .band{ position: relative; }
-        #streetSnow .snowLine{
+        .site-header {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: var(--header-h);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 18px;
+            backdrop-filter: blur(10px);
+            background: linear-gradient(180deg, rgba(10, 14, 30, .72), rgba(10, 14, 30, .46));
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .logo {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        /* ===== ОДИНАКОВЕ НЕБО (і там, і там) ===== */
+        .sky-gradient,
+        #sky {
+            background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 60%),
+            linear-gradient(180deg, #7A8CF1 0%, #6FA2FA 28%, #79C3FF 62%, #CFEFFF 88%, #F6FDFF 100%);
+        }
+
+        /* ===== INTRO: небо + 4 хмарки + лого ===== */
+        .intro {
+            position: relative;
+            height: var(--intro-h);
+            overflow: hidden;
+        }
+
+        .intro-logo {
             position: absolute;
-            left: 0; right: 0;
+            left: 50%;
+            top: 16vh;
+            transform: translateX(-50%);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .intro-logo img {
+            width: min(48vmax, 760px);
+            height: auto;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+        }
+
+        .intro .cloud {
+            position: absolute;
+            z-index: 2;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .12));
+        }
+
+        .intro .cloud img {
+            height: 22vh;
+            width: auto;
+        }
+
+        /* 4 хмарки; нижні — вище */
+        .cloud--lt {
+            left: 6vw;
+            top: 22vh;
+        }
+
+        .cloud--rt {
+            right: 6vw;
+            top: 22vh;
+        }
+
+        .cloud--lb {
+            left: 12vw;
+            bottom: 22vh;
+        }
+
+        .cloud--rb {
+            right: 12vw;
+            bottom: 22vh;
+        }
+
+        /* ===== STAGE (паретаж із героями) ===== */
+        .stage {
+            position: relative;
+            height: var(--stage-h);
+            overflow: hidden;
+        }
+
+        .layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .band {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 100%;
+            min-width: 100%;
+            display: flex;
+            align-items: flex-end;
+            white-space: nowrap;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        .band::after {
+            content: "";
+            flex: 0 0 0;
+        }
+
+        #sky {
+            z-index: 1
+        }
+
+        #sun {
+            z-index: 2
+        }
+
+        #mountains {
+            z-index: 4
+        }
+
+        #streetGround {
+            z-index: 5
+        }
+
+        #streetSnow {
+            z-index: 6
+        }
+
+        #houses {
+            z-index: 7
+        }
+
+        #chars {
+            z-index: 8;
+            pointer-events: auto;
+        }
+
+        #sky::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 6vh;
+            transform: translateX(-50%);
+            width: 64vmin;
+            height: 64vmin;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
+            filter: blur(16px);
+            opacity: .22;
+        }
+
+        #sun {
+            display: grid;
+            place-items: center;
+        }
+
+        .sunImg {
+            width: min(22vmax, 420px);
+            height: auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: calc(var(--ground-h) * var(--sun-k) + 8vh);
+            opacity: .93;
+            filter: blur(.2px);
+        }
+
+        .mountainsImg {
+            height: 32vh;
+            width: auto;
+            margin: 0 0 10vh;
+        }
+
+        /* ВАЖЛИВО: даємо лід-відступ першій горі, щоб не обрізало */
+        #mountains .mountainsImg:first-child {
+            margin-left: var(--mountains-lead);
+        }
+
+        #mountainsBand {
+            bottom: calc(var(--ground-h) * var(--mountains-k));
+        }
+
+        .houseImg {
+            height: 44vh;
+            width: auto;
+            margin: 0 36px 0;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+        }
+
+        /* ВАЖЛИВО: лід-відступ першому будинку */
+        #houses .houseImg:first-child {
+            margin-left: var(--houses-lead);
+        }
+
+        #housesBand {
+            bottom: var(--ground-h);
+        }
+
+        /* ВУЛИЦЯ */
+        #streetGround .band {
+            background: url("./assets/street_ground.jpg") repeat-x left bottom;
+            background-size: auto var(--ground-h);
+        }
+
+        .streetGroundSpacer {
+            width: 600vw;
+            height: var(--ground-h);
+        }
+
+        #streetSnow .band {
+            position: relative;
+        }
+
+        #streetSnow .snowLine {
+            position: absolute;
+            left: 0;
+            right: 0;
             bottom: var(--ground-h);
             height: var(--snow-h);
             background: #fff;
             pointer-events: none;
         }
-        .streetSnowSpacer{ width:600vw; height:0; }
 
-        /* ===== ПЕРСОНАЖІ ===== */
-        .charImg{
-            position:relative; display:inline-block;
-            width:240px; margin:0 90px 0;
-            transform:translateY(var(--char-drop));
-            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
-            vertical-align:bottom;
+        .streetSnowSpacer {
+            width: 600vw;
+            height: 0;
         }
-        .charImg.sm{ width:200px; }
-        .charImg.lg{ width:280px; }
 
-        /* базовий та hover-спрайт */
-        .charImg > img.base{ display:block; width:100%; height:auto; position:relative; z-index:2; }
-        .charImg > img.hover{
-            position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-            height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease;
-            object-fit:contain; object-position:center bottom; z-index:2;
+        /* ПЕРСОНАЖІ — вище */
+        .charImg {
+            position: relative;
+            display: inline-block;
+            width: 240px;
+            margin: 0 90px 0;
+            transform: translateY(var(--char-drop));
+            filter: drop-shadow(0 12px 34px rgba(0, 0, 0, .35));
+            vertical-align: bottom;
+            will-change: transform;
         }
+
+        .charImg.sm {
+            width: 200px;
+        }
+
+        .charImg.lg {
+            width: 280px;
+        }
+
+        .charImg > img.base {
+            display: block;
+            width: 100%;
+            height: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .charImg > img.hover {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            height: 100%;
+            width: auto;
+            margin: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease;
+            object-fit: contain;
+            object-position: center bottom;
+            z-index: 2;
+        }
+
         .charImg:hover > img.hover,
         .charImg:focus-visible > img.hover,
-        .charImg.is-touch > img.hover{ opacity:1; }
-
-        #charsBand > .charImg:first-child { margin-left:5vw; }
-
-        /* ===== НИЖНІЙ БЛОК (plate) ПІД ПЕРСОНАЖЕМ ===== */
-        .charPlate{
-            position:absolute;
-            left:50%; transform:translateX(-50%);
-            top: calc(100% + 14px); /* завжди під ногами спрайта */
-            z-index:1; pointer-events:none;
-
-            background:#111;
-            color:#fff;
-            padding:12px 18px;
-            border-radius:14px;
-            box-shadow:
-                    0 0 0 3px #fff,
-                    0 8px 18px rgba(0,0,0,.35);
-            display:none;
-        }
-        .charPlate__inner{
-            display:flex; flex-direction:column; gap:15px; align-items:center; text-align:center;
-            min-width:240px; max-width:320px;
-        }
-        .charPlate__title{
-            font-weight:900; letter-spacing:.06em; text-transform:uppercase;
-            text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px;
-        }
-        .charPlate__text{ line-height:1.25; font-weight:600; }
-
-        .charImg:hover .charPlate,
-        .charImg:focus-visible .charPlate,
-        .charImg.is-touch .charPlate{ display:block; }
-
-        @media (max-width:780px){
-            :root{--char-drop:calc(-20vh);}
-            .houseImg{height:40vh;margin-bottom:0}
-            .charPlate__inner{ min-width:200px; max-width:260px; }
+        .charImg.is-touch > img.hover {
+            opacity: 1;
         }
 
-        .stage::after{
-            content:"";position:absolute;left:-5vw;right:-5vw;bottom:-6vh;height:18vh;
-            background:radial-gradient(120% 150% at 50% 115%,rgba(0,0,0,.35) 0%,rgba(0,0,0,.18) 38%,rgba(0,0,0,0) 72%);
-            pointer-events:none;z-index:3;
+        #charsBand > .charImg:first-child {
+            margin-left: 5vw;
         }
 
-        .tail{min-height:70vh;display:grid;place-items:center;background:radial-gradient(1100px 520px at 70% 15%,#1d2a66 0%,#0b1020 62%);color:#cfd6ff;}
+        /* plate */
+        .charPlate {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: calc(100% + 14px);
+            z-index: 1;
+            pointer-events: none;
+            background: #111;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 14px;
+            box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0, 0, 0, .35);
+            display: none;
+        }
+
+        .charPlate__inner {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            text-align: center;
+            min-width: 240px;
+            max-width: 320px;
+        }
+
+        .charPlate__title {
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+        }
+
+        .charPlate__text {
+            line-height: 1.25;
+            font-weight: 600;
+        }
+
+        .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate {
+            display: block;
+        }
+
+        /* віньєтка низу сцени */
+        .stage::after {
+            content: "";
+            position: absolute;
+            left: -5vw;
+            right: -5vw;
+            bottom: -6vh;
+            height: 18vh;
+            background: radial-gradient(120% 150% at 50% 115%, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, .18) 38%, rgba(0, 0, 0, 0) 72%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .tail {
+            min-height: 70vh;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%);
+            color: #cfd6ff;
+        }
     </style>
 </head>
 <body>
-<header class="site-header"><a class="logo" href="#stage">CyberGame</a></header>
+<header class="site-header"><a class="logo" href="#intro">CyberGame</a></header>
 
+<!-- ===== INTRO ===== -->
+<section class="intro sky-gradient" id="intro">
+    <div class="intro-logo"><img src="./assets/fighton.png" alt="FightTON"></div>
+    <div class="cloud cloud--lt"><img src="./assets/cloud_left_top.svg" alt=""></div>
+    <div class="cloud cloud--rt"><img src="./assets/cloud_right_top.svg" alt=""></div>
+    <div class="cloud cloud--lb"><img src="./assets/cloud_left_bottom.svg" alt=""></div>
+    <div class="cloud cloud--rb"><img src="./assets/cloud_right_bottom.svg" alt=""></div>
+</section>
+
+<!-- ===== STAGE ===== -->
 <div class="stage" id="stage">
-    <div class="stage-logo"><img src="./assets/fighton.png" alt="FightTON logo"></div>
-
-    <div class="layer" id="sky"><div class="band" id="skyBand"></div></div>
-    <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
-
-    <div class="layer" id="clouds">
-        <div class="cloud cloud--lt sm"><img src="./assets/cloud_left_top.svg" alt=""></div>
-        <div class="cloud cloud--rt sm"><img src="./assets/cloud_right_top.svg" alt=""></div>
-        <div class="cloud cloud--lb lg"><img src="./assets/cloud_left_bottom.svg" alt=""></div>
-        <div class="cloud cloud--rb lg"><img src="./assets/cloud_right_bottom.svg" alt=""></div>
+    <div class="layer sky-gradient" id="sky">
+        <div class="band"></div>
     </div>
+    <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
 
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
@@ -208,24 +419,24 @@
 
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png"  alt="House 1">
-            <img class="houseImg" src="./assets/house2.png"  alt="House 2">
-            <img class="houseImg" src="./assets/house3.png"  alt="House 3">
-            <img class="houseImg" src="./assets/house4.png"  alt="House 4">
-            <img class="houseImg" src="./assets/house5.png"  alt="House 5">
-            <img class="houseImg" src="./assets/house6.png"  alt="House 6">
-            <img class="houseImg" src="./assets/house7.png"  alt="House 7">
-            <img class="houseImg" src="./assets/house8.png"  alt="House 8">
-            <img class="houseImg" src="./assets/house9.png"  alt="House 9">
-            <img class="houseImg" src="./assets/house10.png" alt="House 10">
+            <img class="houseImg" src="./assets/house1.png" alt="">
+            <img class="houseImg" src="./assets/house2.png" alt="">
+            <img class="houseImg" src="./assets/house3.png" alt="">
+            <img class="houseImg" src="./assets/house4.png" alt="">
+            <img class="houseImg" src="./assets/house5.png" alt="">
+            <img class="houseImg" src="./assets/house6.png" alt="">
+            <img class="houseImg" src="./assets/house7.png" alt="">
+            <img class="houseImg" src="./assets/house8.png" alt="">
+            <img class="houseImg" src="./assets/house9.png" alt="">
+            <img class="houseImg" src="./assets/house10.png" alt="">
         </div>
     </div>
 
-    <!-- дорога -->
     <div class="layer" id="streetGround">
-        <div class="band" id="streetGroundBand"><div class="streetGroundSpacer"></div></div>
+        <div class="band" id="streetGroundBand">
+            <div class="streetGroundSpacer"></div>
+        </div>
     </div>
-
     <div class="layer" id="streetSnow">
         <div class="band" id="streetSnowBand">
             <div class="snowLine"></div>
@@ -233,25 +444,25 @@
         </div>
     </div>
 
-    <!-- персонажі -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg" src="./assets/Sniper.svg"  alt="Sniper"
-                 data-plate-title="SNIPER"
+            <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" data-plate-title="SNIPER"
                  data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla"
-                 data-plate-title="GORILLA"
+            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla" data-plate-title="GORILLA"
                  data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster"
-                 data-plate-title="MOBSTER"
+            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster" data-plate-title="MOBSTER"
                  data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Snap.svg"      alt="Snap"       data-plate-title="SNAP"       data-plate-text="...">
-            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla"  data-plate-title="CUADRILLA"  data-plate-text="...">
-            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren"  data-plate-title="SHELLDREN"  data-plate-text="...">
-            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero"  data-plate-title="PISTOLERO"  data-plate-text="...">
-            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero"  data-plate-title="MACHETERO"  data-plate-text="...">
-            <img class="charImg lg" src="./assets/Golfer.svg" alt="Golfer" style="margin-right:6vw"
-                 data-plate-title="GOLFER" data-plate-text="...">
+            <img class="charImg" src="./assets/Snap.svg" alt="Snap" data-plate-title="SNAP" data-plate-text="...">
+            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO"
+                 data-plate-text="...">
+            <img class="charImg lg" src="./assets/Golfer.svg" alt="Golfer" data-plate-title="GOLFER"
+                 data-plate-text="..." style="margin-right:6vw">
         </div>
     </div>
 </div>
@@ -260,107 +471,86 @@
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
 <script>
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-    gsap.config({ nullTargetWarn:false });
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.config({nullTargetWarn: false});
 
-    function waitStageImgs(){
-        const imgs = Array.from(document.querySelectorAll('#stage img'));
-        return Promise.all(imgs.map(img => img.complete ? 1 : new Promise(r => img.addEventListener('load', r, {once:true}))));
+    /* ===== ХМАРКИ В INTRO (виїжджають назовні) ===== */
+    (function introClouds() {
+        const tl = gsap.timeline({
+            scrollTrigger: {trigger: "#intro", start: "top top", end: "bottom top", scrub: 1}
+        });
+        const push = () => Math.max(innerWidth * 0.28, 280);
+        tl.to(".intro .cloud.cloud--lt", {x: -push(), ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--rt", {x: push(), ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--lb", {x: -push() * 0.8, ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--rb", {x: push() * 0.8, ease: "none"}, 0);
+        tl.to(".intro-logo", {y: -40, opacity: 0.92, ease: "none"}, 0);
+    })();
+
+    function waitImgs(sel) {
+        const imgs = Array.from(document.querySelectorAll(sel + ' img'));
+        return Promise.all(imgs.map(i => i.complete ? 1 : new Promise(r => i.addEventListener('load', r, {once: true}))));
     }
 
     const bandFull = (sel) => {
         const el = document.querySelector(sel);
-        if(!el) return 0;
+        if (!el) return 0;
         const w = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
         return Math.max(0, w - innerWidth);
     };
-
     const startOffset = (sel, k) => -(bandFull(sel) * (1 - k));
-    const endOffset   = (sel)     => -(bandFull(sel));
-    const leadPaddingPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
+    const endOffset = (sel) => -(bandFull(sel));
+    const leadPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
-    const cssVar = (name, def=0.55) => {
-        const v = getComputedStyle(document.documentElement).getPropertyValue(name);
-        const n = parseFloat((v || "").trim());
-        return Number.isFinite(n) ? n : def;
-    };
-
-    function init(){
+    function initStage() {
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
 
         const groundSpacer = document.querySelector('.streetGroundSpacer');
-        const snowSpacer   = document.querySelector('.streetSnowSpacer');
+        const snowSpacer = document.querySelector('.streetSnowSpacer');
         const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
         if (groundSpacer) groundSpacer.style.width = baseWidth + 'px';
-        if (snowSpacer)   snowSpacer.style.width   = baseWidth + 'px';
+        if (snowSpacer) snowSpacer.style.width = baseWidth + 'px';
 
-        document.documentElement.style.setProperty('--mountains-lead', leadPaddingPx('#mountainsBand', 0.28) + 'px');
-        document.documentElement.style.setProperty('--houses-lead',    leadPaddingPx('#housesBand',    0.72) + 'px');
+        /* ВАЖЛИВО: порахували лід-відступи, щоб не обрізало перші елементи */
+        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
+        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
 
         const tl = gsap.timeline({
-            scrollTrigger:{
-                id:"stageParallax",
-                trigger:"#stage",
-                start:"top top",
+            scrollTrigger: {
+                id: "stageParallax",
+                trigger: "#stage",
+                start: "top top",
                 end: () => {
                     const w = bandFull('#charsBand');
-                    return "+=" + Math.max(1200, Math.round(w * 0.95)); // трішки коротше
+                    return "+=" + Math.max(1600, Math.round(w * 1.15));
                 },
-                pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
+                pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true
             }
         });
 
-        tl.add('sky', 0);
+        /* легка динаміка сонця */
+        tl.to('.sunImg', {yPercent: -6, scale: 0.98, ease: 'none', duration: 18}, 0);
 
-        // НЕБО — коротше
-        const SKY_LEN = 10;
-        tl.to('.sunImg', { yPercent:-6, scale:0.985, ease:'none', duration:SKY_LEN }, 'sky');
-
-        const cloudPush = () => Math.max(innerWidth * 0.22, 220);
-        function flyOut(sel, dir){
-            tl.to(sel, {
-                x: `+=${dir * cloudPush()}`,
-                y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=8' : '+=6',
-                opacity: 0,
-                ease: 'power1.inOut',
-                duration: SKY_LEN
-            }, 'sky');
-        }
-        flyOut('.cloud--lt', -1); flyOut('.cloud--rt', 1); flyOut('.cloud--lb', -1); flyOut('.cloud--rb', 1);
-        tl.add(() => gsap.set('#clouds', {display:'none'}), `sky+=${SKY_LEN * 0.96}`);
-
-        // ЗЕМЛЯ стартує раніше — перекриття фаз
-        const overlap = cssVar('--sky-overlap', .55);
-        tl.add('ground', `sky+=${SKY_LEN * (1 - overlap)}`);
-
-        const groundDur = 78;
-
-        tl.fromTo('#mountainsBand',{ x: () => startOffset('#mountainsBand', 0.28) },
-            { x: () => endOffset('#mountainsBand'), ease:'none', duration:groundDur }, 'ground');
-        tl.fromTo('#housesBand',   { x: () => startOffset('#housesBand',    0.72) },
-            { x: () => endOffset('#housesBand'),    ease:'none', duration:groundDur }, 'ground');
-        tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },
-            { x: () => endOffset('#streetGroundBand'), ease:'none', duration:groundDur }, 'ground');
-        tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },
-            { x: () => endOffset('#streetSnowBand'),   ease:'none', duration:groundDur }, 'ground');
-        tl.fromTo('#charsBand',    { x: () => startOffset('#charsBand',     1.00) },
-            { x: () => endOffset('#charsBand'),     ease:'none', duration:groundDur }, 'ground');
+        const dur = 82;
+        tl.fromTo('#mountainsBand', {x: () => startOffset('#mountainsBand', 0.28)},
+            {x: () => endOffset('#mountainsBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#housesBand', {x: () => startOffset('#housesBand', 0.72)},
+            {x: () => endOffset('#housesBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#streetGroundBand', {x: () => startOffset('#streetGroundBand', 0.90)},
+            {x: () => endOffset('#streetGroundBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#streetSnowBand', {x: () => startOffset('#streetSnowBand', 0.90)},
+            {x: () => endOffset('#streetSnowBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#charsBand', {x: () => startOffset('#charsBand', 1.00)},
+            {x: () => endOffset('#charsBand'), ease: 'none', duration: dur}, 0);
 
         addEventListener('resize', () => ScrollTrigger.refresh());
     }
 
-    waitStageImgs().then(() => { init(); ScrollTrigger.refresh(); });
-    addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 0));
-</script>
-
-<!-- HOVER-оверлеї + нижній plate -->
-<script>
-    (function(){
+    /* plates + hover */
+    (function attachPlates() {
         const band = document.getElementById('charsBand');
-        if(!band) return;
-
+        if (!band) return;
         const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
         list.forEach(baseImg => {
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
@@ -368,8 +558,10 @@
             const wrap = document.createElement('span');
             wrap.className = baseImg.className;
             wrap.tabIndex = 0;
-            if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
-
+            if (baseImg.style.margin) {
+                wrap.style.margin = baseImg.style.margin;
+                baseImg.style.margin = '';
+            }
             baseImg.className = 'base';
 
             const hoverImg = new Image();
@@ -377,34 +569,34 @@
             hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
             hoverImg.src = hoverSrc;
 
-            /* нижній plate із дата-атрибутів */
             const plate = document.createElement('div');
             plate.className = 'charPlate';
             const title = baseImg.dataset.plateTitle || baseImg.alt || '';
-            const text  = baseImg.dataset.plateText  || '';
-            if (title || text){
-                plate.innerHTML =
-                    `<div class="charPlate__inner">
-             ${title ? `<div class="charPlate__title">${title}</div>` : ``}
-             ${text  ? `<div class="charPlate__text">${text}</div>`   : ``}
-           </div>`;
+            const text = baseImg.dataset.plateText || '';
+            if (title || text) {
+                plate.innerHTML = `<div class="charPlate__inner">
+          ${title ? `<div class="charPlate__title">${title}</div>` : ``}
+          ${text ? `<div class="charPlate__text">${text}</div>` : ``}
+        </div>`;
             }
 
-            const pre = new Image(); pre.src = hoverSrc;
+            const pre = new Image();
+            pre.src = hoverSrc;
 
             baseImg.parentNode.insertBefore(wrap, baseImg);
             wrap.appendChild(baseImg);
             wrap.appendChild(hoverImg);
             if (title || text) wrap.appendChild(plate);
 
-            // короткий touch-режим як hover
             wrap.addEventListener('touchstart', () => {
                 wrap.classList.add('is-touch');
                 clearTimeout(wrap._t);
                 wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 900);
-            }, {passive:true});
+            }, {passive: true});
         });
     })();
+
+    waitImgs('body').then(initStage);
 </script>
 </body>
 </html>
