@@ -9,8 +9,6 @@
         :root{
             --char-drop: calc(-4vh);
             --header-h: 64px;
-
-            /* підкладки, що компенсують початковий зсув стрічок (щоб перші елементи не обрізались) */
             --mountains-lead: 0px;
             --houses-lead: 0px;
         }
@@ -19,7 +17,6 @@
         body{padding-top:var(--header-h);}
         .stage,section{scroll-margin-top:var(--header-h);}
 
-        /* HEADER (мінімальний) */
         .site-header{
             position:fixed;inset:0 0 auto 0;height:var(--header-h);z-index:10000;
             display:flex;align-items:center;gap:16px;padding:0 18px;
@@ -29,7 +26,6 @@
         }
         .logo{color:#fff;text-decoration:none;font-weight:800;}
 
-        /* СЦЕНА */
         .stage{position:relative;height:120vh;overflow:hidden;}
         @media (max-width:780px){ .stage{height:110vh;} }
 
@@ -41,16 +37,14 @@
         }
         .band::after{content:"";flex:0 0 0;}
 
-        /* порядок шарів */
         #sky{z-index:1}
-        #sun{z-index:2}     /* сонце під горами */
+        #sun{z-index:2}
         #clouds{z-index:3}
         #mountains{z-index:4}
         #street{z-index:5}
         #houses{z-index:6}
-        #chars{z-index:7}
+        #chars{z-index:7; pointer-events:auto;}
 
-        /* SKY */
         #sky{
             background:
                     radial-gradient(900px 520px at 65% 10%,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 60%),
@@ -63,61 +57,34 @@
             filter:blur(16px);opacity:.26;
         }
 
-        /* логотип */
         .stage-logo{position:absolute;top:calc(var(--header-h) + 6px);left:50%;transform:translateX(-50%);z-index:9;pointer-events:none;}
         .stage-logo img{width:clamp(140px,28vw,320px);height:auto;display:block;filter:drop-shadow(0 6px 14px rgba(0,0,0,.25));}
 
-        /* SUN — визирає ЗА горами */
         #sun{display:grid;place-items:center;}
-        .sunImg{
-            width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);
-            bottom:8vh;opacity:.93;filter:blur(.2px);
-        }
+        .sunImg{width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);bottom:8vh;opacity:.93;filter:blur(.2px);}
 
-        /* CLOUDS — 4 штуки у верхній половині сцени */
         #clouds{pointer-events:none;}
-        #clouds .cloud{
-            position:absolute;top:0;left:0;right:0;bottom:50%;
-            display:grid;place-items:center;
-        }
+        #clouds .cloud{position:absolute;top:0;left:0;right:0;bottom:50%;display:grid;place-items:center;}
         #clouds .cloud img{height:24vh;width:auto;filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));will-change:transform,opacity;}
         #clouds .sm img{height:18vh;}  #clouds .lg img{height:28vh;}
+        .cloud--lt{ transform: translate(-34vw,  8vh); }
+        .cloud--rt{ transform: translate( 34vw, 10vh); }
+        .cloud--lb{ transform: translate(-26vw, 28vh); }
+        .cloud--rb{ transform: translate( 28vw, 30vh); }
 
-        /* стартові позиції як у макеті */
-        .cloud--lt{ transform: translate(-34vw,  8vh); } /* ліва верхня */
-        .cloud--rt{ transform: translate( 34vw, 10vh); } /* права верхня */
-        .cloud--lb{ transform: translate(-26vw, 28vh); } /* ліва нижня (велика) */
-        .cloud--rb{ transform: translate( 28vw, 30vh); } /* права нижня (велика) */
-
-        /* MOUNTAINS / HOUSES */
-        .mountainsImg{
-            height:32vh;width:auto;margin:0 0 10vh;
-            filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));
-        }
-        /* додаємо lead-підкладку першій горі */
+        .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;filter:drop-shadow(0 10px 24px rgba(0,0,0,.25));}
         #mountains .mountainsImg:first-child{ margin-left: calc(0px + var(--mountains-lead)); }
 
-        .houseImg{
-            height:44vh;width:auto;margin:0 36px 7vh;
-            filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));
-        }
-        /* додаємо lead-підкладку першому будинку */
+        .houseImg{height:44vh;width:auto;margin:0 36px 7vh;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
         #houses .houseImg:first-child{ margin-left: calc(5vw + var(--houses-lead)); }
 
-        /* STREET — repeat-x */
-        #street .band{
-            background:url("./assets/street.svg") repeat-x left bottom;
-            background-size:auto 22vh;
-        }
+        #street .band{background:url("./assets/street.svg") repeat-x left bottom;background-size:auto 22vh;}
         .streetSpacer{width:600vw;height:22vh;}
 
-        /* ===== CHARS (контейнер + базовий та hover-слої) ===== */
-        /* ВАЖЛИВО: тепер .charImg — це КОНТЕЙНЕР (JS сам обгорне <img>) */
+        /* === CHAR CONTAINERS === */
         .charImg{
-            position:relative;
-            display:inline-block;
-            width:240px;
-            margin:0 90px 0;
+            position:relative; display:inline-block;
+            width:240px; margin:0 90px 0;
             transform:translateY(var(--char-drop));
             filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
             vertical-align:bottom;
@@ -125,24 +92,18 @@
         .charImg.sm{ width:200px; }
         .charImg.lg{ width:280px; }
 
-        .charImg > img{ display:block; width:100%; height:auto; }
+        /* базовий спрайт лишаємо блоком (визначає висоту контейнера) */
+        .charImg > img.base{ display:block; width:100%; height:auto; }
+
+        /* hover — вирівнюємо НИЗ/ЦЕНТР, щоб різні viewBox лягали однаково */
         .charImg > img.hover{
-            position:absolute; inset:0;
-            opacity:0; pointer-events:none;
-            transition:opacity .18s ease;
+            position:absolute; left:50%; bottom:0; transform:translateX(-50%);
+            height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease;
+            object-fit:contain; object-position:center bottom;
         }
         .charImg:hover > img.hover,
         .charImg:focus-visible > img.hover,
-        .charImg.is-touch > img.hover{
-            opacity:1;
-        }
-
-        /* увімкнути події на шарі з персонажами */
-        #chars { pointer-events:auto; }
-        #chars .band { pointer-events:auto; }  /* на всяк випадок */
-
-        .charImg { pointer-events:auto; cursor:pointer; } /* щоб точно ловився hover */
-
+        .charImg.is-touch > img.hover{ opacity:1; }
 
         @media (max-width:780px){
             :root{--char-drop:calc(-3vh);}
@@ -151,14 +112,12 @@
             .streetSpacer{height:20vh}
         }
 
-        /* легка «тінь землі» */
         .stage::after{
             content:"";position:absolute;left:-5vw;right:-5vw;bottom:-6vh;height:18vh;
             background:radial-gradient(120% 150% at 50% 115%,rgba(0,0,0,.35) 0%,rgba(0,0,0,.18) 38%,rgba(0,0,0,0) 72%);
             pointer-events:none;z-index:3;
         }
 
-        /* хвіст після сцени */
         .tail{min-height:70vh;display:grid;place-items:center;background:radial-gradient(1100px 520px at 70% 15%,#1d2a66 0%,#0b1020 62%);color:#cfd6ff;}
     </style>
 </head>
@@ -168,13 +127,9 @@
 <div class="stage" id="stage">
     <div class="stage-logo"><img src="./assets/fighton.png" alt="FightTON logo"></div>
 
-    <!-- SKY -->
     <div class="layer" id="sky"><div class="band" id="skyBand"></div></div>
-
-    <!-- SUN (позаду гір) -->
     <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
 
-    <!-- CLOUDS -->
     <div class="layer" id="clouds">
         <div class="cloud cloud--lt sm"><img src="./assets/cloud_left_top.svg" alt=""></div>
         <div class="cloud cloud--rt sm"><img src="./assets/cloud_right_top.svg" alt=""></div>
@@ -182,7 +137,6 @@
         <div class="cloud cloud--rb lg"><img src="./assets/cloud_right_bottom.svg" alt=""></div>
     </div>
 
-    <!-- MOUNTAINS -->
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
             <img class="mountainsImg" src="./assets/mountains.svg" alt="">
@@ -190,7 +144,6 @@
         </div>
     </div>
 
-    <!-- HOUSES (10 шт) -->
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
             <img class="houseImg" src="./assets/house1.png"  alt="House 1">
@@ -202,22 +155,17 @@
             <img class="houseImg" src="./assets/house7.png"  alt="House 7">
             <img class="houseImg" src="./assets/house8.png"  alt="House 8">
             <img class="houseImg" src="./assets/house9.png"  alt="House 9">
-            <!-- якщо є house10.png — лишай; якщо ні, можеш замінити на 9-й -->
-            <img class="houseImg" src="./assets/house10.png"  alt="House 10">
+            <img class="houseImg" src="./assets/house10.png" alt="House 10">
         </div>
     </div>
 
-    <!-- STREET -->
     <div class="layer" id="street">
-        <div class="band" id="streetBand">
-            <div class="streetSpacer"></div>
-        </div>
+        <div class="band" id="streetBand"><div class="streetSpacer"></div></div>
     </div>
 
-    <!-- CHARS (9) -->
+    <!-- CHARS (можна додатково дати data-hover, data-hover-x, data-hover-y на будь-який) -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <!-- Якщо назва hover-версії не *_hover.svg, додай data-hover="..." -->
             <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper"    style="margin-left:5vw">
             <img class="charImg"    src="./assets/Gorilla.svg"    alt="Gorilla">
             <img class="charImg"    src="./assets/Mobster.svg"    alt="Mobster">
@@ -226,6 +174,7 @@
             <img class="charImg"    src="./assets/Shelldren.svg"  alt="Shelldren">
             <img class="charImg"    src="./assets/Pistolero.svg"  alt="Pistolero">
             <img class="charImg"    src="./assets/Machetero.svg"  alt="Machetero">
+            <!-- приклад, якщо у першого зараз інше hover-зображення -->
             <img class="charImg lg" src="./assets/Golfer.svg"     alt="Golfer" style="margin-right:6vw">
         </div>
     </div>
@@ -233,7 +182,6 @@
 
 <section class="tail"><h2>Далі контент</h2></section>
 
-<!-- GSAP -->
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
@@ -241,52 +189,43 @@
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
     gsap.config({ nullTargetWarn:false });
 
-    /* дочекатися картинок на сцені */
     function waitStageImgs(){
         const imgs = Array.from(document.querySelectorAll('#stage img'));
         return Promise.all(imgs.map(img => img.complete ? 1 : new Promise(r => img.addEventListener('load', r, {once:true}))));
     }
 
-    // корисні обчислювачі
     const bandFull = (sel) => {
         const el = document.querySelector(sel);
         if(!el) return 0;
         const w = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
-        return Math.max(0, w - innerWidth); // «надлишок» ширини
+        return Math.max(0, w - innerWidth);
     };
 
-    // початковий зсув для коеф. паралаксу k так, щоб у фіналі дійти до -full
     const startOffset = (sel, k) => -(bandFull(sel) * (1 - k));
     const endOffset   = (sel)     => -(bandFull(sel));
-
-    // підкладка (lead), яка компенсує початковий зсув, щоб перший елемент був видимим
     const leadPaddingPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
     function init(){
-        // вулиця має бути не коротшою за персонажів
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
         const spacer = document.querySelector('.streetSpacer');
         if (spacer) spacer.style.width = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5)) + 'px';
 
-        // поставити lead-підкладки для гір і будинків
         document.documentElement.style.setProperty('--mountains-lead', leadPaddingPx('#mountainsBand', 0.28) + 'px');
         document.documentElement.style.setProperty('--houses-lead',    leadPaddingPx('#housesBand',    0.72) + 'px');
 
-        // головний TL
         const tl = gsap.timeline({
             scrollTrigger:{
                 id:"stageParallax",
                 trigger:"#stage",
                 start:"top top",
                 end: () => {
-                    const w = bandFull('#charsBand');              // базуємо довжину піну на персонажах
+                    const w = bandFull('#charsBand');
                     return "+=" + Math.max(1600, Math.round(w * 1.15));
                 },
                 pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
             }
         });
 
-        // ФАЗА 1: небо + хмари розлітаються
         tl.add('skyPhase', 0);
         tl.to('.sunImg', {yPercent:-8, scale:0.97, ease:'none', duration:18}, 'skyPhase');
 
@@ -300,36 +239,15 @@
                 duration: 20
             }, 'skyPhase');
         }
-        flyOut('.cloud--lt', -1);
-        flyOut('.cloud--rt',  1);
-        flyOut('.cloud--lb', -1);
-        flyOut('.cloud--rb',  1);
+        flyOut('.cloud--lt', -1); flyOut('.cloud--rt', 1); flyOut('.cloud--lb', -1); flyOut('.cloud--rb', 1);
         tl.add(() => gsap.set('#clouds', {display:'none'}), 'skyPhase+=19.6');
 
-        // ФАЗА 2: земля — усі стрічки рухаються за повний «full» (через fromTo)
         tl.add('ground', '+=0');
         const groundDur = 82;
-
-        tl.fromTo('#mountainsBand',
-            { x: () => startOffset('#mountainsBand', 0.28) },
-            { x: () => endOffset('#mountainsBand'), ease:'none', duration:groundDur },
-            'ground'
-        );
-        tl.fromTo('#housesBand',
-            { x: () => startOffset('#housesBand', 0.72) },
-            { x: () => endOffset('#housesBand'), ease:'none', duration:groundDur },
-            'ground'
-        );
-        tl.fromTo('#streetBand',
-            { x: () => startOffset('#streetBand', 0.90) },
-            { x: () => endOffset('#streetBand'), ease:'none', duration:groundDur },
-            'ground'
-        );
-        tl.fromTo('#charsBand',
-            { x: () => startOffset('#charsBand', 1.00) },
-            { x: () => endOffset('#charsBand'), ease:'none', duration:groundDur },
-            'ground'
-        );
+        tl.fromTo('#mountainsBand',{ x: () => startOffset('#mountainsBand', 0.28) },{ x: () => endOffset('#mountainsBand'), ease:'none', duration:groundDur },'ground');
+        tl.fromTo('#housesBand',   { x: () => startOffset('#housesBand',    0.72) },{ x: () => endOffset('#housesBand'),    ease:'none', duration:groundDur },'ground');
+        tl.fromTo('#streetBand',   { x: () => startOffset('#streetBand',    0.90) },{ x: () => endOffset('#streetBand'),    ease:'none', duration:groundDur },'ground');
+        tl.fromTo('#charsBand',    { x: () => startOffset('#charsBand',     1.00) },{ x: () => endOffset('#charsBand'),     ease:'none', duration:groundDur },'ground');
 
         addEventListener('resize', () => ScrollTrigger.refresh());
     }
@@ -338,17 +256,8 @@
     addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 0));
 </script>
 
-<!-- ===== HOVER-обводка персонажів (обгортання та підміна спрайта) ===== -->
+<!-- HOVER-оверлеї -->
 <script>
-    /*
-      Логіка:
-      - знаходимо всі <img class="charImg ..."> всередині #charsBand
-      - обгортаємо їх у <span class="charImg ...">, переносимо класи/марджини на контейнер
-      - додаємо верхній <img.hover> з src: data-hover або *_hover.svg
-      - робимо попереднє завантаження hover-версій
-      - додаємо легкий підсвіт по тапу на тачі
-      // TODO: tooltip later
-    */
     (function(){
         const band = document.getElementById('charsBand');
         if(!band) return;
@@ -357,30 +266,29 @@
         list.forEach(baseImg => {
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
 
-            // створюємо контейнер і переносимо класи + inline margin
             const wrap = document.createElement('span');
             wrap.className = baseImg.className;
-            wrap.tabIndex = 0; // доступність із клавіатури
+            wrap.tabIndex = 0;
             if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
 
-            // базова картинка всередині
             baseImg.className = 'base';
 
-            // верхня картинка (hover)
             const hoverImg = new Image();
             hoverImg.className = 'hover';
             hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
             hoverImg.src = hoverSrc;
 
-            // попереднє завантаження для уникнення мерехтіння
+            // опціональні дрібні підстройки, якщо потрібно точніше сумістити
+            const dx = parseFloat(baseImg.dataset.hoverX || 0);
+            const dy = parseFloat(baseImg.dataset.hoverY || 0);
+            if (dx || dy) hoverImg.style.transform = `translateX(calc(-50% + ${dx}px)) translateY(${dy}px)`;
+
             const pre = new Image(); pre.src = hoverSrc;
 
-            // заміна у DOM
             baseImg.parentNode.insertBefore(wrap, baseImg);
             wrap.appendChild(baseImg);
             wrap.appendChild(hoverImg);
 
-            // легкий "highlight" по тапу (мобільні)
             wrap.addEventListener('touchstart', () => {
                 wrap.classList.add('is-touch');
                 clearTimeout(wrap._t);
