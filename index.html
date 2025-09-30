@@ -9,21 +9,24 @@
         :root{
             /* висоти секцій */
             --header-h: 64px;
-            --intro-h: 120vh;       /* скільки «неба» перед сценою */
-            --stage-h: 108vh;       /* висота pinned-сцени (щоб герої одразу були видимі) */
+            --intro-h: 120vh;   /* скільки «неба» перед сценою */
+
+            /* pinned-сцена з героями */
+            --stage-h: 108vh;   /* одразу видно героїв */
 
             /* земля / паретаж */
-            --ground-h: 40vh;       /* висота асфальту (впливає на зсув будинків) */
+            --ground-h: 40vh;
             --snow-h: 50px;
-            --mountains-k: 0.85;    /* наскільки підняті гори відносно землі (0..1) */
-            --sun-k: 0.90;          /* висота сонця над землею */
+            --mountains-k: 0.85;
+            --sun-k: 0.90;
 
-            /* позиція героїв */
-            --char-drop: calc(-25vh);
+            /* позиція героїв — ТУТ крутити, якщо ще треба вище/нижче */
+            --char-drop: -25vh; /* було -25vh, підняв значно вище */
         }
 
         html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
         body{padding-top:var(--header-h);}
+
         .site-header{
             position:fixed;inset:0 0 auto 0;height:var(--header-h);z-index:10000;
             display:flex;align-items:center;gap:16px;padding:0 18px;
@@ -33,47 +36,49 @@
         }
         .logo{color:#fff;text-decoration:none;font-weight:800;}
 
-        /* ===== INTRO (небо + 4 хмарки + лого) ===== */
-        .intro{
-            position:relative;height:var(--intro-h);overflow:hidden;
-            background:
-                    radial-gradient(900px 520px at 65% 10%,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 60%),
-                    linear-gradient(180deg,#7A8CF1 0%,#6FA2FA 28%,#79C3FF 62%,#CFEFFF 88%,#F6FDFF 100%);
-        }
-        .intro-logo{position:absolute;left:50%;top:16vh;transform:translateX(-50%);z-index:3;pointer-events:none;}
-        .intro-logo img{width:min(48vmax,760px);height:auto;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
-        .intro .cloud{position:absolute;z-index:2;filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));}
-        .intro .cloud img{height:22vh;width:auto;}
-        /* 4 хмарки як у макеті */
-        .cloud--lt{ left:6vw;  top:22vh; }   /* left top */
-        .cloud--rt{ right:6vw; top:22vh; }   /* right top */
-        .cloud--lb{ left:12vw; bottom:10vh;} /* left bottom */
-        .cloud--rb{ right:12vw;bottom:10vh;} /* right bottom */
-
-        /* ===== STAGE (паретаж) ===== */
-        .stage{position:relative;height:var(--stage-h);overflow:hidden;}
-        .layer{position:absolute;inset:0;pointer-events:none;}
-        .band{
-            position:absolute;left:0;bottom:0;height:100%;
-            min-width:100%;display:flex;align-items:flex-end;white-space:nowrap;
-        }
-        .band::after{content:"";flex:0 0 0;}
-
-        #sky{z-index:1}
-        #sun{z-index:2}
-        #clouds{z-index:3}
-        #mountains{z-index:4}
-        #streetGround{z-index:5}
-        #streetSnow{z-index:6}
-        #houses{z-index:7}
-        #chars{z-index:8; pointer-events:auto;}
-
-        /* фон неба для stage — такий самий градієнт, щоб злиття з intro було чистим */
+        /* ===== ОДИНАКОВЕ НЕБО (і там, і там) ===== */
+        .sky-gradient,
         #sky{
             background:
                     radial-gradient(900px 520px at 65% 10%,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 60%),
                     linear-gradient(180deg,#7A8CF1 0%,#6FA2FA 28%,#79C3FF 62%,#CFEFFF 88%,#F6FDFF 100%);
         }
+
+        /* ===== INTRO: небо + 4 хмарки + лого ===== */
+        .intro{
+            position:relative;height:var(--intro-h);overflow:hidden;
+        }
+        .intro::before{content:"";position:absolute;inset:0;display:block;z-index:0;/* фон неба */
+            composes: sky-gradient;
+        }
+        .intro-logo{position:absolute;left:50%;top:16vh;transform:translateX(-50%);z-index:3;pointer-events:none;}
+        .intro-logo img{width:min(48vmax,760px);height:auto;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
+        .intro .cloud{position:absolute;z-index:2;filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));}
+        .intro .cloud img{height:22vh;width:auto;}
+        /* 4 хмарки; нижні — підняв помітно вище */
+        .cloud--lt{ left:6vw;  top:22vh; }
+        .cloud--rt{ right:6vw; top:22vh; }
+        .cloud--lb{ left:12vw; bottom:22vh;}  /* було ~10vh */
+        .cloud--rb{ right:12vw;bottom:22vh;}  /* було ~10vh */
+
+        /* ===== STAGE (паретаж із героями) ===== */
+        .stage{position:relative;height:var(--stage-h);overflow:hidden;}
+        .layer{position:absolute;inset:0;pointer-events:none;}
+        .band{
+            position:absolute;left:0;bottom:0;height:100%;
+            min-width:100%;display:flex;align-items:flex-end;white-space:nowrap;
+            will-change:transform;transform:translateZ(0); /* гладка анімація */
+        }
+        .band::after{content:"";flex:0 0 0;}
+
+        #sky{z-index:1}
+        #sun{z-index:2}
+        /* ХМАР НА СЦЕНІ НЕМАЄ — шар #clouds видалено */
+        #mountains{z-index:4}
+        #streetGround{z-index:5}
+        #streetSnow{z-index:6}
+        #houses{z-index:7}
+        #chars{z-index:8; pointer-events:auto;}
 
         #sky::before{
             content:"";position:absolute;left:50%;top:6vh;transform:translateX(-50%);
@@ -85,18 +90,9 @@
         #sun{display:grid;place-items:center;}
         .sunImg{
             width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);
-            bottom: calc(var(--ground-h) * var(--sun-k) + 8vh); opacity:.93; filter:blur(.2px);
+            bottom: calc(var(--ground-h) * var(--sun-k) + 8vh);
+            opacity:.93;filter:blur(.2px);
         }
-
-        /* Хмарки у stage (паралакс) — 4 шт */
-        #clouds .cloud{position:absolute;z-index:3;filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));}
-        #clouds .cloud img{height:24vh;width:auto;}
-        #clouds .cloud.sm img{height:18vh;}
-        #clouds .cloud.lg img{height:28vh;}
-        .cloud--lt.st{ left:  0; top: 6vh; transform: translate(-28vw,  0); }
-        .cloud--rt.st{ right: 0; top: 8vh; transform: translate( 28vw,  0); }
-        .cloud--lb.st{ left:  0; top:28vh; transform: translate(-20vw,  0); }
-        .cloud--rb.st{ right: 0; top:30vh; transform: translate( 22vw,  0); }
 
         .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;}
         #mountainsBand{ bottom: calc(var(--ground-h) * var(--mountains-k)); }
@@ -119,13 +115,14 @@
         }
         .streetSnowSpacer{ width:600vw; height:0; }
 
-        /* ПЕРСОНАЖІ */
+        /* ПЕРСОНАЖІ — помітно вище */
         .charImg{
             position:relative; display:inline-block;
             width:240px; margin:0 90px 0;
             transform:translateY(var(--char-drop));
             filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
             vertical-align:bottom;
+            will-change:transform;
         }
         .charImg.sm{ width:200px; } .charImg.lg{ width:280px; }
         .charImg > img.base{ display:block; width:100%; height:auto; position:relative; z-index:2; }
@@ -140,7 +137,7 @@
 
         #charsBand > .charImg:first-child { margin-left:5vw; }
 
-        /* нижній plate (як ми робили) */
+        /* plate */
         .charPlate{
             position:absolute; left:50%; transform:translateX(-50%); top: calc(100% + 14px);
             z-index:1; pointer-events:none; background:#111; color:#fff;
@@ -153,7 +150,7 @@
         .charPlate__text{ line-height:1.25; font-weight:600; }
         .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate{ display:block; }
 
-        /* декоративна віньєтка низу сцени */
+        /* віньєтка низу сцени */
         .stage::after{
             content:"";position:absolute;left:-5vw;right:-5vw;bottom:-6vh;height:18vh;
             background:radial-gradient(120% 150% at 50% 115%,rgba(0,0,0,.35) 0%,rgba(0,0,0,.18) 38%,rgba(0,0,0,0) 72%);
@@ -167,7 +164,7 @@
 <header class="site-header"><a class="logo" href="#intro">CyberGame</a></header>
 
 <!-- ===== INTRO ===== -->
-<section class="intro" id="intro">
+<section class="intro sky-gradient" id="intro">
     <div class="intro-logo"><img src="./assets/fighton.png" alt="FightTON"></div>
     <div class="cloud cloud--lt"><img src="./assets/cloud_left_top.svg" alt=""></div>
     <div class="cloud cloud--rt"><img src="./assets/cloud_right_top.svg" alt=""></div>
@@ -177,15 +174,10 @@
 
 <!-- ===== STAGE ===== -->
 <div class="stage" id="stage">
-    <div class="layer" id="sky"><div class="band"></div></div>
+    <div class="layer sky-gradient" id="sky"><div class="band"></div></div>
     <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
 
-    <div class="layer" id="clouds">
-        <div class="cloud cloud--lt st sm"><img src="./assets/cloud_left_top.svg" alt=""></div>
-        <div class="cloud cloud--rt st sm"><img src="./assets/cloud_right_top.svg" alt=""></div>
-        <div class="cloud cloud--lb st lg"><img src="./assets/cloud_left_bottom.svg" alt=""></div>
-        <div class="cloud cloud--rb st lg"><img src="./assets/cloud_right_bottom.svg" alt=""></div>
-    </div>
+    <!-- ХМАРИ для сцени ВИДАЛЕНО -->
 
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
@@ -196,16 +188,16 @@
 
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png"  alt="House 1">
-            <img class="houseImg" src="./assets/house2.png"  alt="House 2">
-            <img class="houseImg" src="./assets/house3.png"  alt="House 3">
-            <img class="houseImg" src="./assets/house4.png"  alt="House 4">
-            <img class="houseImg" src="./assets/house5.png"  alt="House 5">
-            <img class="houseImg" src="./assets/house6.png"  alt="House 6">
-            <img class="houseImg" src="./assets/house7.png"  alt="House 7">
-            <img class="houseImg" src="./assets/house8.png"  alt="House 8">
-            <img class="houseImg" src="./assets/house9.png"  alt="House 9">
-            <img class="houseImg" src="./assets/house10.png" alt="House 10">
+            <img class="houseImg" src="./assets/house1.png"  alt="">
+            <img class="houseImg" src="./assets/house2.png"  alt="">
+            <img class="houseImg" src="./assets/house3.png"  alt="">
+            <img class="houseImg" src="./assets/house4.png"  alt="">
+            <img class="houseImg" src="./assets/house5.png"  alt="">
+            <img class="houseImg" src="./assets/house6.png"  alt="">
+            <img class="houseImg" src="./assets/house7.png"  alt="">
+            <img class="houseImg" src="./assets/house8.png"  alt="">
+            <img class="houseImg" src="./assets/house9.png"  alt="">
+            <img class="houseImg" src="./assets/house10.png" alt="">
         </div>
     </div>
 
@@ -222,11 +214,11 @@
             <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla"    data-plate-title="GORILLA"    data-plate-text="Я можу все і навіть трохи більше!">
             <img class="charImg" src="./assets/Mobster.svg" alt="Mobster"    data-plate-title="MOBSTER"    data-plate-text="Я можу все і навіть трохи більше!">
             <img class="charImg" src="./assets/Snap.svg"    alt="Snap"       data-plate-title="SNAP"       data-plate-text="...">
-            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA"  data-plate-text="...">
-            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN"  data-plate-text="...">
-            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO"  data-plate-text="...">
-            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO"  data-plate-text="...">
-            <img class="charImg lg" src="./assets/Golfer.svg"  alt="Golfer"    data-plate-title="GOLFER"     data-plate-text="..." style="margin-right:6vw">
+            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA" data-plate-text="...">
+            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN" data-plate-text="...">
+            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO" data-plate-text="...">
+            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO" data-plate-text="...">
+            <img class="charImg lg" src="./assets/Golfer.svg"  alt="Golfer"    data-plate-title="GOLFER"    data-plate-text="..." style="margin-right:6vw">
         </div>
     </div>
 </div>
@@ -239,22 +231,17 @@
     gsap.registerPlugin(ScrollTrigger);
     gsap.config({ nullTargetWarn:false });
 
-    /* ===== ХМАРКИ В INTRO (виїзд назовні) ===== */
+    /* ===== ХМАРКИ В INTRO (виїжджають назовні) ===== */
     (function introClouds(){
         const tl = gsap.timeline({
-            scrollTrigger:{
-                trigger: "#intro",
-                start: "top top",
-                end: "bottom top",
-                scrub: 1
-            }
+            scrollTrigger:{ trigger:"#intro", start:"top top", end:"bottom top", scrub:1 }
         });
         const push = () => Math.max(innerWidth * 0.28, 280);
         tl.to(".intro .cloud.cloud--lt", { x: -push(), ease:"none" }, 0);
         tl.to(".intro .cloud.cloud--rt", { x:  push(), ease:"none" }, 0);
         tl.to(".intro .cloud.cloud--lb", { x: -push()*0.8, ease:"none" }, 0);
         tl.to(".intro .cloud.cloud--rb", { x:  push()*0.8,  ease:"none" }, 0);
-        tl.to(".intro-logo", { y: -40, opacity: 0.92, ease:"none" }, 0);
+        tl.to(".intro-logo", { y:-40, opacity:0.92, ease:"none" }, 0);
     })();
 
     function waitImgs(sel){
@@ -270,7 +257,6 @@
     };
     const startOffset = (sel, k) => -(bandFull(sel) * (1 - k));
     const endOffset   = (sel)     => -(bandFull(sel));
-    const leadPaddingPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
     function initStage(){
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
@@ -285,7 +271,7 @@
             scrollTrigger:{
                 id:"stageParallax",
                 trigger:"#stage",
-                start:"top top",      // одразу коли зайшли у сцену — видно героїв
+                start:"top top",
                 end: () => {
                     const w = bandFull('#charsBand');
                     return "+=" + Math.max(1600, Math.round(w * 1.15));
@@ -294,26 +280,32 @@
             }
         });
 
-        // легка динаміка сонця
-        tl.to('.sunImg', {yPercent:-6, scale:0.98, ease:'none', duration:18}, 0);
+        /* легка динаміка сонця */
+        tl.to('.sunImg', { yPercent:-6, scale:0.98, ease:'none', duration:18 }, 0);
 
         const dur = 82;
-        tl.fromTo('#mountainsBand',{ x: () => startOffset('#mountainsBand', 0.28) },{ x: () => endOffset('#mountainsBand'), ease:'none', duration:dur },0);
-        tl.fromTo('#housesBand',   { x: () => startOffset('#housesBand',    0.72) },{ x: () => endOffset('#housesBand'),    ease:'none', duration:dur },0);
-        tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },{ x: () => endOffset('#streetGroundBand'), ease:'none', duration:dur },0);
-        tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },{ x: () => endOffset('#streetSnowBand'),   ease:'none', duration:dur },0);
-        tl.fromTo('#charsBand',    { x: () => startOffset('#charsBand',     1.00) },{ x: () => endOffset('#charsBand'),     ease:'none', duration:dur },0);
+        tl.fromTo('#mountainsBand', { x: () => startOffset('#mountainsBand', 0.28) },
+            { x: () => endOffset('#mountainsBand'), ease:'none', duration:dur }, 0);
+        tl.fromTo('#housesBand',    { x: () => startOffset('#housesBand',    0.72) },
+            { x: () => endOffset('#housesBand'),    ease:'none', duration:dur }, 0);
+        tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },
+            { x: () => endOffset('#streetGroundBand'), ease:'none', duration:dur }, 0);
+        tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },
+            { x: () => endOffset('#streetSnowBand'),   ease:'none', duration:dur }, 0);
+        tl.fromTo('#charsBand',      { x: () => startOffset('#charsBand',     1.00) },
+            { x: () => endOffset('#charsBand'),      ease:'none', duration:dur }, 0);
 
         addEventListener('resize', () => ScrollTrigger.refresh());
     }
 
-    /* Hover-оверлеї та нижні plate */
+    /* plates + hover */
     (function attachPlates(){
         const band = document.getElementById('charsBand');
         if(!band) return;
         const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
         list.forEach(baseImg => {
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
+
             const wrap = document.createElement('span');
             wrap.className = baseImg.className; wrap.tabIndex = 0;
             if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
@@ -327,11 +319,10 @@
             const title = baseImg.dataset.plateTitle || baseImg.alt || '';
             const text  = baseImg.dataset.plateText  || '';
             if (title || text){
-                plate.innerHTML =
-                    `<div class="charPlate__inner">
-             ${title ? `<div class="charPlate__title">${title}</div>` : ``}
-             ${text  ? `<div class="charPlate__text">${text}</div>`   : ``}
-           </div>`;
+                plate.innerHTML = `<div class="charPlate__inner">
+          ${title ? `<div class="charPlate__title">${title}</div>` : ``}
+          ${text  ? `<div class="charPlate__text">${text}</div>`   : ``}
+        </div>`;
             }
 
             const pre = new Image(); pre.src = hoverSrc;
