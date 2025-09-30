@@ -12,9 +12,9 @@
             --mountains-lead: 0px;
             --houses-lead: 0px;
 
-            /* окремі висоти для снігу та асфальту */
-            --snow-h: 50px;   /* товщина білої смуги (сніг) */
-            --ground-h: 22vh; /* висота асфальту (регулюється незалежно) */
+            /* дорога */
+            --snow-h: 50px;   /* наскільки будинки “в снігу” */
+            --ground-h: 22vh; /* висота асфальту */
         }
 
         html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
@@ -45,10 +45,10 @@
         #sun{z-index:2}
         #clouds{z-index:3}
         #mountains{z-index:4}
-        #streetGround{z-index:4} /* асфальт нижче */
-        #streetSnow{z-index:5}   /* сніг вище асфальту */
-        #houses{z-index:6}
-        #chars{z-index:7; pointer-events:auto;}
+        #streetGround{z-index:5}  /* асфальт */
+        #houses{z-index:7}        /* будинки (під снігом) */
+        #streetSnow{z-index:6}    /* сніг поверх будинків */
+        #chars{z-index:8; pointer-events:auto;}
 
         #sky{
             background:
@@ -80,32 +80,34 @@
         .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;}
         #mountains .mountainsImg:first-child{ margin-left: calc(0px + var(--mountains-lead)); }
 
-        .houseImg{height:44vh;width:auto;margin:0 36px 7vh;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
+        /* БУДИНКИ: прибрано нижній відступ і піднято ряд на верх асфальту */
+        .houseImg{height:44vh;width:auto;margin:0 36px 0;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
         #houses .houseImg:first-child{ margin-left: calc(5vw + var(--houses-lead)); }
+        /* головне — підняти ВЕСЬ band будинків на висоту ground */
+        #housesBand{ bottom: var(--ground-h); }
 
-        /* ===== НОВІ ШАРИ ВУЛИЦІ ===== */
+        /* ===== ВУЛИЦЯ ===== */
 
-        /* Асфальт — повторюване зображення вздовж осі X, керуємо висотою через --ground-h */
+        /* Асфальт */
         #streetGround .band{
             background:url("./assets/street_ground.jpg") repeat-x left bottom;
             background-size:auto var(--ground-h);
         }
         .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
 
-        /* Сніг — окрема біла смуга, прив’язана до верхнього краю асфальту */
+        /* Сніг: рівно по верху асфальту, перекриває низ будинків */
         #streetSnow .band{ position: relative; }
         #streetSnow .snowLine{
             position: absolute;
             left: 0; right: 0;
-            bottom: var(--ground-h); /* рівно по верхньому краю асфальту */
-            height: var(--snow-h);   /* товщина снігу */
+            bottom: var(--ground-h);
+            height: var(--snow-h);
             background: #fff;
             pointer-events: none;
         }
-        /* spacer тут лише для ширини паралаксу */
         .streetSnowSpacer{ width:600vw; height:0; }
 
-        /* ====== ПЕРСОНАЖІ ====== */
+        /* ПЕРСОНАЖІ */
         .charImg{
             position:relative; display:inline-block;
             width:240px; margin:0 90px 0;
@@ -117,7 +119,6 @@
         .charImg.lg{ width:280px; }
 
         .charImg > img.base{ display:block; width:100%; height:auto; }
-
         .charImg > img.hover{
             position:absolute; left:50%; bottom:0; transform:translateX(-50%);
             height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease;
@@ -131,7 +132,7 @@
 
         @media (max-width:780px){
             :root{--char-drop:calc(-3vh);}
-            .houseImg{height:40vh;margin-bottom:6vh}
+            .houseImg{height:40vh;margin-bottom:0}
         }
 
         .stage::after{
@@ -181,19 +182,19 @@
         </div>
     </div>
 
-    <!-- два окремі шари дороги -->
+    <!-- дорога -->
     <div class="layer" id="streetGround">
         <div class="band" id="streetGroundBand"><div class="streetGroundSpacer"></div></div>
     </div>
 
     <div class="layer" id="streetSnow">
         <div class="band" id="streetSnowBand">
-            <div class="snowLine"></div>         <!-- сніг над асфальтом -->
-            <div class="streetSnowSpacer"></div> <!-- для ширини паралаксу -->
+            <div class="snowLine"></div>
+            <div class="streetSnowSpacer"></div>
         </div>
     </div>
 
-    <!-- CHARS -->
+    <!-- персонажі -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
             <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper">
@@ -237,7 +238,6 @@
     function init(){
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
 
-        /* ширини спейсерів для обох шарів дороги однакові */
         const groundSpacer = document.querySelector('.streetGroundSpacer');
         const snowSpacer   = document.querySelector('.streetSnowSpacer');
         const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
@@ -265,13 +265,7 @@
 
         const cloudPush = () => Math.max(innerWidth * 0.22, 220);
         function flyOut(sel, dir){
-            tl.to(sel, {
-                x: `+=${dir * cloudPush()}`,
-                y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=10' : '+=6',
-                opacity: 0,
-                ease: 'power1.inOut',
-                duration: 20
-            }, 'skyPhase');
+            tl.to(sel, { x: `+=${dir * cloudPush()}`, y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=10' : '+=6', opacity: 0, ease: 'power1.inOut', duration: 20 }, 'skyPhase');
         }
         flyOut('.cloud--lt', -1); flyOut('.cloud--rt', 1); flyOut('.cloud--lb', -1); flyOut('.cloud--rb', 1);
         tl.add(() => gsap.set('#clouds', {display:'none'}), 'skyPhase+=19.6');
@@ -279,11 +273,9 @@
         tl.add('ground', '+=0');
         const groundDur = 82;
 
-        /* паралакс: гори, будинки, дорога (2 шари з однаковою швидкістю), персонажі */
         tl.fromTo('#mountainsBand',{ x: () => startOffset('#mountainsBand', 0.28) },{ x: () => endOffset('#mountainsBand'), ease:'none', duration:groundDur },'ground');
         tl.fromTo('#housesBand',   { x: () => startOffset('#housesBand',    0.72) },{ x: () => endOffset('#housesBand'),    ease:'none', duration:groundDur },'ground');
 
-        /* обидва дорожні шари рухаються з однаковим k = 0.90 */
         tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },{ x: () => endOffset('#streetGroundBand'), ease:'none', duration:groundDur },'ground');
         tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },{ x: () => endOffset('#streetSnowBand'),   ease:'none', duration:groundDur },'ground');
 
@@ -296,41 +288,28 @@
     addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 0));
 </script>
 
-<!-- HOVER-оверлеї (без змін) -->
+<!-- HOVER-оверлеї — без змін -->
 <script>
     (function(){
         const band = document.getElementById('charsBand');
         if(!band) return;
-
         const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
         list.forEach(baseImg => {
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
-
             const wrap = document.createElement('span');
             wrap.className = baseImg.className;
             wrap.tabIndex = 0;
             if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
-
             baseImg.className = 'base';
-
-            const hoverImg = new Image();
-            hoverImg.className = 'hover';
-            hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
-            hoverImg.src = hoverSrc;
-
+            const hoverImg = new Image(); hoverImg.className = 'hover'; hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : ''; hoverImg.src = hoverSrc;
             const dx = parseFloat(baseImg.dataset.hoverX || 0);
             const dy = parseFloat(baseImg.dataset.hoverY || 0);
             if (dx || dy) hoverImg.style.transform = `translateX(calc(-50% + ${dx}px)) translateY(${dy}px)`;
-
             const pre = new Image(); pre.src = hoverSrc;
-
             baseImg.parentNode.insertBefore(wrap, baseImg);
-            wrap.appendChild(baseImg);
-            wrap.appendChild(hoverImg);
-
+            wrap.appendChild(baseImg); wrap.appendChild(hoverImg);
             wrap.addEventListener('touchstart', () => {
-                wrap.classList.add('is-touch');
-                clearTimeout(wrap._t);
+                wrap.classList.add('is-touch'); clearTimeout(wrap._t);
                 wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 450);
             }, {passive:true});
         });
