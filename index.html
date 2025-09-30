@@ -6,13 +6,13 @@
     <title>FightON</title>
 
     <style>
-        :root{
+        :root {
             /* висоти секцій */
             --header-h: 64px;
-            --intro-h: 120vh;   /* скільки «неба» перед сценою */
+            --intro-h: 120vh; /* скільки «неба» перед сценою */
 
             /* pinned-сцена з героями */
-            --stage-h: 108vh;   /* одразу видно героїв */
+            --stage-h: 108vh; /* одразу видно героїв */
 
             /* земля / паретаж */
             --ground-h: 40vh;
@@ -20,144 +20,375 @@
             --mountains-k: 0.85;
             --sun-k: 0.90;
 
-            /* позиція героїв — ТУТ крутити, якщо ще треба вище/нижче */
-            --char-drop: -25vh; /* було -25vh, підняв значно вище */
+            /* позиція героїв */
+            --char-drop: -25vh;
+
+            /* лід-відступи (рахуються в JS) */
+            --mountains-lead: 0px;
+            --houses-lead: 0px;
         }
 
-        html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
-        body{padding-top:var(--header-h);}
-
-        .site-header{
-            position:fixed;inset:0 0 auto 0;height:var(--header-h);z-index:10000;
-            display:flex;align-items:center;gap:16px;padding:0 18px;
-            backdrop-filter:blur(10px);
-            background:linear-gradient(180deg,rgba(10,14,30,.72),rgba(10,14,30,.46));
-            border-bottom:1px solid rgba(255,255,255,.08);
+        html, body {
+            margin: 0;
+            background: #0b1020;
+            color: #fff;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
         }
-        .logo{color:#fff;text-decoration:none;font-weight:800;}
+
+        body {
+            padding-top: var(--header-h);
+        }
+
+        .site-header {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: var(--header-h);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 0 18px;
+            backdrop-filter: blur(10px);
+            background: linear-gradient(180deg, rgba(10, 14, 30, .72), rgba(10, 14, 30, .46));
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .logo {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 800;
+        }
 
         /* ===== ОДИНАКОВЕ НЕБО (і там, і там) ===== */
         .sky-gradient,
-        #sky{
-            background:
-                    radial-gradient(900px 520px at 65% 10%,rgba(255,255,255,.18) 0%,rgba(255,255,255,0) 60%),
-                    linear-gradient(180deg,#7A8CF1 0%,#6FA2FA 28%,#79C3FF 62%,#CFEFFF 88%,#F6FDFF 100%);
+        #sky {
+            background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 60%),
+            linear-gradient(180deg, #7A8CF1 0%, #6FA2FA 28%, #79C3FF 62%, #CFEFFF 88%, #F6FDFF 100%);
         }
 
         /* ===== INTRO: небо + 4 хмарки + лого ===== */
-        .intro{
-            position:relative;height:var(--intro-h);overflow:hidden;
+        .intro {
+            position: relative;
+            height: var(--intro-h);
+            overflow: hidden;
         }
-        .intro::before{content:"";position:absolute;inset:0;display:block;z-index:0;/* фон неба */
-            composes: sky-gradient;
+
+        .intro-logo {
+            position: absolute;
+            left: 50%;
+            top: 16vh;
+            transform: translateX(-50%);
+            z-index: 3;
+            pointer-events: none;
         }
-        .intro-logo{position:absolute;left:50%;top:16vh;transform:translateX(-50%);z-index:3;pointer-events:none;}
-        .intro-logo img{width:min(48vmax,760px);height:auto;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
-        .intro .cloud{position:absolute;z-index:2;filter:drop-shadow(0 6px 14px rgba(0,0,0,.12));}
-        .intro .cloud img{height:22vh;width:auto;}
-        /* 4 хмарки; нижні — підняв помітно вище */
-        .cloud--lt{ left:6vw;  top:22vh; }
-        .cloud--rt{ right:6vw; top:22vh; }
-        .cloud--lb{ left:12vw; bottom:22vh;}  /* було ~10vh */
-        .cloud--rb{ right:12vw;bottom:22vh;}  /* було ~10vh */
+
+        .intro-logo img {
+            width: min(48vmax, 760px);
+            height: auto;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+        }
+
+        .intro .cloud {
+            position: absolute;
+            z-index: 2;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .12));
+        }
+
+        .intro .cloud img {
+            height: 22vh;
+            width: auto;
+        }
+
+        /* 4 хмарки; нижні — вище */
+        .cloud--lt {
+            left: 6vw;
+            top: 22vh;
+        }
+
+        .cloud--rt {
+            right: 6vw;
+            top: 22vh;
+        }
+
+        .cloud--lb {
+            left: 12vw;
+            bottom: 22vh;
+        }
+
+        .cloud--rb {
+            right: 12vw;
+            bottom: 22vh;
+        }
 
         /* ===== STAGE (паретаж із героями) ===== */
-        .stage{position:relative;height:var(--stage-h);overflow:hidden;}
-        .layer{position:absolute;inset:0;pointer-events:none;}
-        .band{
-            position:absolute;left:0;bottom:0;height:100%;
-            min-width:100%;display:flex;align-items:flex-end;white-space:nowrap;
-            will-change:transform;transform:translateZ(0); /* гладка анімація */
-        }
-        .band::after{content:"";flex:0 0 0;}
-
-        #sky{z-index:1}
-        #sun{z-index:2}
-        /* ХМАР НА СЦЕНІ НЕМАЄ — шар #clouds видалено */
-        #mountains{z-index:4}
-        #streetGround{z-index:5}
-        #streetSnow{z-index:6}
-        #houses{z-index:7}
-        #chars{z-index:8; pointer-events:auto;}
-
-        #sky::before{
-            content:"";position:absolute;left:50%;top:6vh;transform:translateX(-50%);
-            width:64vmin;height:64vmin;border-radius:50%;
-            background:radial-gradient(circle at 50% 50%,#fff 0 10%,#fff8 10% 26%,#fff3 26% 42%,transparent 60%);
-            filter:blur(16px);opacity:.22;
+        .stage {
+            position: relative;
+            height: var(--stage-h);
+            overflow: hidden;
         }
 
-        #sun{display:grid;place-items:center;}
-        .sunImg{
-            width:min(22vmax,420px);height:auto;position:absolute;left:50%;transform:translateX(-50%);
+        .layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+
+        .band {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 100%;
+            min-width: 100%;
+            display: flex;
+            align-items: flex-end;
+            white-space: nowrap;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        .band::after {
+            content: "";
+            flex: 0 0 0;
+        }
+
+        #sky {
+            z-index: 1
+        }
+
+        #sun {
+            z-index: 2
+        }
+
+        #mountains {
+            z-index: 4
+        }
+
+        #streetGround {
+            z-index: 5
+        }
+
+        #streetSnow {
+            z-index: 6
+        }
+
+        #houses {
+            z-index: 7
+        }
+
+        #chars {
+            z-index: 8;
+            pointer-events: auto;
+        }
+
+        #sky::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 6vh;
+            transform: translateX(-50%);
+            width: 64vmin;
+            height: 64vmin;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
+            filter: blur(16px);
+            opacity: .22;
+        }
+
+        #sun {
+            display: grid;
+            place-items: center;
+        }
+
+        .sunImg {
+            width: min(22vmax, 420px);
+            height: auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
             bottom: calc(var(--ground-h) * var(--sun-k) + 8vh);
-            opacity:.93;filter:blur(.2px);
+            opacity: .93;
+            filter: blur(.2px);
         }
 
-        .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;}
-        #mountainsBand{ bottom: calc(var(--ground-h) * var(--mountains-k)); }
-        #mountains .mountainsImg:first-child{ margin-left: 0; }
+        .mountainsImg {
+            height: 32vh;
+            width: auto;
+            margin: 0 0 10vh;
+        }
 
-        .houseImg{height:44vh;width:auto;margin:0 36px 0;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
-        #housesBand{ bottom: var(--ground-h); }
+        /* ВАЖЛИВО: даємо лід-відступ першій горі, щоб не обрізало */
+        #mountains .mountainsImg:first-child {
+            margin-left: var(--mountains-lead);
+        }
+
+        #mountainsBand {
+            bottom: calc(var(--ground-h) * var(--mountains-k));
+        }
+
+        .houseImg {
+            height: 44vh;
+            width: auto;
+            margin: 0 36px 0;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+        }
+
+        /* ВАЖЛИВО: лід-відступ першому будинку */
+        #houses .houseImg:first-child {
+            margin-left: var(--houses-lead);
+        }
+
+        #housesBand {
+            bottom: var(--ground-h);
+        }
 
         /* ВУЛИЦЯ */
-        #streetGround .band{
-            background:url("./assets/street_ground.jpg") repeat-x left bottom;
-            background-size:auto var(--ground-h);
+        #streetGround .band {
+            background: url("./assets/street_ground.jpg") repeat-x left bottom;
+            background-size: auto var(--ground-h);
         }
-        .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
 
-        #streetSnow .band{ position: relative; }
-        #streetSnow .snowLine{
-            position: absolute;left:0;right:0;bottom: var(--ground-h);
-            height: var(--snow-h);background:#fff;pointer-events:none;
+        .streetGroundSpacer {
+            width: 600vw;
+            height: var(--ground-h);
         }
-        .streetSnowSpacer{ width:600vw; height:0; }
 
-        /* ПЕРСОНАЖІ — помітно вище */
-        .charImg{
-            position:relative; display:inline-block;
-            width:240px; margin:0 90px 0;
-            transform:translateY(var(--char-drop));
-            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
-            vertical-align:bottom;
-            will-change:transform;
+        #streetSnow .band {
+            position: relative;
         }
-        .charImg.sm{ width:200px; } .charImg.lg{ width:280px; }
-        .charImg > img.base{ display:block; width:100%; height:auto; position:relative; z-index:2; }
-        .charImg > img.hover{
-            position:absolute; left:50%; bottom:0; transform:translateX(-50%);
-            height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease;
-            object-fit:contain; object-position:center bottom; z-index:2;
+
+        #streetSnow .snowLine {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: var(--ground-h);
+            height: var(--snow-h);
+            background: #fff;
+            pointer-events: none;
         }
+
+        .streetSnowSpacer {
+            width: 600vw;
+            height: 0;
+        }
+
+        /* ПЕРСОНАЖІ — вище */
+        .charImg {
+            position: relative;
+            display: inline-block;
+            width: 240px;
+            margin: 0 90px 0;
+            transform: translateY(var(--char-drop));
+            filter: drop-shadow(0 12px 34px rgba(0, 0, 0, .35));
+            vertical-align: bottom;
+            will-change: transform;
+        }
+
+        .charImg.sm {
+            width: 200px;
+        }
+
+        .charImg.lg {
+            width: 280px;
+        }
+
+        .charImg > img.base {
+            display: block;
+            width: 100%;
+            height: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .charImg > img.hover {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            height: 100%;
+            width: auto;
+            margin: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease;
+            object-fit: contain;
+            object-position: center bottom;
+            z-index: 2;
+        }
+
         .charImg:hover > img.hover,
         .charImg:focus-visible > img.hover,
-        .charImg.is-touch > img.hover{ opacity:1; }
+        .charImg.is-touch > img.hover {
+            opacity: 1;
+        }
 
-        #charsBand > .charImg:first-child { margin-left:5vw; }
+        #charsBand > .charImg:first-child {
+            margin-left: 5vw;
+        }
 
         /* plate */
-        .charPlate{
-            position:absolute; left:50%; transform:translateX(-50%); top: calc(100% + 14px);
-            z-index:1; pointer-events:none; background:#111; color:#fff;
-            padding:12px 18px; border-radius:14px;
-            box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0,0,0,.35);
-            display:none;
+        .charPlate {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: calc(100% + 14px);
+            z-index: 1;
+            pointer-events: none;
+            background: #111;
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 14px;
+            box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0, 0, 0, .35);
+            display: none;
         }
-        .charPlate__inner{ display:flex; flex-direction:column; gap:15px; align-items:center; text-align:center; min-width:240px; max-width:320px; }
-        .charPlate__title{ font-weight:900; letter-spacing:.06em; text-transform:uppercase; text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px; }
-        .charPlate__text{ line-height:1.25; font-weight:600; }
-        .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate{ display:block; }
+
+        .charPlate__inner {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            align-items: center;
+            text-align: center;
+            min-width: 240px;
+            max-width: 320px;
+        }
+
+        .charPlate__title {
+            font-weight: 900;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+            text-decoration: underline;
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+        }
+
+        .charPlate__text {
+            line-height: 1.25;
+            font-weight: 600;
+        }
+
+        .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate {
+            display: block;
+        }
 
         /* віньєтка низу сцени */
-        .stage::after{
-            content:"";position:absolute;left:-5vw;right:-5vw;bottom:-6vh;height:18vh;
-            background:radial-gradient(120% 150% at 50% 115%,rgba(0,0,0,.35) 0%,rgba(0,0,0,.18) 38%,rgba(0,0,0,0) 72%);
-            pointer-events:none;z-index:3;
+        .stage::after {
+            content: "";
+            position: absolute;
+            left: -5vw;
+            right: -5vw;
+            bottom: -6vh;
+            height: 18vh;
+            background: radial-gradient(120% 150% at 50% 115%, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, .18) 38%, rgba(0, 0, 0, 0) 72%);
+            pointer-events: none;
+            z-index: 3;
         }
 
-        .tail{min-height:70vh;display:grid;place-items:center;background:radial-gradient(1100px 520px at 70% 15%,#1d2a66 0%,#0b1020 62%);color:#cfd6ff;}
+        .tail {
+            min-height: 70vh;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%);
+            color: #cfd6ff;
+        }
     </style>
 </head>
 <body>
@@ -174,10 +405,10 @@
 
 <!-- ===== STAGE ===== -->
 <div class="stage" id="stage">
-    <div class="layer sky-gradient" id="sky"><div class="band"></div></div>
+    <div class="layer sky-gradient" id="sky">
+        <div class="band"></div>
+    </div>
     <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
-
-    <!-- ХМАРИ для сцени ВИДАЛЕНО -->
 
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
@@ -188,37 +419,50 @@
 
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png"  alt="">
-            <img class="houseImg" src="./assets/house2.png"  alt="">
-            <img class="houseImg" src="./assets/house3.png"  alt="">
-            <img class="houseImg" src="./assets/house4.png"  alt="">
-            <img class="houseImg" src="./assets/house5.png"  alt="">
-            <img class="houseImg" src="./assets/house6.png"  alt="">
-            <img class="houseImg" src="./assets/house7.png"  alt="">
-            <img class="houseImg" src="./assets/house8.png"  alt="">
-            <img class="houseImg" src="./assets/house9.png"  alt="">
+            <img class="houseImg" src="./assets/house1.png" alt="">
+            <img class="houseImg" src="./assets/house2.png" alt="">
+            <img class="houseImg" src="./assets/house3.png" alt="">
+            <img class="houseImg" src="./assets/house4.png" alt="">
+            <img class="houseImg" src="./assets/house5.png" alt="">
+            <img class="houseImg" src="./assets/house6.png" alt="">
+            <img class="houseImg" src="./assets/house7.png" alt="">
+            <img class="houseImg" src="./assets/house8.png" alt="">
+            <img class="houseImg" src="./assets/house9.png" alt="">
             <img class="houseImg" src="./assets/house10.png" alt="">
         </div>
     </div>
 
     <div class="layer" id="streetGround">
-        <div class="band" id="streetGroundBand"><div class="streetGroundSpacer"></div></div>
+        <div class="band" id="streetGroundBand">
+            <div class="streetGroundSpacer"></div>
+        </div>
     </div>
     <div class="layer" id="streetSnow">
-        <div class="band" id="streetSnowBand"><div class="snowLine"></div><div class="streetSnowSpacer"></div></div>
+        <div class="band" id="streetSnowBand">
+            <div class="snowLine"></div>
+            <div class="streetSnowSpacer"></div>
+        </div>
     </div>
 
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg" src="./assets/Sniper.svg"  alt="Sniper"     data-plate-title="SNIPER"     data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla"    data-plate-title="GORILLA"    data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster"    data-plate-title="MOBSTER"    data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Snap.svg"    alt="Snap"       data-plate-title="SNAP"       data-plate-text="...">
-            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA" data-plate-text="...">
-            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN" data-plate-text="...">
-            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO" data-plate-text="...">
-            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO" data-plate-text="...">
-            <img class="charImg lg" src="./assets/Golfer.svg"  alt="Golfer"    data-plate-title="GOLFER"    data-plate-text="..." style="margin-right:6vw">
+            <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" data-plate-title="SNIPER"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla" data-plate-title="GORILLA"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster" data-plate-title="MOBSTER"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+            <img class="charImg" src="./assets/Snap.svg" alt="Snap" data-plate-title="SNAP" data-plate-text="...">
+            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO"
+                 data-plate-text="...">
+            <img class="charImg lg" src="./assets/Golfer.svg" alt="Golfer" data-plate-title="GOLFER"
+                 data-plate-text="..." style="margin-right:6vw">
         </div>
     </div>
 </div>
@@ -229,112 +473,126 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script>
     gsap.registerPlugin(ScrollTrigger);
-    gsap.config({ nullTargetWarn:false });
+    gsap.config({nullTargetWarn: false});
 
     /* ===== ХМАРКИ В INTRO (виїжджають назовні) ===== */
-    (function introClouds(){
+    (function introClouds() {
         const tl = gsap.timeline({
-            scrollTrigger:{ trigger:"#intro", start:"top top", end:"bottom top", scrub:1 }
+            scrollTrigger: {trigger: "#intro", start: "top top", end: "bottom top", scrub: 1}
         });
         const push = () => Math.max(innerWidth * 0.28, 280);
-        tl.to(".intro .cloud.cloud--lt", { x: -push(), ease:"none" }, 0);
-        tl.to(".intro .cloud.cloud--rt", { x:  push(), ease:"none" }, 0);
-        tl.to(".intro .cloud.cloud--lb", { x: -push()*0.8, ease:"none" }, 0);
-        tl.to(".intro .cloud.cloud--rb", { x:  push()*0.8,  ease:"none" }, 0);
-        tl.to(".intro-logo", { y:-40, opacity:0.92, ease:"none" }, 0);
+        tl.to(".intro .cloud.cloud--lt", {x: -push(), ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--rt", {x: push(), ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--lb", {x: -push() * 0.8, ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--rb", {x: push() * 0.8, ease: "none"}, 0);
+        tl.to(".intro-logo", {y: -40, opacity: 0.92, ease: "none"}, 0);
     })();
 
-    function waitImgs(sel){
+    function waitImgs(sel) {
         const imgs = Array.from(document.querySelectorAll(sel + ' img'));
-        return Promise.all(imgs.map(i => i.complete ? 1 : new Promise(r => i.addEventListener('load', r, {once:true}))));
+        return Promise.all(imgs.map(i => i.complete ? 1 : new Promise(r => i.addEventListener('load', r, {once: true}))));
     }
 
     const bandFull = (sel) => {
         const el = document.querySelector(sel);
-        if(!el) return 0;
+        if (!el) return 0;
         const w = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
         return Math.max(0, w - innerWidth);
     };
     const startOffset = (sel, k) => -(bandFull(sel) * (1 - k));
-    const endOffset   = (sel)     => -(bandFull(sel));
+    const endOffset = (sel) => -(bandFull(sel));
+    const leadPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
-    function initStage(){
+    function initStage() {
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
 
         const groundSpacer = document.querySelector('.streetGroundSpacer');
-        const snowSpacer   = document.querySelector('.streetSnowSpacer');
+        const snowSpacer = document.querySelector('.streetSnowSpacer');
         const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
         if (groundSpacer) groundSpacer.style.width = baseWidth + 'px';
-        if (snowSpacer)   snowSpacer.style.width   = baseWidth + 'px';
+        if (snowSpacer) snowSpacer.style.width = baseWidth + 'px';
+
+        /* ВАЖЛИВО: порахували лід-відступи, щоб не обрізало перші елементи */
+        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
+        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
 
         const tl = gsap.timeline({
-            scrollTrigger:{
-                id:"stageParallax",
-                trigger:"#stage",
-                start:"top top",
+            scrollTrigger: {
+                id: "stageParallax",
+                trigger: "#stage",
+                start: "top top",
                 end: () => {
                     const w = bandFull('#charsBand');
                     return "+=" + Math.max(1600, Math.round(w * 1.15));
                 },
-                pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
+                pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true
             }
         });
 
         /* легка динаміка сонця */
-        tl.to('.sunImg', { yPercent:-6, scale:0.98, ease:'none', duration:18 }, 0);
+        tl.to('.sunImg', {yPercent: -6, scale: 0.98, ease: 'none', duration: 18}, 0);
 
         const dur = 82;
-        tl.fromTo('#mountainsBand', { x: () => startOffset('#mountainsBand', 0.28) },
-            { x: () => endOffset('#mountainsBand'), ease:'none', duration:dur }, 0);
-        tl.fromTo('#housesBand',    { x: () => startOffset('#housesBand',    0.72) },
-            { x: () => endOffset('#housesBand'),    ease:'none', duration:dur }, 0);
-        tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },
-            { x: () => endOffset('#streetGroundBand'), ease:'none', duration:dur }, 0);
-        tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },
-            { x: () => endOffset('#streetSnowBand'),   ease:'none', duration:dur }, 0);
-        tl.fromTo('#charsBand',      { x: () => startOffset('#charsBand',     1.00) },
-            { x: () => endOffset('#charsBand'),      ease:'none', duration:dur }, 0);
+        tl.fromTo('#mountainsBand', {x: () => startOffset('#mountainsBand', 0.28)},
+            {x: () => endOffset('#mountainsBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#housesBand', {x: () => startOffset('#housesBand', 0.72)},
+            {x: () => endOffset('#housesBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#streetGroundBand', {x: () => startOffset('#streetGroundBand', 0.90)},
+            {x: () => endOffset('#streetGroundBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#streetSnowBand', {x: () => startOffset('#streetSnowBand', 0.90)},
+            {x: () => endOffset('#streetSnowBand'), ease: 'none', duration: dur}, 0);
+        tl.fromTo('#charsBand', {x: () => startOffset('#charsBand', 1.00)},
+            {x: () => endOffset('#charsBand'), ease: 'none', duration: dur}, 0);
 
         addEventListener('resize', () => ScrollTrigger.refresh());
     }
 
     /* plates + hover */
-    (function attachPlates(){
+    (function attachPlates() {
         const band = document.getElementById('charsBand');
-        if(!band) return;
+        if (!band) return;
         const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
         list.forEach(baseImg => {
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
 
             const wrap = document.createElement('span');
-            wrap.className = baseImg.className; wrap.tabIndex = 0;
-            if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
+            wrap.className = baseImg.className;
+            wrap.tabIndex = 0;
+            if (baseImg.style.margin) {
+                wrap.style.margin = baseImg.style.margin;
+                baseImg.style.margin = '';
+            }
             baseImg.className = 'base';
 
             const hoverImg = new Image();
-            hoverImg.className = 'hover'; hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : ''; hoverImg.src = hoverSrc;
+            hoverImg.className = 'hover';
+            hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
+            hoverImg.src = hoverSrc;
 
             const plate = document.createElement('div');
             plate.className = 'charPlate';
             const title = baseImg.dataset.plateTitle || baseImg.alt || '';
-            const text  = baseImg.dataset.plateText  || '';
-            if (title || text){
+            const text = baseImg.dataset.plateText || '';
+            if (title || text) {
                 plate.innerHTML = `<div class="charPlate__inner">
           ${title ? `<div class="charPlate__title">${title}</div>` : ``}
-          ${text  ? `<div class="charPlate__text">${text}</div>`   : ``}
+          ${text ? `<div class="charPlate__text">${text}</div>` : ``}
         </div>`;
             }
 
-            const pre = new Image(); pre.src = hoverSrc;
+            const pre = new Image();
+            pre.src = hoverSrc;
 
             baseImg.parentNode.insertBefore(wrap, baseImg);
-            wrap.appendChild(baseImg); wrap.appendChild(hoverImg);
+            wrap.appendChild(baseImg);
+            wrap.appendChild(hoverImg);
             if (title || text) wrap.appendChild(plate);
 
             wrap.addEventListener('touchstart', () => {
-                wrap.classList.add('is-touch'); clearTimeout(wrap._t);
+                wrap.classList.add('is-touch');
+                clearTimeout(wrap._t);
                 wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 900);
-            }, {passive:true});
+            }, {passive: true});
         });
     })();
 
