@@ -105,6 +105,8 @@
         .charImg:focus-visible > img.hover,
         .charImg.is-touch > img.hover{ opacity:1; }
 
+        #charsBand > .charImg:first-child { margin-left:5vw; }
+
         @media (max-width:780px){
             :root{--char-drop:calc(-3vh);}
             .houseImg{height:40vh;margin-bottom:6vh}
@@ -167,7 +169,7 @@
     <!-- CHARS (можна додатково дати data-hover, data-hover-x, data-hover-y на будь-який) -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper"    style="margin-left:5vw">
+            <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper">
             <img class="charImg"    src="./assets/Gorilla.svg"    alt="Gorilla">
             <img class="charImg"    src="./assets/Mobster.svg"    alt="Mobster">
             <img class="charImg"    src="./assets/Snap.svg"       alt="Snap">
