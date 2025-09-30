@@ -11,6 +11,10 @@
             --header-h: 64px;
             --mountains-lead: 0px;
             --houses-lead: 0px;
+
+            /* дорога */
+            --snow-h: 50px;   /* наскільки будинки “в снігу” */
+            --ground-h: 22vh; /* висота асфальту */
         }
 
         html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
@@ -41,9 +45,10 @@
         #sun{z-index:2}
         #clouds{z-index:3}
         #mountains{z-index:4}
-        #street{z-index:5}
-        #houses{z-index:6}
-        #chars{z-index:7; pointer-events:auto;}
+        #streetGround{z-index:5}  /* асфальт */
+        #houses{z-index:7}        /* будинки (під снігом) */
+        #streetSnow{z-index:6}    /* сніг поверх будинків */
+        #chars{z-index:8; pointer-events:auto;}
 
         #sky{
             background:
@@ -75,13 +80,34 @@
         .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;}
         #mountains .mountainsImg:first-child{ margin-left: calc(0px + var(--mountains-lead)); }
 
-        .houseImg{height:44vh;width:auto;margin:0 36px 7vh;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
+        /* БУДИНКИ: прибрано нижній відступ і піднято ряд на верх асфальту */
+        .houseImg{height:44vh;width:auto;margin:0 36px 0;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
         #houses .houseImg:first-child{ margin-left: calc(5vw + var(--houses-lead)); }
+        /* головне — підняти ВЕСЬ band будинків на висоту ground */
+        #housesBand{ bottom: var(--ground-h); }
 
-        #street .band{background:url("./assets/street.svg") repeat-x left bottom;background-size:auto 22vh;}
-        .streetSpacer{width:600vw;height:22vh;}
+        /* ===== ВУЛИЦЯ ===== */
 
-        /* === CHAR CONTAINERS === */
+        /* Асфальт */
+        #streetGround .band{
+            background:url("./assets/street_ground.jpg") repeat-x left bottom;
+            background-size:auto var(--ground-h);
+        }
+        .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
+
+        /* Сніг: рівно по верху асфальту, перекриває низ будинків */
+        #streetSnow .band{ position: relative; }
+        #streetSnow .snowLine{
+            position: absolute;
+            left: 0; right: 0;
+            bottom: var(--ground-h);
+            height: var(--snow-h);
+            background: #fff;
+            pointer-events: none;
+        }
+        .streetSnowSpacer{ width:600vw; height:0; }
+
+        /* ПЕРСОНАЖІ */
         .charImg{
             position:relative; display:inline-block;
             width:240px; margin:0 90px 0;
@@ -92,10 +118,7 @@
         .charImg.sm{ width:200px; }
         .charImg.lg{ width:280px; }
 
-        /* базовий спрайт лишаємо блоком (визначає висоту контейнера) */
         .charImg > img.base{ display:block; width:100%; height:auto; }
-
-        /* hover — вирівнюємо НИЗ/ЦЕНТР, щоб різні viewBox лягали однаково */
         .charImg > img.hover{
             position:absolute; left:50%; bottom:0; transform:translateX(-50%);
             height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease;
@@ -109,9 +132,7 @@
 
         @media (max-width:780px){
             :root{--char-drop:calc(-3vh);}
-            .houseImg{height:40vh;margin-bottom:6vh}
-            #street .band{background-size:auto 20vh}
-            .streetSpacer{height:20vh}
+            .houseImg{height:40vh;margin-bottom:0}
         }
 
         .stage::after{
@@ -121,7 +142,6 @@
         }
 
         .tail{min-height:70vh;display:grid;place-items:center;background:radial-gradient(1100px 520px at 70% 15%,#1d2a66 0%,#0b1020 62%);color:#cfd6ff;}
-
     </style>
 </head>
 <body>
@@ -162,11 +182,19 @@
         </div>
     </div>
 
-    <div class="layer" id="street">
-        <div class="band" id="streetBand"><div class="streetSpacer"></div></div>
+    <!-- дорога -->
+    <div class="layer" id="streetGround">
+        <div class="band" id="streetGroundBand"><div class="streetGroundSpacer"></div></div>
     </div>
 
-    <!-- CHARS (можна додатково дати data-hover, data-hover-x, data-hover-y на будь-який) -->
+    <div class="layer" id="streetSnow">
+        <div class="band" id="streetSnowBand">
+            <div class="snowLine"></div>
+            <div class="streetSnowSpacer"></div>
+        </div>
+    </div>
+
+    <!-- персонажі -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
             <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper">
@@ -177,7 +205,6 @@
             <img class="charImg"    src="./assets/Shelldren.svg"  alt="Shelldren">
             <img class="charImg"    src="./assets/Pistolero.svg"  alt="Pistolero">
             <img class="charImg"    src="./assets/Machetero.svg"  alt="Machetero">
-            <!-- приклад, якщо у першого зараз інше hover-зображення -->
             <img class="charImg lg" src="./assets/Golfer.svg"     alt="Golfer" style="margin-right:6vw">
         </div>
     </div>
@@ -210,8 +237,12 @@
 
     function init(){
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
-        const spacer = document.querySelector('.streetSpacer');
-        if (spacer) spacer.style.width = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5)) + 'px';
+
+        const groundSpacer = document.querySelector('.streetGroundSpacer');
+        const snowSpacer   = document.querySelector('.streetSnowSpacer');
+        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
+        if (groundSpacer) groundSpacer.style.width = baseWidth + 'px';
+        if (snowSpacer)   snowSpacer.style.width   = baseWidth + 'px';
 
         document.documentElement.style.setProperty('--mountains-lead', leadPaddingPx('#mountainsBand', 0.28) + 'px');
         document.documentElement.style.setProperty('--houses-lead',    leadPaddingPx('#housesBand',    0.72) + 'px');
@@ -234,22 +265,20 @@
 
         const cloudPush = () => Math.max(innerWidth * 0.22, 220);
         function flyOut(sel, dir){
-            tl.to(sel, {
-                x: `+=${dir * cloudPush()}`,
-                y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=10' : '+=6',
-                opacity: 0,
-                ease: 'power1.inOut',
-                duration: 20
-            }, 'skyPhase');
+            tl.to(sel, { x: `+=${dir * cloudPush()}`, y: (sel.includes('--lt') || sel.includes('--rt')) ? '-=10' : '+=6', opacity: 0, ease: 'power1.inOut', duration: 20 }, 'skyPhase');
         }
         flyOut('.cloud--lt', -1); flyOut('.cloud--rt', 1); flyOut('.cloud--lb', -1); flyOut('.cloud--rb', 1);
         tl.add(() => gsap.set('#clouds', {display:'none'}), 'skyPhase+=19.6');
 
         tl.add('ground', '+=0');
         const groundDur = 82;
+
         tl.fromTo('#mountainsBand',{ x: () => startOffset('#mountainsBand', 0.28) },{ x: () => endOffset('#mountainsBand'), ease:'none', duration:groundDur },'ground');
         tl.fromTo('#housesBand',   { x: () => startOffset('#housesBand',    0.72) },{ x: () => endOffset('#housesBand'),    ease:'none', duration:groundDur },'ground');
-        tl.fromTo('#streetBand',   { x: () => startOffset('#streetBand',    0.90) },{ x: () => endOffset('#streetBand'),    ease:'none', duration:groundDur },'ground');
+
+        tl.fromTo('#streetGroundBand',{ x: () => startOffset('#streetGroundBand', 0.90) },{ x: () => endOffset('#streetGroundBand'), ease:'none', duration:groundDur },'ground');
+        tl.fromTo('#streetSnowBand',  { x: () => startOffset('#streetSnowBand',   0.90) },{ x: () => endOffset('#streetSnowBand'),   ease:'none', duration:groundDur },'ground');
+
         tl.fromTo('#charsBand',    { x: () => startOffset('#charsBand',     1.00) },{ x: () => endOffset('#charsBand'),     ease:'none', duration:groundDur },'ground');
 
         addEventListener('resize', () => ScrollTrigger.refresh());
@@ -259,42 +288,28 @@
     addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 0));
 </script>
 
-<!-- HOVER-оверлеї -->
+<!-- HOVER-оверлеї — без змін -->
 <script>
     (function(){
         const band = document.getElementById('charsBand');
         if(!band) return;
-
         const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
         list.forEach(baseImg => {
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
-
             const wrap = document.createElement('span');
             wrap.className = baseImg.className;
             wrap.tabIndex = 0;
             if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
-
             baseImg.className = 'base';
-
-            const hoverImg = new Image();
-            hoverImg.className = 'hover';
-            hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
-            hoverImg.src = hoverSrc;
-
-            // опціональні дрібні підстройки, якщо потрібно точніше сумістити
+            const hoverImg = new Image(); hoverImg.className = 'hover'; hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : ''; hoverImg.src = hoverSrc;
             const dx = parseFloat(baseImg.dataset.hoverX || 0);
             const dy = parseFloat(baseImg.dataset.hoverY || 0);
             if (dx || dy) hoverImg.style.transform = `translateX(calc(-50% + ${dx}px)) translateY(${dy}px)`;
-
             const pre = new Image(); pre.src = hoverSrc;
-
             baseImg.parentNode.insertBefore(wrap, baseImg);
-            wrap.appendChild(baseImg);
-            wrap.appendChild(hoverImg);
-
+            wrap.appendChild(baseImg); wrap.appendChild(hoverImg);
             wrap.addEventListener('touchstart', () => {
-                wrap.classList.add('is-touch');
-                clearTimeout(wrap._t);
+                wrap.classList.add('is-touch'); clearTimeout(wrap._t);
                 wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 450);
             }, {passive:true});
         });
