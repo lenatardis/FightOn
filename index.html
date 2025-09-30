@@ -111,13 +111,38 @@
         }
         .streetSpacer{width:600vw;height:22vh;}
 
-        /* CHARS */
+        /* ===== CHARS (контейнер + базовий та hover-слої) ===== */
+        /* ВАЖЛИВО: тепер .charImg — це КОНТЕЙНЕР (JS сам обгорне <img>) */
         .charImg{
-            width:240px;height:auto;margin:0 90px 0;
+            position:relative;
+            display:inline-block;
+            width:240px;
+            margin:0 90px 0;
             transform:translateY(var(--char-drop));
-            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));flex:0 0 auto;
+            filter:drop-shadow(0 12px 34px rgba(0,0,0,.35));
+            vertical-align:bottom;
         }
-        .charImg.sm{width:200px}.charImg.lg{width:280px}
+        .charImg.sm{ width:200px; }
+        .charImg.lg{ width:280px; }
+
+        .charImg > img{ display:block; width:100%; height:auto; }
+        .charImg > img.hover{
+            position:absolute; inset:0;
+            opacity:0; pointer-events:none;
+            transition:opacity .18s ease;
+        }
+        .charImg:hover > img.hover,
+        .charImg:focus-visible > img.hover,
+        .charImg.is-touch > img.hover{
+            opacity:1;
+        }
+
+        /* увімкнути події на шарі з персонажами */
+        #chars { pointer-events:auto; }
+        #chars .band { pointer-events:auto; }  /* на всяк випадок */
+
+        .charImg { pointer-events:auto; cursor:pointer; } /* щоб точно ловився hover */
+
 
         @media (max-width:780px){
             :root{--char-drop:calc(-3vh);}
@@ -177,7 +202,7 @@
             <img class="houseImg" src="./assets/house7.png"  alt="House 7">
             <img class="houseImg" src="./assets/house8.png"  alt="House 8">
             <img class="houseImg" src="./assets/house9.png"  alt="House 9">
-            <!-- якщо є house10.png — заміни src нижче -->
+            <!-- якщо є house10.png — лишай; якщо ні, можеш замінити на 9-й -->
             <img class="houseImg" src="./assets/house10.png"  alt="House 10">
         </div>
     </div>
@@ -192,15 +217,16 @@
     <!-- CHARS (9) -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg" src="./assets/Sniper.svg"    alt="Sniper"    style="margin-left:5vw">
-            <img class="charImg" src="./assets/Gorilla.svg"   alt="Gorilla">
-            <img class="charImg" src="./assets/Mobster.svg"   alt="Mobster">
-            <img class="charImg" src="./assets/Snap.svg"      alt="Snap">
-            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla">
-            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren">
-            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero">
-            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero">
-            <img class="charImg lg" src="./assets/Golfer.svg" alt="Golfer" style="margin-right:6vw">
+            <!-- Якщо назва hover-версії не *_hover.svg, додай data-hover="..." -->
+            <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper"    style="margin-left:5vw">
+            <img class="charImg"    src="./assets/Gorilla.svg"    alt="Gorilla">
+            <img class="charImg"    src="./assets/Mobster.svg"    alt="Mobster">
+            <img class="charImg"    src="./assets/Snap.svg"       alt="Snap">
+            <img class="charImg"    src="./assets/Cuadrilla.svg"  alt="Cuadrilla">
+            <img class="charImg"    src="./assets/Shelldren.svg"  alt="Shelldren">
+            <img class="charImg"    src="./assets/Pistolero.svg"  alt="Pistolero">
+            <img class="charImg"    src="./assets/Machetero.svg"  alt="Machetero">
+            <img class="charImg lg" src="./assets/Golfer.svg"     alt="Golfer" style="margin-right:6vw">
         </div>
     </div>
 </div>
@@ -310,6 +336,58 @@
 
     waitStageImgs().then(() => { init(); ScrollTrigger.refresh(); });
     addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 0));
+</script>
+
+<!-- ===== HOVER-обводка персонажів (обгортання та підміна спрайта) ===== -->
+<script>
+    /*
+      Логіка:
+      - знаходимо всі <img class="charImg ..."> всередині #charsBand
+      - обгортаємо їх у <span class="charImg ...">, переносимо класи/марджини на контейнер
+      - додаємо верхній <img.hover> з src: data-hover або *_hover.svg
+      - робимо попереднє завантаження hover-версій
+      - додаємо легкий підсвіт по тапу на тачі
+      // TODO: tooltip later
+    */
+    (function(){
+        const band = document.getElementById('charsBand');
+        if(!band) return;
+
+        const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
+        list.forEach(baseImg => {
+            const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
+
+            // створюємо контейнер і переносимо класи + inline margin
+            const wrap = document.createElement('span');
+            wrap.className = baseImg.className;
+            wrap.tabIndex = 0; // доступність із клавіатури
+            if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
+
+            // базова картинка всередині
+            baseImg.className = 'base';
+
+            // верхня картинка (hover)
+            const hoverImg = new Image();
+            hoverImg.className = 'hover';
+            hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
+            hoverImg.src = hoverSrc;
+
+            // попереднє завантаження для уникнення мерехтіння
+            const pre = new Image(); pre.src = hoverSrc;
+
+            // заміна у DOM
+            baseImg.parentNode.insertBefore(wrap, baseImg);
+            wrap.appendChild(baseImg);
+            wrap.appendChild(hoverImg);
+
+            // легкий "highlight" по тапу (мобільні)
+            wrap.addEventListener('touchstart', () => {
+                wrap.classList.add('is-touch');
+                clearTimeout(wrap._t);
+                wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 450);
+            }, {passive:true});
+        });
+    })();
 </script>
 </body>
 </html>
