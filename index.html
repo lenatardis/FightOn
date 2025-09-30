@@ -7,14 +7,17 @@
 
     <style>
         :root{
-            --char-drop: calc(-4vh);
+            --char-drop: calc(-25vh);
             --header-h: 64px;
             --mountains-lead: 0px;
             --houses-lead: 0px;
 
             /* дорога */
-            --snow-h: 50px;   /* наскільки будинки “в снігу” */
-            --ground-h: 22vh; /* висота асфальту */
+            --snow-h: 50px;
+            --ground-h: 40vh; /* залишив як у тебе; можна змінити в 1 рядку */
+
+            --mountains-k: 0.85;   /* наскільки "йдуть вгору" гори відносно асфальту (0…1) */
+            --sun-k: 0.9;
         }
 
         html,body{margin:0;background:#0b1020;color:#fff;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial;}
@@ -30,7 +33,7 @@
         }
         .logo{color:#fff;text-decoration:none;font-weight:800;}
 
-        .stage{position:relative;height:120vh;overflow:hidden;}
+        .stage{position:relative;height:150vh;overflow:hidden;}
         @media (max-width:780px){ .stage{height:110vh;} }
 
         .layer{position:absolute;inset:0;pointer-events:none;}
@@ -45,9 +48,9 @@
         #sun{z-index:2}
         #clouds{z-index:3}
         #mountains{z-index:4}
-        #streetGround{z-index:5}  /* асфальт */
-        #houses{z-index:7}        /* будинки (під снігом) */
-        #streetSnow{z-index:6}    /* сніг поверх будинків */
+        #streetGround{z-index:5}
+        #streetSnow{z-index:6}
+        #houses{z-index:7}
         #chars{z-index:8; pointer-events:auto;}
 
         #sky{
@@ -79,23 +82,25 @@
 
         .mountainsImg{height:32vh;width:auto;margin:0 0 10vh;}
         #mountains .mountainsImg:first-child{ margin-left: calc(0px + var(--mountains-lead)); }
+        /* піднімаємо гори рівно на висоту асфальту */
+        #mountainsBand{ bottom: calc(var(--ground-h) * var(--mountains-k)); }
 
-        /* БУДИНКИ: прибрано нижній відступ і піднято ряд на верх асфальту */
+        /* Сонце трохи вище гір + твій базовий запас 8vh */
+        .sunImg{ bottom: calc(var(--ground-h) * var(--sun-k) + 8vh); }
+
+
+        /* БУДИНКИ */
         .houseImg{height:44vh;width:auto;margin:0 36px 0;filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));}
         #houses .houseImg:first-child{ margin-left: calc(5vw + var(--houses-lead)); }
-        /* головне — підняти ВЕСЬ band будинків на висоту ground */
         #housesBand{ bottom: var(--ground-h); }
 
         /* ===== ВУЛИЦЯ ===== */
-
-        /* Асфальт */
         #streetGround .band{
             background:url("./assets/street_ground.jpg") repeat-x left bottom;
             background-size:auto var(--ground-h);
         }
         .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
 
-        /* Сніг: рівно по верху асфальту, перекриває низ будинків */
         #streetSnow .band{ position: relative; }
         #streetSnow .snowLine{
             position: absolute;
@@ -107,7 +112,7 @@
         }
         .streetSnowSpacer{ width:600vw; height:0; }
 
-        /* ПЕРСОНАЖІ */
+        /* ===== ПЕРСОНАЖІ ===== */
         .charImg{
             position:relative; display:inline-block;
             width:240px; margin:0 90px 0;
@@ -118,11 +123,12 @@
         .charImg.sm{ width:200px; }
         .charImg.lg{ width:280px; }
 
-        .charImg > img.base{ display:block; width:100%; height:auto; }
+        /* базовий та hover-спрайт */
+        .charImg > img.base{ display:block; width:100%; height:auto; position:relative; z-index:2; }
         .charImg > img.hover{
             position:absolute; left:50%; bottom:0; transform:translateX(-50%);
             height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease;
-            object-fit:contain; object-position:center bottom;
+            object-fit:contain; object-position:center bottom; z-index:2;
         }
         .charImg:hover > img.hover,
         .charImg:focus-visible > img.hover,
@@ -130,9 +136,40 @@
 
         #charsBand > .charImg:first-child { margin-left:5vw; }
 
+        /* ===== НИЖНІЙ БЛОК (plate) ПІД ПЕРСОНАЖЕМ ===== */
+        .charPlate{
+            position:absolute;
+            left:50%; transform:translateX(-50%);
+            top: calc(100% + 14px); /* завжди під ногами спрайта */
+            z-index:1; pointer-events:none;
+
+            background:#111;
+            color:#fff;
+            padding:12px 18px;
+            border-radius:14px;
+            box-shadow:
+                    0 0 0 3px #fff,                 /* білий кант */
+                    0 8px 18px rgba(0,0,0,.35);     /* тінь */
+            display:none;
+        }
+        .charPlate__inner{
+            display:flex; flex-direction:column; gap:15px; align-items:center; text-align:center;
+            min-width:240px; max-width:320px;
+        }
+        .charPlate__title{
+            font-weight:900; letter-spacing:.06em; text-transform:uppercase;
+            text-decoration:underline; text-decoration-thickness:2px; text-underline-offset:4px;
+        }
+        .charPlate__text{ line-height:1.25; font-weight:600; }
+
+        .charImg:hover .charPlate,
+        .charImg:focus-visible .charPlate,
+        .charImg.is-touch .charPlate{ display:block; }
+
         @media (max-width:780px){
-            :root{--char-drop:calc(-3vh);}
+            :root{--char-drop:calc(-20vh);}
             .houseImg{height:40vh;margin-bottom:0}
+            .charPlate__inner{ min-width:200px; max-width:260px; }
         }
 
         .stage::after{
@@ -169,16 +206,16 @@
 
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png"  alt="House 1">
-            <img class="houseImg" src="./assets/house2.png"  alt="House 2">
-            <img class="houseImg" src="./assets/house3.png"  alt="House 3">
-            <img class="houseImg" src="./assets/house4.png"  alt="House 4">
-            <img class="houseImg" src="./assets/house5.png"  alt="House 5">
-            <img class="houseImg" src="./assets/house6.png"  alt="House 6">
-            <img class="houseImg" src="./assets/house7.png"  alt="House 7">
-            <img class="houseImg" src="./assets/house8.png"  alt="House 8">
-            <img class="houseImg" src="./assets/house9.png"  alt="House 9">
-            <img class="houseImg" src="./assets/house10.png" alt="House 10">
+            <img class="houseImg" src="./assets/house1.png"  alt="">
+            <img class="houseImg" src="./assets/house2.png"  alt="">
+            <img class="houseImg" src="./assets/house3.png"  alt="">
+            <img class="houseImg" src="./assets/house4.png"  alt="">
+            <img class="houseImg" src="./assets/house5.png"  alt="">
+            <img class="houseImg" src="./assets/house6.png"  alt="">
+            <img class="houseImg" src="./assets/house7.png"  alt="">
+            <img class="houseImg" src="./assets/house8.png"  alt="">
+            <img class="houseImg" src="./assets/house9.png"  alt="">
+            <img class="houseImg" src="./assets/house10.png" alt="">
         </div>
     </div>
 
@@ -197,15 +234,31 @@
     <!-- персонажі -->
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg"    src="./assets/Sniper.svg"     alt="Sniper">
-            <img class="charImg"    src="./assets/Gorilla.svg"    alt="Gorilla">
-            <img class="charImg"    src="./assets/Mobster.svg"    alt="Mobster">
-            <img class="charImg"    src="./assets/Snap.svg"       alt="Snap">
-            <img class="charImg"    src="./assets/Cuadrilla.svg"  alt="Cuadrilla">
-            <img class="charImg"    src="./assets/Shelldren.svg"  alt="Shelldren">
-            <img class="charImg"    src="./assets/Pistolero.svg"  alt="Pistolero">
-            <img class="charImg"    src="./assets/Machetero.svg"  alt="Machetero">
-            <img class="charImg lg" src="./assets/Golfer.svg"     alt="Golfer" style="margin-right:6vw">
+            <!-- тексти для plate через data-атрибути -->
+            <img class="charImg" src="./assets/Sniper.svg"  alt="Sniper"
+                 data-plate-title="SNIPER"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+
+            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla"
+                 data-plate-title="GORILLA"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+
+            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster"
+                 data-plate-title="MOBSTER"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+
+            <img class="charImg" src="./assets/Snap.svg"      alt="Snap"
+                 data-plate-title="SNAP" data-plate-text="...">
+            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla"
+                 data-plate-title="CUADRILLA" data-plate-text="...">
+            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren"
+                 data-plate-title="SHELLDREN" data-plate-text="...">
+            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero"
+                 data-plate-title="PISTOLERO" data-plate-text="...">
+            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero"
+                 data-plate-title="MACHETERO" data-plate-text="...">
+            <img class="charImg lg" src="./assets/Golfer.svg" alt="Golfer" style="margin-right:6vw"
+                 data-plate-title="GOLFER" data-plate-text="...">
         </div>
     </div>
 </div>
@@ -288,29 +341,53 @@
     addEventListener('load', () => setTimeout(() => ScrollTrigger.refresh(), 0));
 </script>
 
-<!-- HOVER-оверлеї — без змін -->
+<!-- HOVER-оверлеї + нижній plate -->
 <script>
     (function(){
         const band = document.getElementById('charsBand');
         if(!band) return;
+
         const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
         list.forEach(baseImg => {
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
+
             const wrap = document.createElement('span');
             wrap.className = baseImg.className;
             wrap.tabIndex = 0;
             if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin=''; }
+
             baseImg.className = 'base';
-            const hoverImg = new Image(); hoverImg.className = 'hover'; hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : ''; hoverImg.src = hoverSrc;
-            const dx = parseFloat(baseImg.dataset.hoverX || 0);
-            const dy = parseFloat(baseImg.dataset.hoverY || 0);
-            if (dx || dy) hoverImg.style.transform = `translateX(calc(-50% + ${dx}px)) translateY(${dy}px)`;
+
+            const hoverImg = new Image();
+            hoverImg.className = 'hover';
+            hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
+            hoverImg.src = hoverSrc;
+
+            /* === нижній plate із дата-атрибутів === */
+            const plate = document.createElement('div');
+            plate.className = 'charPlate';
+            const title = baseImg.dataset.plateTitle || baseImg.alt || '';
+            const text  = baseImg.dataset.plateText  || '';
+            if (title || text){
+                plate.innerHTML =
+                    `<div class="charPlate__inner">
+             ${title ? `<div class="charPlate__title">${title}</div>` : ``}
+             ${text  ? `<div class="charPlate__text">${text}</div>`   : ``}
+           </div>`;
+            }
+
             const pre = new Image(); pre.src = hoverSrc;
+
             baseImg.parentNode.insertBefore(wrap, baseImg);
-            wrap.appendChild(baseImg); wrap.appendChild(hoverImg);
+            wrap.appendChild(baseImg);
+            wrap.appendChild(hoverImg);
+            if (title || text) wrap.appendChild(plate);
+
+            // короткий touch-режим як hover
             wrap.addEventListener('touchstart', () => {
-                wrap.classList.add('is-touch'); clearTimeout(wrap._t);
-                wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 450);
+                wrap.classList.add('is-touch');
+                clearTimeout(wrap._t);
+                wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 900);
             }, {passive:true});
         });
     })();
