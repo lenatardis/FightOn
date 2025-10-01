@@ -231,6 +231,12 @@
             bottom: calc(var(--ground-h) * var(--mountains-k));
         }
 
+        /* трохи перекриваємо край, щоб не просвічувалась лінія */
+        #mountainsBand .mountainsImg + .mountainsImg {
+            margin-left: -2px;
+        }
+
+
         .houseImg {
             height: 44vh;
             width: auto;
