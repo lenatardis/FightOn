@@ -426,6 +426,19 @@
             --plate-tip-x: calc(100% - 28px); /* відступ від правого краю */
         }
 
+        @media (max-width: 780px) {
+            .charPlate {
+                padding: 10px 5px;
+            }
+            .charPlate__inner {
+                column-gap: 10px;
+            }
+
+            .charPlate .column_1, .charPlate .column_2 {
+                row-gap: 5px;
+            }
+        }
+
         /* віньєтка низу сцени */
         .stage::after {
             content: "";
