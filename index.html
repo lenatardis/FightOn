@@ -330,7 +330,7 @@
             position: absolute;
             left: 50%;
             transform: translateX(-50%);
-            top: calc(100% + 14px);
+            top: calc(100% + 15px);
             z-index: 1;
             pointer-events: none;
             background: #111;
@@ -365,6 +365,32 @@
             line-height: 1.25;
             font-family: 'Gotham', sans-serif;
         }
+
+        /* Трикутничок-указівник над баблом */
+        .charPlate::before,
+        .charPlate::after{
+            content:"";
+            position:absolute;
+            left:50%;
+            transform:translateX(-50%);
+            width:0; height:0;
+            border-left:10px solid transparent;
+            border-right:10px solid transparent;
+            pointer-events:none;
+        }
+
+        /* біла обводка (щоб збігалась з рамкою бабла) */
+        .charPlate::before{
+            top:-13px;
+            border-bottom:13px solid #fff;
+        }
+
+        /* чорний заповнювач */
+        .charPlate::after{
+            top:-11px;
+            border-bottom:11px solid #ffffff; /* той самий колір, що й фон бабла */
+        }
+
 
         .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate {
             display: block;
