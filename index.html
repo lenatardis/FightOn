@@ -335,7 +335,7 @@
             pointer-events: none;
             background: #111;
             color: #fff;
-            padding: 12px 18px;
+            padding: 20px;
             border-radius: 14px;
             box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0, 0, 0, .35);
             display: none;
@@ -344,24 +344,12 @@
         .charPlate__inner {
             display: flex;
             column-gap: 15px;
-            align-items: center;
-            padding: 20px;
         }
 
-        .charPlate__title {
-            letter-spacing: .06em;
-            text-transform: uppercase;
-            text-decoration: underline;
-            text-decoration-thickness: 2px;
-            text-underline-offset: 4px;
-            font-family: 'Lucznik', sans-serif;
-
+        .charPlate__inner p {
+            margin: 0;
         }
 
-        .charPlate__text {
-            line-height: 1.25;
-            font-family: 'Gotham', sans-serif;
-        }
 
         /* Трикутничок-указівник над баблом */
         .charPlate::before,
@@ -389,6 +377,33 @@
             border-bottom: 11px solid #ffffff; /* той самий колір, що й фон бабла */
         }
 
+        .charPlate .column_1, .charPlate .column_2 {
+            display: flex;
+            flex-direction: column;
+            row-gap: 12px;
+            width: 100%;
+        }
+
+        .charPlate .column_1 > div, .charPlate .column_2 > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #ffffff;
+        }
+
+        .charPlate p {
+            font-size: 14px;
+            line-height: 1em;
+            font-family: 'Lucznik', sans-serif;
+        }
+
+        .charPlate span {
+            display: block;
+            margin-left: 10px;
+            font-size: 12px;
+            line-height: 12px;
+            font-family: 'Gotham', sans-serif;
+        }
 
         .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate {
             display: block;
@@ -654,13 +669,17 @@
         }];
 
     /* plates + hover */
+    /* plates + hover: будуємо 2 колонки з charData */
     (function attachPlates() {
         const band = document.getElementById('charsBand');
         if (!band) return;
-        const list = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
-        list.forEach(baseImg => {
-            const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
 
+        const cards = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
+
+        cards.forEach((baseImg, idx) => {
+            const data = charData[idx] || null;
+
+            // обгортка замість <img>, щоб додати hover-спрайт і plate
             const wrap = document.createElement('span');
             wrap.className = baseImg.className;
             wrap.tabIndex = 0;
@@ -670,30 +689,55 @@
             }
             baseImg.className = 'base';
 
+            // hover-спрайт (як і було)
+            const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
             const hoverImg = new Image();
             hoverImg.className = 'hover';
             hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
             hoverImg.src = hoverSrc;
+            const pre = new Image();
+            pre.src = hoverSrc; // preload
 
+            // будуємо plate із двома колонками
             const plate = document.createElement('div');
             plate.className = 'charPlate';
-            const title = baseImg.dataset.plateTitle || baseImg.alt || '';
-            const text = baseImg.dataset.plateText || '';
-            if (title || text) {
-                plate.innerHTML = `<div class="charPlate__inner">
-          ${title ? `<div class="charPlate__title">${title}</div>` : ``}
-          ${text ? `<div class="charPlate__text">${text}</div>` : ``}
-        </div>`;
+
+            if (data) {
+                const inner = document.createElement('div');
+                inner.className = 'charPlate__inner';
+
+                const col1 = document.createElement('div');
+                col1.className = 'column_1';
+                const col2 = document.createElement('div');
+                col2.className = 'column_2';
+
+                const entries = Object.entries(data); // порядок ключів як у об’єкті
+                const buildItems = (pairs) => pairs.map(([k, v]) => {
+                    const item = document.createElement('div');
+                    const p = document.createElement('p');
+                    p.textContent = String(k).toUpperCase();
+                    const span = document.createElement('span');
+                    span.textContent = v;
+                    item.appendChild(p);
+                    item.appendChild(span);
+                    return item;
+                });
+
+                buildItems(entries.slice(0, 3)).forEach(el => col1.appendChild(el));
+                buildItems(entries.slice(3, 6)).forEach(el => col2.appendChild(el));
+
+                inner.appendChild(col1);
+                inner.appendChild(col2);
+                plate.appendChild(inner);
             }
 
-            const pre = new Image();
-            pre.src = hoverSrc;
-
+            // вставляємо у DOM
             baseImg.parentNode.insertBefore(wrap, baseImg);
             wrap.appendChild(baseImg);
             wrap.appendChild(hoverImg);
-            if (title || text) wrap.appendChild(plate);
+            if (data) wrap.appendChild(plate);
 
+            // короткий touch-режим як hover
             wrap.addEventListener('touchstart', () => {
                 wrap.classList.add('is-touch');
                 clearTimeout(wrap._t);
