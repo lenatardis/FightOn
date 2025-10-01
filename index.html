@@ -356,7 +356,7 @@
         .charPlate::after {
             content: "";
             position: absolute;
-            left: 50%;
+            left: var(--plate-tip-x, 50%);
             transform: translateX(-50%);
             width: 0;
             height: 0;
@@ -407,6 +407,23 @@
 
         .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate {
             display: block;
+        }
+
+        /* 1) лівий край для першого персонажа */
+        #charsBand > .charImg:first-child .charPlate{
+            left: 20px;
+            right: auto;
+            transform: none;          /* вимикаємо центр */
+            /* щоб дзьобик не залишився посередині: */
+            --plate-tip-x: 28px;      /* відступ від лівого краю бабла */
+        }
+
+        /* 2) правий край для останнього персонажа */
+        #charsBand > .charImg:last-child .charPlate{
+            left: auto;
+            right: 20px;
+            transform: none;
+            --plate-tip-x: calc(100% - 28px); /* відступ від правого краю */
         }
 
         /* віньєтка низу сцени */
