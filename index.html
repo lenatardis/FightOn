@@ -764,6 +764,64 @@
     })();
 
     waitImgs('body').then(initStage);
+
+        /* ===== СВАЙП ДЛЯ МОБІЛОК НА СЦЕНІ #stage ===== */
+        (function () {
+        // лише для мобі/вузьких екранів
+        if (!window.matchMedia('(max-width:780px)').matches) return;
+
+        const stage = document.getElementById('stage');
+        if (!stage) return;
+
+        let x0 = null, y0 = null;
+
+        function onStart(e) {
+        const t = e.touches && e.touches[0];
+        if (!t) return;
+        x0 = t.clientX;
+        y0 = t.clientY;
+    }
+
+        function onEnd(e) {
+        if (x0 == null) return;
+
+        const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
+        x0 = x0 ?? 0; y0 = y0 ?? 0;
+        if (!t) { x0 = y0 = null; return; }
+
+        const dx = t.clientX - x0;
+        const dy = Math.abs(t.clientY - y0 || 0);
+
+        // жест має бути переважно горизонтальним
+        if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2) {
+        const ST = ScrollTrigger.getById('stageParallax');
+        const curr = window.scrollY;
+
+        // крок прокрутки відносно екрану + трохи від сили свайпу
+        const step = Math.max(innerHeight * 0.45, Math.min(innerHeight * 0.9, Math.abs(dx) * 8));
+        const delta = dx < 0 ? step : -step;
+        let target = curr + delta;
+
+        // якщо тягнемо ліворуч на самому кінці сцени — стрибаємо до наступної секції
+        if (dx < 0 && ST && curr >= (ST.end - 4)) {
+        document.querySelector('.tail')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        // інакше — просто скролимо в межах пін-сцени
+        if (ST) {
+        target = Math.max(ST.start, Math.min(ST.end, target));
+    }
+        window.scrollTo({ top: target, behavior: 'smooth' });
+    }
+    }
+
+        x0 = y0 = null;
+    }
+
+        stage.addEventListener('touchstart', onStart, { passive: true });
+        stage.addEventListener('touchend', onEnd,   { passive: true });
+    })();
+
+
 </script>
 </body>
 </html>
