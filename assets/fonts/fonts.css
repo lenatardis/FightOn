@@ -1,0 +1,13 @@
+@font-face {
+    font-family: 'Lucznik';
+    src: url('./lucznik.otf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Gotham';
+    src: url('./gotham_book.otf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+}
