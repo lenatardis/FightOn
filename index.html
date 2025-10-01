@@ -59,12 +59,17 @@
             font-weight: 800;
         }
 
-        /* ===== ОДИНАКОВЕ НЕБО (і там, і там) ===== */
-        .sky-gradient,
-        #sky {
-            background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 60%),
-            linear-gradient(180deg, #7A8CF1 0%, #6FA2FA 28%, #79C3FF 62%, #CFEFFF 88%, #F6FDFF 100%);
+        .sky-gradient1 {
+            /*  background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0%, rgba(255, 255, 255, 0) 60%),
+              linear-gradient(180deg, #7A8CF1 0%, #6FA2FA 28%, #79C3FF 62%, #CFEFFF 88%, #F6FDFF 100%);*/
+            background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0, rgba(255, 255, 255, 0) 60%),
+            linear-gradient(180deg,
+                    #7B8CF1 0%,
+                    #6FA2FA 28%,
+                    #699BD8 100%);
         }
+
+        .sky-gradient2 {background: linear-gradient(180deg, #699BD8 0%, #82ABDD 28%, #ACBEB4 100%);}
 
         /* ===== INTRO: небо + 4 хмарки + лого ===== */
         .intro {
@@ -232,7 +237,7 @@
         }
 
         /* трохи перекриваємо край, щоб не просвічувалась лінія */
-        #mountains .mountainsImg:nth-of-type(2){
+        #mountains .mountainsImg:nth-of-type(2) {
             margin-left: -2px;
         }
 
@@ -295,9 +300,9 @@
             will-change: transform;
         }
 
-      /*  .charImg:hover {
-            cursor: pointer;
-        }*/
+        /*  .charImg:hover {
+              cursor: pointer;
+          }*/
 
         .charImg.sm {
             width: 200px;
@@ -492,7 +497,7 @@
 <header class="site-header"><a class="logo" href="#intro">CyberGame</a></header>
 
 <!-- ===== INTRO ===== -->
-<section class="intro sky-gradient" id="intro">
+<section class="intro sky-gradient1" id="intro">
     <div class="intro-logo"><img src="./assets/fighton.png" alt="FightTON"></div>
     <div class="cloud cloud--lt"><img src="./assets/cloud_left_top.svg" alt=""></div>
     <div class="cloud cloud--rt"><img src="./assets/cloud_right_top.svg" alt=""></div>
@@ -502,7 +507,7 @@
 
 <!-- ===== STAGE ===== -->
 <div class="stage" id="stage">
-    <div class="layer sky-gradient" id="sky">
+    <div class="layer sky-gradient2" id="sky">
         <div class="band"></div>
     </div>
     <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
@@ -600,14 +605,14 @@
     const endOffset = (sel) => -(bandFull(sel));
     const leadPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
-    function recalcStageDims(){
+    function recalcStageDims() {
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
         const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
         document.querySelector('.streetGroundSpacer')?.style && (document.querySelector('.streetGroundSpacer').style.width = baseWidth + 'px');
-        document.querySelector('.streetSnowSpacer')?.style   && (document.querySelector('.streetSnowSpacer').style.width   = baseWidth + 'px');
+        document.querySelector('.streetSnowSpacer')?.style && (document.querySelector('.streetSnowSpacer').style.width = baseWidth + 'px');
 
         document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
-        document.documentElement.style.setProperty('--houses-lead',    leadPx('#housesBand',    0.72) + 'px');
+        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
     }
 
     // перед initStage():
@@ -830,7 +835,10 @@
         });
     })();
 
-    waitImgs('body').then(() => { initStage(); ScrollTrigger.refresh(); });
+    waitImgs('body').then(() => {
+        initStage();
+        ScrollTrigger.refresh();
+    });
 
     /* ===== СВАЙП ДЛЯ МОБІЛОК НА СЦЕНІ #stage ===== */
     (function () {
