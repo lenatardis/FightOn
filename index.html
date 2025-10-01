@@ -210,6 +210,12 @@
             filter: blur(.2px);
         }
 
+        @media (max-width: 780px) {
+            .sunImg {
+                bottom: calc(var(--ground-h) * var(--sun-k) + 19vh);
+            }
+        }
+
         .mountainsImg {
             height: 32vh;
             width: auto;
@@ -410,16 +416,16 @@
         }
 
         /* 1) лівий край для першого персонажа */
-        #charsBand > .charImg:first-child .charPlate{
+        #charsBand > .charImg:first-child .charPlate {
             left: 20px;
             right: auto;
-            transform: none;          /* вимикаємо центр */
+            transform: none; /* вимикаємо центр */
             /* щоб дзьобик не залишився посередині: */
-            --plate-tip-x: 28px;      /* відступ від лівого краю бабла */
+            --plate-tip-x: 28px; /* відступ від лівого краю бабла */
         }
 
         /* 2) правий край для останнього персонажа */
-        #charsBand > .charImg:last-child .charPlate{
+        #charsBand > .charImg:last-child .charPlate {
             left: auto;
             right: 20px;
             transform: none;
@@ -430,6 +436,7 @@
             .charPlate {
                 padding: 10px 5px;
             }
+
             .charPlate__inner {
                 column-gap: 10px;
             }
@@ -442,6 +449,7 @@
             .charPlate {
                 top: 100%;
             }
+
             .charPlate__inner {
                 flex-direction: column;
                 row-gap: 5px;
@@ -582,6 +590,20 @@
     const endOffset = (sel) => -(bandFull(sel));
     const leadPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
+    function recalcStageDims(){
+        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
+        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
+        document.querySelector('.streetGroundSpacer')?.style && (document.querySelector('.streetGroundSpacer').style.width = baseWidth + 'px');
+        document.querySelector('.streetSnowSpacer')?.style   && (document.querySelector('.streetSnowSpacer').style.width   = baseWidth + 'px');
+
+        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
+        document.documentElement.style.setProperty('--houses-lead',    leadPx('#housesBand',    0.72) + 'px');
+    }
+
+    // перед initStage():
+    ScrollTrigger.addEventListener('refreshInit', recalcStageDims);
+
+
     function initStage() {
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
 
@@ -612,10 +634,23 @@
         tl.to('.sunImg', {yPercent: -6, scale: 0.98, ease: 'none', duration: 18}, 0);
 
         const dur = 82;
-        tl.fromTo('#mountainsBand', {x: () => startOffset('#mountainsBand', 0.28)},
-            {x: () => endOffset('#mountainsBand'), ease: 'none', duration: dur}, 0);
-        tl.fromTo('#housesBand', {x: () => startOffset('#housesBand', 0.72)},
-            {x: () => endOffset('#housesBand'), ease: 'none', duration: dur}, 0);
+        // хелпер: дістати числове значення CSS-змінної в px
+        const cssVarPx = (name) =>
+            parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
+
+// старт — рівно на величину lead (щоб перший елемент повністю був у кадрі)
+        tl.fromTo('#mountainsBand',
+            {x: () => -cssVarPx('--mountains-lead')},
+            {x: () => endOffset('#mountainsBand'), ease: 'none', duration: dur},
+            0
+        );
+
+        tl.fromTo('#housesBand',
+            {x: () => -cssVarPx('--houses-lead')},
+            {x: () => endOffset('#housesBand'), ease: 'none', duration: dur},
+            0
+        );
+
         tl.fromTo('#streetGroundBand', {x: () => startOffset('#streetGroundBand', 0.90)},
             {x: () => endOffset('#streetGroundBand'), ease: 'none', duration: dur}, 0);
         tl.fromTo('#streetSnowBand', {x: () => startOffset('#streetSnowBand', 0.90)},
@@ -785,10 +820,10 @@
         });
     })();
 
-    waitImgs('body').then(initStage);
+    waitImgs('body').then(() => { initStage(); ScrollTrigger.refresh(); });
 
-        /* ===== СВАЙП ДЛЯ МОБІЛОК НА СЦЕНІ #stage ===== */
-        (function () {
+    /* ===== СВАЙП ДЛЯ МОБІЛОК НА СЦЕНІ #stage ===== */
+    (function () {
         // лише для мобі/вузьких екранів
         if (!window.matchMedia('(max-width:780px)').matches) return;
 
@@ -798,49 +833,53 @@
         let x0 = null, y0 = null;
 
         function onStart(e) {
-        const t = e.touches && e.touches[0];
-        if (!t) return;
-        x0 = t.clientX;
-        y0 = t.clientY;
-    }
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            x0 = t.clientX;
+            y0 = t.clientY;
+        }
 
         function onEnd(e) {
-        if (x0 == null) return;
+            if (x0 == null) return;
 
-        const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
-        x0 = x0 ?? 0; y0 = y0 ?? 0;
-        if (!t) { x0 = y0 = null; return; }
+            const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
+            x0 = x0 ?? 0;
+            y0 = y0 ?? 0;
+            if (!t) {
+                x0 = y0 = null;
+                return;
+            }
 
-        const dx = t.clientX - x0;
-        const dy = Math.abs(t.clientY - y0 || 0);
+            const dx = t.clientX - x0;
+            const dy = Math.abs(t.clientY - y0 || 0);
 
-        // жест має бути переважно горизонтальним
-        if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2) {
-        const ST = ScrollTrigger.getById('stageParallax');
-        const curr = window.scrollY;
+            // жест має бути переважно горизонтальним
+            if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2) {
+                const ST = ScrollTrigger.getById('stageParallax');
+                const curr = window.scrollY;
 
-        // крок прокрутки відносно екрану + трохи від сили свайпу
-        const step = Math.max(innerHeight * 0.45, Math.min(innerHeight * 0.9, Math.abs(dx) * 8));
-        const delta = dx < 0 ? step : -step;
-        let target = curr + delta;
+                // крок прокрутки відносно екрану + трохи від сили свайпу
+                const step = Math.max(innerHeight * 0.45, Math.min(innerHeight * 0.9, Math.abs(dx) * 8));
+                const delta = dx < 0 ? step : -step;
+                let target = curr + delta;
 
-        // якщо тягнемо ліворуч на самому кінці сцени — стрибаємо до наступної секції
-        if (dx < 0 && ST && curr >= (ST.end - 4)) {
-        document.querySelector('.tail')?.scrollIntoView({ behavior: 'smooth' });
-    } else {
-        // інакше — просто скролимо в межах пін-сцени
-        if (ST) {
-        target = Math.max(ST.start, Math.min(ST.end, target));
-    }
-        window.scrollTo({ top: target, behavior: 'smooth' });
-    }
-    }
+                // якщо тягнемо ліворуч на самому кінці сцени — стрибаємо до наступної секції
+                if (dx < 0 && ST && curr >= (ST.end - 4)) {
+                    document.querySelector('.tail')?.scrollIntoView({behavior: 'smooth'});
+                } else {
+                    // інакше — просто скролимо в межах пін-сцени
+                    if (ST) {
+                        target = Math.max(ST.start, Math.min(ST.end, target));
+                    }
+                    window.scrollTo({top: target, behavior: 'smooth'});
+                }
+            }
 
-        x0 = y0 = null;
-    }
+            x0 = y0 = null;
+        }
 
-        stage.addEventListener('touchstart', onStart, { passive: true });
-        stage.addEventListener('touchend', onEnd,   { passive: true });
+        stage.addEventListener('touchstart', onStart, {passive: true});
+        stage.addEventListener('touchend', onEnd, {passive: true});
     })();
 
 
