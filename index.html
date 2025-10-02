@@ -30,7 +30,7 @@
 
         html, body {
             margin: 0;
-            background: #0b1020;
+            background: #7B8CF1;
             color: #fff;
             font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
         }
@@ -40,68 +40,164 @@
         }
 
         /* header*/
-        .site-header{
-            position: fixed; inset: 0 0 auto 0; height: var(--header-h); z-index: 10000;
-            display: flex; align-items: center; justify-content: center; /* центр меню */
-            gap: 16px; padding: 0 18px;
+        .site-header {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: var(--header-h);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* центр меню */
+            gap: 16px;
+            padding: 0 18px;
             backdrop-filter: blur(10px);
-            background: linear-gradient(180deg, rgba(10,14,30,.72), rgba(10,14,30,.46));
-            border-bottom: 1px solid rgba(255,255,255,.08);
+            background: linear-gradient(180deg, rgba(10, 14, 30, .72), rgba(10, 14, 30, .46));
+            border-bottom: 1px solid rgba(255, 255, 255, .08);
         }
 
         /* меню по центру; на десктопі — в одну лінію */
-        .main-nav{ display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-        .nav-link{
-            position: relative; display: inline-flex; align-items: center;
-            height: 36px; padding: 0 12px; border-radius: 10px;
-            color: #e9f2ff; text-decoration: none; font-weight: 700; letter-spacing: .2px;
-            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10);
+        .main-nav {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 10px;
+            color: #e9f2ff;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: .2px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .10);
             transition: transform .15s ease, background .15s ease, border-color .15s ease;
         }
-        .nav-link:hover{ transform: translateY(-1px); background: rgba(255,255,255,.10); }
-        .nav-link.active{
-            background: #ffd400; color: #111; border-color: #111; box-shadow: 4px 4px 0 #111;
+
+        .nav-link:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, .10);
         }
+
+        /* .nav-link.active{
+             background: #ffd400; color: #111; border-color: #111; box-shadow: 4px 4px 0 #111;
+         }*/
 
         /* якір — нижче фіксованого хедера */
-        .intro, .stage, section{ scroll-margin-top: var(--header-h); }
+        .intro, .stage, section {
+            scroll-margin-top: var(--header-h);
+        }
 
         /* Гамбургер: ховаємо на десктопі, показуємо на мобілці */
-        .nav-toggle{
-            display: none; margin-left: 0; /* по центру меню — кнопка справа не потрібна */
-            width: 40px; height: 40px; border: 1px solid rgba(255,255,255,.12);
-            background: rgba(255,255,255,.06); border-radius: 10px; cursor: pointer;
-            align-items: center; justify-content: center;
+        .nav-toggle {
+            display: none;
+            margin-left: 0; /* по центру меню — кнопка справа не потрібна */
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .06);
+            border-radius: 10px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
         }
-        .nav-toggle-bar{ display:block; width:22px; height:2px; background:#fff; border-radius:2px; position:relative; }
-        .nav-toggle-bar::before, .nav-toggle-bar::after{
-            content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px;
+
+        .nav-toggle-bar {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            position: relative;
         }
-        .nav-toggle-bar::before{ top:-7px; } .nav-toggle-bar::after{ top:7px; }
+
+        .nav-toggle-bar::before, .nav-toggle-bar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        .nav-toggle-bar::before {
+            top: -7px;
+        }
+
+        .nav-toggle-bar::after {
+            top: 7px;
+        }
 
         /* мобільне меню — випадаюче */
-        @media (max-width: 780px){
-            .site-header{ height: 58px; padding: 0 12px; }
-            body{ padding-top: 58px; }
-            .nav-link{ height: 44px; padding: 0 12px; font-size: 15px; }
-            .nav-toggle{ display: inline-grid; position: absolute; right: 12px; }
-
-            .main-nav{
-                position: fixed; top: var(--header-h); left: 0; right: 0;
-                display: grid; gap: 8px; padding: 10px;
-                background: linear-gradient(180deg, rgba(10,14,30,.92), rgba(10,14,30,.82));
-                border: 1px solid rgba(255,255,255,.10); border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,.45);
-                transform-origin: top center; transform: translateY(-8px) scale(.98);
-                opacity: 0; pointer-events: none; transition: transform .18s ease, opacity .18s ease; z-index: 10001;
+        @media (max-width: 780px) {
+            .site-header {
+                height: 58px;
+                padding: 0 12px;
             }
+
+            body {
+                padding-top: 58px;
+            }
+
+            .nav-link {
+                height: 44px;
+                padding: 0 12px;
+                font-size: 15px;
+            }
+
+            .nav-toggle {
+                display: inline-grid;
+                position: absolute;
+                right: 12px;
+            }
+
+            .main-nav {
+                position: fixed;
+                top: var(--header-h);
+                left: 0;
+                right: 0;
+                display: grid;
+                gap: 8px;
+                padding: 10px;
+                background: linear-gradient(180deg, rgba(10, 14, 30, .92), rgba(10, 14, 30, .82));
+                border: 1px solid rgba(255, 255, 255, .10);
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+                transform-origin: top center;
+                transform: translateY(-8px) scale(.98);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform .18s ease, opacity .18s ease;
+                z-index: 10001;
+            }
+
             /* відкритий стан — клас на <html> */
-            .nav-open .main-nav{ opacity:1; pointer-events:auto; transform: translateY(0) scale(1); }
+            .nav-open .main-nav {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0) scale(1);
+            }
 
             /* перетворюємо бургер на «х» */
-            .nav-open #navToggle .nav-toggle-bar{ background: transparent; }
-            .nav-open #navToggle .nav-toggle-bar::before{ top:0; transform: rotate(45deg); }
-            .nav-open #navToggle .nav-toggle-bar::after{ top:0; transform: rotate(-45deg); }
+            .nav-open #navToggle .nav-toggle-bar {
+                background: transparent;
+            }
+
+            .nav-open #navToggle .nav-toggle-bar::before {
+                top: 0;
+                transform: rotate(45deg);
+            }
+
+            .nav-open #navToggle .nav-toggle-bar::after {
+                top: 0;
+                transform: rotate(-45deg);
+            }
         }
 
         /*intro */
@@ -115,7 +211,9 @@
                     #699BD8 100%);
         }
 
-        .sky-gradient2 {background: linear-gradient(180deg, #699BD8 0%, #82ABDD 28%, #ACBEB4 100%);}
+        .sky-gradient2 {
+            background: linear-gradient(180deg, #699BD8 0%, #82ABDD 28%, #ACBEB4 100%);
+        }
 
         /* ===== INTRO: небо + 4 хмарки + лого ===== */
         .intro {
@@ -550,10 +648,13 @@
     </button>
 
     <nav class="main-nav" id="primaryNav" aria-label="Main">
-        <a class="nav-link" href="#intro" data-target="#intro">Початок</a>
-        <a class="nav-link" href="#stage" data-target="#stage">Сцена</a>
-        <a class="nav-link" href="#tail"  data-target=".tail">Далі</a>
+        <a class="nav-link" href="#intro" data-target="#intro">Особливості</a>
+        <a class="nav-link" href="#tail" data-target="#tail">Досліджуй</a>
+        <a class="nav-link" href="#gallery" data-target="#gallery">Галерея</a>
+        <a class="nav-link" href="#templates" data-target="#templates">Шаблони</a>
+        <a class="nav-link" href="#faq" data-target="#faq">FAQ</a>
     </nav>
+
 </header>
 
 
@@ -630,14 +731,14 @@
     </div>
 </div>
 
-<section class="tail"><h2>Далі контент</h2></section>
+<section class="tail" id="tail"><h2>Далі контент</h2></section>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
 <script>
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-    gsap.config({ nullTargetWarn: false });
+    gsap.config({nullTargetWarn: false});
 </script>
 <script>
     /* ===== ХМАРКИ В INTRO (виїжджають назовні) ===== */
@@ -967,23 +1068,29 @@
 </script>
 <script>
     /* ===== Fixed Header logic ===== */
-    (function(){
+    (function () {
         /* синхронізуємо --header-h */
         const header = document.getElementById('siteHeader');
         const headerH = () => header ? Math.round(header.getBoundingClientRect().height) : 64;
-        function syncHeaderVar(){
+
+        function syncHeaderVar() {
             document.documentElement.style.setProperty('--header-h', headerH() + 'px');
         }
+
         syncHeaderVar();
-        addEventListener('resize', () => { syncHeaderVar(); ScrollTrigger.refresh(); });
+        addEventListener('resize', () => {
+            syncHeaderVar();
+            ScrollTrigger.refresh();
+        });
 
         /* плавний скрол з відступом під хедер */
-        function setActiveById(id){
+        function setActiveById(id) {
             document.querySelectorAll('.nav-link').forEach(a => {
                 const target = a.dataset.target || a.getAttribute('href');
                 a.classList.toggle('active', target === id);
             });
         }
+
         document.querySelectorAll('.nav-link').forEach(a => {
             a.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -991,52 +1098,65 @@
                 setActiveById(sel);
                 gsap.to(window, {
                     duration: 0.8, ease: 'power2.out',
-                    scrollTo: { y: sel, offsetY: headerH() }
+                    scrollTo: {y: sel, offsetY: headerH()}
                 });
                 // закриваємо мобільне меню, якщо відкрите
                 document.documentElement.classList.remove('nav-open');
-                document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
+                document.getElementById('navToggle')?.setAttribute('aria-expanded', 'false');
             });
         });
 
         /* актуальний пункт під час скролу — по лінії низу хедера */
-        const SECTIONS = ['#intro', '#stage', '.tail'];
+        const SECTIONS = ['#intro', '#tail', '#gallery', '#templates', '#faq'];
         let currentActive = null, rafRunning = false;
 
-        function updateActive(){
+        function updateActive() {
             rafRunning = false;
             const y = headerH();
             const hysteresis = 10;
             let winner = null;
 
-            for (const id of SECTIONS){
+            for (const id of SECTIONS) {
                 const el = document.querySelector(id);
-                if(!el) continue;
+                if (!el) continue;
                 const r = el.getBoundingClientRect();
-                if (r.top <= y + hysteresis && r.bottom > y + hysteresis){ winner = id; break; }
-            }
-            if(!winner){
-                let best = Infinity;
-                for (const id of SECTIONS){
-                    const el = document.querySelector(id);
-                    if(!el) continue;
-                    const dist = Math.abs(el.getBoundingClientRect().top - y);
-                    if (dist < best){ best = dist; winner = id; }
+                if (r.top <= y + hysteresis && r.bottom > y + hysteresis) {
+                    winner = id;
+                    break;
                 }
             }
-            if (winner && winner !== currentActive){
+            if (!winner) {
+                let best = Infinity;
+                for (const id of SECTIONS) {
+                    const el = document.querySelector(id);
+                    if (!el) continue;
+                    const dist = Math.abs(el.getBoundingClientRect().top - y);
+                    if (dist < best) {
+                        best = dist;
+                        winner = id;
+                    }
+                }
+            }
+            if (winner && winner !== currentActive) {
                 currentActive = winner;
                 setActiveById(winner);
             }
         }
-        function onScroll(){ if(!rafRunning){ rafRunning = true; requestAnimationFrame(updateActive); } }
-        addEventListener('scroll', onScroll, {passive:true});
+
+        function onScroll() {
+            if (!rafRunning) {
+                rafRunning = true;
+                requestAnimationFrame(updateActive);
+            }
+        }
+
+        addEventListener('scroll', onScroll, {passive: true});
         addEventListener('resize', updateActive);
         addEventListener('load', () => {
             // якщо зайшли з #якорем — одразу поправимо відступ
             const hash = window.location.hash;
-            if (hash && document.querySelector(hash)){
-                gsap.set(window, { scrollTo: { y: hash, offsetY: headerH(), autoKill: false }});
+            if (hash && document.querySelector(hash)) {
+                gsap.set(window, {scrollTo: {y: hash, offsetY: headerH(), autoKill: false}});
             }
             updateActive();
             ScrollTrigger.refresh();
@@ -1044,21 +1164,29 @@
 
         /* гамбургер */
         const navToggle = document.getElementById('navToggle');
-        function closeNav(){
+
+        function closeNav() {
             document.documentElement.classList.remove('nav-open');
-            navToggle?.setAttribute('aria-expanded','false');
+            navToggle?.setAttribute('aria-expanded', 'false');
         }
-        function openNav(){
+
+        function openNav() {
             document.documentElement.classList.add('nav-open');
-            navToggle?.setAttribute('aria-expanded','true');
+            navToggle?.setAttribute('aria-expanded', 'true');
         }
-        function toggleNav(){
+
+        function toggleNav() {
             if (document.documentElement.classList.contains('nav-open')) closeNav();
             else openNav();
         }
+
         navToggle?.addEventListener('click', toggleNav);
-        addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNav(); });
-        addEventListener('resize', () => { if (matchMedia('(min-width:781px)').matches) closeNav(); });
+        addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeNav();
+        });
+        addEventListener('resize', () => {
+            if (matchMedia('(min-width:781px)').matches) closeNav();
+        });
     })();
 </script>
 
