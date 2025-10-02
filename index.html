@@ -153,7 +153,11 @@
         .charImg>img.base{ display:block; width:100%; height:auto; position:relative; z-index:2; }
         .charImg>img.hover{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition: opacity .18s ease; object-fit:contain; object-position:center bottom; z-index:2; }
         .charImg:hover>img.hover, .charImg:focus-visible>img.hover, .charImg.is-touch>img.hover{ opacity:1; }
-        #charsBand>.charImg:first-child{ margin-left:5vw; }
+        :root { --first-char-extra-gap: 0px; }
+        #charsBand > .charImg:first-child{
+            margin-left: calc(5vw + var(--first-char-extra-gap));
+        }
+
 
         .charPlate{ position:absolute; left:50%; transform:translateX(-50%); top: calc(100% + 15px); z-index:1; pointer-events:none; background:#111; color:#fff; padding:20px; border-radius:14px; box-shadow:0 0 0 3px #fff, 0 8px 18px rgba(0,0,0,.35); display:none; }
         .charPlate__inner{ display:flex; column-gap:15px; }
@@ -455,6 +459,34 @@
             }, {passive: true});
         });
     })();
+
+    // зсуваємо першого персонажа рівно на ширину одного «слоту»
+    function setFirstCharExtraGap(mult = 1) {
+        const band   = document.getElementById('charsBand');
+        const first  = band?.querySelector('.charImg');
+        const second = first?.nextElementSibling;
+        if (!band || !first || !second) return;
+
+        const cs1 = getComputedStyle(first);
+        const cs2 = getComputedStyle(second);
+
+        const w1  = first.getBoundingClientRect().width;
+        const mr1 = parseFloat(cs1.marginRight) || 0;   // 90px
+        const ml2 = parseFloat(cs2.marginLeft)  || 0;   // 90px
+
+        // один повний «крок» вправо — від початку першого до початку другого
+        const slot = Math.round((w1 + mr1 + ml2) * mult); // ~240 + 90 + 90 = 420
+
+        // додаємо лише цей «крок», 5vw лишається як і було в CSS
+        document.documentElement.style.setProperty('--first-char-extra-gap', slot + 'px');
+    }
+
+    // 1 = точна позиція другого; можна трохи підкрутити, напр. 0.98 або 1.02
+    setFirstCharExtraGap(1);
+
+    // тримаємо актуальним при ресайзі та рефреші ScrollTrigger
+    addEventListener('resize', () => setFirstCharExtraGap(1));
+    ScrollTrigger.addEventListener('refreshInit', () => setFirstCharExtraGap(1));
 
     waitImgs('body').then(() => {
         initStage();
