@@ -336,15 +336,14 @@
         /* легка динаміка сонця */
         tl.to('.sunImg', {yPercent: -6, scale: 0.98, ease: 'none', duration: 18}, 0);
 
-        /* --- НОВЕ: різні «швидкості» через різні тривалості --- */
-      /*  const durChars      = 80;  // найшвидше (менша тривалість -> більше px за ту ж прокрутку)
-        const durGround     = 88;  // трохи повільніше за персонажів
-        const durHouses     = 96;  // повільніше за землю і персонажів (що тобі й потрібно)
-        const durMountains  = 110; // найповільніші
+      /*  const durChars      = 80;
+        const durGround     = 88;
+        const durHouses     = 96;
+        const durMountains  = 110;
 */
-        const durChars      = 70;   // найшвидше (герої)
-        const durGround     = 88;   // земля/сніг
-        const durHouses     = 125;  // повільніше за все, що попереду
+        const durChars      = 70;
+        const durGround     = 88;
+        const durHouses     = 110;
         const durMountains  = 150;
 
         const cssVarPx = (name) =>
