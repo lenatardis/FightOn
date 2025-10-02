@@ -461,6 +461,8 @@
     })();
 
     // зсуваємо першого персонажа рівно на ширину одного «слоту»
+    // зсуваємо першого персонажа: десктоп — рівно на місце другого,
+    // мобілка — не даємо вилетіти за правий край (клампуємо зсув)
     function setFirstCharExtraGap(mult = 1) {
         const band   = document.getElementById('charsBand');
         const first  = band?.querySelector('.charImg');
@@ -471,22 +473,37 @@
         const cs2 = getComputedStyle(second);
 
         const w1  = first.getBoundingClientRect().width;
-        const mr1 = parseFloat(cs1.marginRight) || 0;   // 90px
-        const ml2 = parseFloat(cs2.marginLeft)  || 0;   // 90px
+        const mr1 = parseFloat(cs1.marginRight) || 0; // 90
+        const ml2 = parseFloat(cs2.marginLeft)  || 0; // 90
 
-        // один повний «крок» вправо — від початку першого до початку другого
-        const slot = Math.round((w1 + mr1 + ml2) * mult); // ~240 + 90 + 90 = 420
+        // «повний крок» до позиції другого
+        const baseSlot = Math.round((w1 + mr1 + ml2) * mult); // ~420
 
-        // додаємо лише цей «крок», 5vw лишається як і було в CSS
-        document.documentElement.style.setProperty('--first-char-extra-gap', slot + 'px');
+        // 5vw у px (бо в CSS у нас margin-left: 5vw)
+        const fiveVwPx = innerWidth * 0.05;
+
+        let extra = baseSlot;
+
+        // На мобілках кламп: щоб правий край Sniper був у вʼюпорті з невеликим запасом
+        if (matchMedia('(max-width:780px)').matches) {
+            const SAFE_PAD = 12; // невеликий відступ справа
+            const maxWithoutOverflow = innerWidth - fiveVwPx - w1 - SAFE_PAD;
+            // трішки «на око», щоб стати ближче до реальної позиції другого на мобілці
+            const tuned = Math.max(0, Math.min(baseSlot, maxWithoutOverflow));
+            // легка мікропідгонка (можеш міняти 0.98 → 1.00/0.96 за бажанням)
+            extra = Math.round(tuned * 0.98);
+        }
+
+        document.documentElement.style.setProperty('--first-char-extra-gap', extra + 'px');
     }
 
-    // 1 = точна позиція другого; можна трохи підкрутити, напр. 0.98 або 1.02
+    // запуск
     setFirstCharExtraGap(1);
 
     // тримаємо актуальним при ресайзі та рефреші ScrollTrigger
     addEventListener('resize', () => setFirstCharExtraGap(1));
     ScrollTrigger.addEventListener('refreshInit', () => setFirstCharExtraGap(1));
+
 
     waitImgs('body').then(() => {
         initStage();
