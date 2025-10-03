@@ -276,8 +276,6 @@
         }
         @keyframes spin{ to{ transform:rotate(360deg) } }
 
-        /* блокуємо скрол поки гейт увімкнений (лише для сцени) */
-        body.gate-lock{ overscroll-behavior: contain; }
     </style>
 </head>
 <body>
@@ -683,20 +681,13 @@
         });
     }
 
-    // 4) Увімкнення/вимкнення гейта + лок-блок скролу
+    // 4) Увімкнення/вимкнення гейта
     function enableGate() {
         const gate = document.getElementById('stageGate');
         if (!gate) return;
         gate.hidden = false;
         requestAnimationFrame(() => gate.classList.add('on'));
-        document.body.classList.add('gate-lock');
-
-        const block = e => { e.preventDefault(); e.stopPropagation(); };
-        window.__gateBlockers = [
-            ['wheel', block, {passive:false}],
-            ['touchmove', block, {passive:false}]
-        ];
-        window.__gateBlockers.forEach(([t,fn,opt]) => document.addEventListener(t, fn, opt));
+        // Прибрано: body.gate-lock, window.__gateBlockers, addEventListener('wheel'/'touchmove'...)
     }
 
     function disableGate() {
@@ -704,11 +695,7 @@
         if (!gate) return;
         gate.classList.remove('on');
         setTimeout(() => { gate.hidden = true; }, 220);
-        document.body.classList.remove('gate-lock');
-        if (window.__gateBlockers) {
-            window.__gateBlockers.forEach(([t,fn,opt]) => document.removeEventListener(t, fn, opt));
-            window.__gateBlockers = null;
-        }
+        // Прибрано: body.gate-lock, зняття window.__gateBlockers
     }
 
     // 5) Smart boot
