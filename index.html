@@ -200,10 +200,32 @@
         }
         .gate-spinner{ width:28px; height:28px; border-radius:50%; border:3px solid rgba(255,255,255,.25); border-top-color:#fff; animation:spin .8s linear infinite; }
         @keyframes spin{ to{ transform:rotate(360deg) } }
+
+
+        .brand--mobile{ display:none; }
+        @media (max-width:780px){
+            .brand--mobile{
+                display:inline-flex;
+                align-items:center;
+                position:absolute;
+                left:12px;
+                height:58px;
+                z-index:10002;
+            }
+            .brand--mobile img{
+                height:40px;
+                width:auto;
+                filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+            }
+        }
+
     </style>
 </head>
 <body>
 <header class="site-header" id="siteHeader">
+    <a class="brand brand--mobile" href="#intro" aria-label="FightON">
+        <img src="./assets/fighton.png" alt="FightON" width="36" height="36" loading="eager" decoding="async">
+    </a>
     <button class="nav-toggle" id="navToggle" aria-label="Відкрити меню" aria-controls="primaryNav" aria-expanded="false">
         <span class="nav-toggle-bar" aria-hidden="true"></span>
     </button>
@@ -384,7 +406,6 @@
         addEventListener('resize', ()=> ScrollTrigger.refresh());
     }
 
-    /* ====== Плейти на персонажах ====== */
     const charData = [
         {'price':'83,33 TON','max profit':'up to 204,17 TON','max roi':'up to 245%','daily profit':'2,1250 TON','daily roi':'2,55%','feeding':'1.57 TON'},
         {'price':'33,33 TON','max profit':'up to 76,67 TON','max roi':'up to 230%','daily profit':'0,8167 TON','daily roi':'2,45%','feeding':'0.57 TON'},
@@ -416,7 +437,6 @@
             hoverImg.decoding = 'async';
             hoverImg.src = hoverSrc;
 
-            // НЕ прелоадимо hover на повільній мережі; на швидкій — під час idle
             const poor = isPoorNet();
             if(!poor && 'requestIdleCallback' in window){
                 requestIdleCallback(()=>{ const pre = new Image(); pre.decoding='async'; pre.src = hoverSrc; });
@@ -451,7 +471,6 @@
         });
     })();
 
-    /* ===== Перший слот героя ===== */
     function setFirstCharExtraGap(mult=1){
         const band = document.getElementById('charsBand');
         const first = band?.querySelector('.charImg');
@@ -476,8 +495,6 @@
     addEventListener('resize', ()=> setFirstCharExtraGap(1));
     ScrollTrigger.addEventListener('refreshInit', ()=> setFirstCharExtraGap(1));
 
-    /* ==== Smart gate only for slow networks ==== */
-
     let STAGE_INITTED = false;
     function initStageOnce(){ if(STAGE_INITTED) return; STAGE_INITTED = true; initStage(); ScrollTrigger.refresh(); }
 
@@ -495,7 +512,6 @@
         return false;
     }
 
-    // критичні — перші N героїв, які одразу у вьюпорті
     function criticalCharNodes(){
         const all = Array.from(document.querySelectorAll('#charsBand .charImg'));
         const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
@@ -503,7 +519,6 @@
     }
     function collectCriticalImgs(){ return criticalCharNodes(); }
 
-    // чекати частку критичних
     function waitCritical({minShow=220, maxWait=5000, readyRatio=0.5} = {}){
         const imgs = collectCriticalImgs(); const need = imgs.length; const start = performance.now();
         const allSettled = new Promise(resolve=>{
@@ -524,7 +539,6 @@
         });
     }
 
-    // ground bg — підключаємо коли вже можна
     function ensureGroundBg(){
         const g = document.getElementById('streetGroundBand');
         if (g && !g.style.backgroundImage){
@@ -542,7 +556,6 @@
         ensureGroundBg(); // підставляємо фон землі одразу після гейта
     }
 
-    // bump пріоритетів героїв (не впливає на швидку мережу, лише допомагає)
     (function bumpHeroPriority(){
         const chars = Array.from(document.querySelectorAll('#charsBand .charImg'));
         const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
@@ -567,7 +580,6 @@
             await waitCritical({minShow:220, maxWait:5000, readyRatio:0.5});
             disableGate();
         } else {
-            // fast path — короткий анти-блимач + одразу фон землі
             await new Promise(r=> setTimeout(r, ready ? 140 : 200));
             ensureGroundBg();
         }
@@ -577,7 +589,6 @@
 </script>
 
 <script>
-    /* ===== Fixed Header logic ===== */
     (function(){
         const header = document.getElementById('siteHeader');
         const headerH = ()=> header ? Math.round(header.getBoundingClientRect().height) : 64;
@@ -647,7 +658,6 @@
 </script>
 
 <script>
-    /* ===== Mobile swipe on #stage ===== */
     (function(){
         if(!matchMedia('(max-width:780px)').matches) return;
         const stage = document.getElementById('stage'); if(!stage) return;
@@ -678,7 +688,6 @@
 </script>
 
 <script>
-    /* ===== Billboard loader (знімаємо оверлей по load і по першому тапу) ===== */
     (function(){
         const loader = document.getElementById('bbLoader');
         const iframe = document.getElementById('bbFrame');
@@ -703,7 +712,6 @@
     })();
 </script>
 <script>
-    /* ===== Billboard hit-test → вмикаємо кліки по YouTube ===== */
     (function billboardHitTest(){
         const charsLayer = document.getElementById('chars');
         const billboard  = document.querySelector('.houseBillboard');          // уся рамка
@@ -711,21 +719,17 @@
 
         if (!charsLayer || !billboard || !screen) return;
 
-        // допоміжне: ми над білбордом?
         const overBillboard = (x, y) => {
             const stack = document.elementsFromPoint(x, y);
             return stack.some(el => el === billboard || el === screen || el.closest?.('.houseBillboard'));
         };
 
-        // вкл/викл перехоплення подій шаром з героями
         const setCharsPE = (enabled) => { charsLayer.style.pointerEvents = enabled ? 'auto' : 'none'; };
 
-        // Миша/трекпад: поки курсор над білбордом — вимикаємо перехоплення у #chars
         document.addEventListener('pointermove', (e) => {
             setCharsPE(!overBillboard(e.clientX, e.clientY));
         }, { passive: true });
 
-        // Сенсор: вимикаємо під пальцем на старт, повертаємо трохи пізніше
         let touched = false;
         document.addEventListener('touchstart', (e) => {
             const t = e.touches && e.touches[0]; if (!t) return;
@@ -740,7 +744,6 @@
             setTimeout(() => setCharsPE(true), 450);
         }, { passive: true });
 
-        // Страховка: якщо курсор входить/виходить саме з «екрану»
         screen.addEventListener('pointerenter', () => setCharsPE(false));
         screen.addEventListener('pointerleave', () => setCharsPE(true));
     })();
