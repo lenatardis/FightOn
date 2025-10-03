@@ -6,119 +6,89 @@
     <title>FightON</title>
     <link type="text/css" rel="stylesheet" href="assets/fonts/fonts.css">
     <style>
-        :root {
-            /* висоти секцій */
-            --header-h: 64px;
-            --intro-h: 120vh; /* скільки «неба» перед сценою */
-
-            /* pinned-сцена з героями */
-            --stage-h: 108vh; /* одразу видно героїв */
-
-            /* земля / паретаж */
-            --ground-h: 40vh;
-            --snow-h: 50px;
-            --mountains-k: 0.85;
-            --sun-k: 0.90;
-
-            /* позиція героїв */
-            --char-drop: -25vh;
-
-            /* лід-відступи (рахуються в JS) */
-            --mountains-lead: 0px;
-            --houses-lead: 0px;
+        :root{
+            --header-h:64px;
+            --intro-h:120vh;
+            --stage-h:108vh;
+            --ground-h:40vh;
+            --snow-h:50px;
+            --mountains-k:0.85;
+            --sun-k:0.90;
+            --char-drop:-25vh;
+            --mountains-lead:0px;
+            --houses-lead:0px;
+            --first-char-extra-gap:0px;
         }
 
-        html, body {
-            margin: 0;
-            background: #7B8CF1;
-            color: #fff;
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-        }
+        html,body{ margin:0; background:#7B8CF1; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; }
+        body{ padding-top:var(--header-h); }
 
-        body { padding-top: var(--header-h); }
-
-        /* header*/
+        /* header */
         .site-header{
-            position: fixed; inset: 0 0 auto 0; height: var(--header-h); z-index: 10000;
-            display: flex; align-items: center; justify-content: center;
-            gap: 16px; padding: 0 18px;
-
-            backdrop-filter: saturate(140%) blur(10px);
-            -webkit-backdrop-filter: saturate(140%) blur(10px);
-
-            background: linear-gradient(
-                    180deg,
-                    rgba(11,16,32,0.14) 0%,
-                    rgba(11,16,32,0.06) 60%,
-                    rgba(11,16,32,0.02) 100%
-            );
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            position:fixed; inset:0 0 auto 0; height:var(--header-h); z-index:10000;
+            display:flex; align-items:center; justify-content:center; gap:16px; padding:0 18px;
+            backdrop-filter:saturate(140%) blur(10px); -webkit-backdrop-filter:saturate(140%) blur(10px);
+            background:linear-gradient(180deg, rgba(11,16,32,0.14) 0%, rgba(11,16,32,0.06) 60%, rgba(11,16,32,0.02) 100%);
+            border-bottom:1px solid rgba(255,255,255,0.06);
         }
-
-        .main-nav { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-
-        .nav-link {
-            position: relative; display: inline-flex; align-items: center;
-            height: 36px; padding: 0 12px; border-radius: 10px;
-            color: #e9f2ff; font-family: 'Lucznik', sans-serif; text-transform: uppercase;
-            text-decoration: none; font-weight: 700; letter-spacing: .2px;
-            background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10);
+        .main-nav{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+        .nav-link{
+            position:relative; display:inline-flex; align-items:center; height:36px; padding:0 12px; border-radius:10px;
+            color:#e9f2ff; font-family:'Lucznik',sans-serif; text-transform:uppercase; text-decoration:none; font-weight:700; letter-spacing:.2px;
+            background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
             transition: transform .15s ease, background .15s ease, border-color .15s ease;
         }
-        .nav-link:hover { transform: translateY(-1px); background: rgba(255,255,255,.10); }
+        .nav-link:hover{ transform:translateY(-1px); background:rgba(255,255,255,.10); }
 
-        .intro, .stage, section { scroll-margin-top: var(--header-h); }
+        .intro,.stage,section{ scroll-margin-top:var(--header-h); }
 
-        .nav-toggle {
-            display: none; margin-left: 0; width: 40px; height: 40px;
-            border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.06);
-            border-radius: 10px; cursor: pointer; align-items: center; justify-content: center;
+        .nav-toggle{
+            display:none; margin-left:0; width:40px; height:40px; border:1px solid rgba(255,255,255,.12);
+            background:rgba(255,255,255,.06); border-radius:10px; cursor:pointer; align-items:center; justify-content:center;
         }
-        .nav-toggle-bar { display: block; width: 22px; height: 2px; background: #fff; border-radius: 2px; position: relative; }
-        .nav-toggle-bar::before, .nav-toggle-bar::after {
-            content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px;
-        }
+        .nav-toggle-bar{ display:block; width:22px; height:2px; background:#fff; border-radius:2px; position:relative; }
+        .nav-toggle-bar::before,.nav-toggle-bar::after{ content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px; }
         .nav-toggle-bar::before{ top:-7px; } .nav-toggle-bar::after{ top:7px; }
 
-        @media (max-width: 780px) {
-            .site-header { height: 58px; padding: 0 12px; }
-            body { padding-top: 58px; }
-            .nav-link { height: 44px; padding: 0 12px; font-size: 15px; }
-            .nav-toggle { display: inline-grid; position: absolute; right: 12px; }
-            .main-nav {
-                position: fixed; top: var(--header-h); left: 0; right: 0; display: grid; gap: 8px; padding: 10px;
-                background: linear-gradient(180deg, rgba(11,16,32,0.14) 0%, rgba(11,16,32,0.06) 60%, rgba(11,16,32,0.02) 100%);
-                border: 1px solid rgba(255,255,255,.10); border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0,0,0,.45); transform-origin: top center;
-                transform: translateY(-8px) scale(.98); opacity: 0; pointer-events: none;
-                transition: transform .18s ease, opacity .18s ease; z-index: 10001;
+        @media (max-width:780px){
+            .site-header{ height:58px; padding:0 12px; }
+            body{ padding-top:58px; }
+            .nav-link{ height:44px; padding:0 12px; font-size:15px; }
+            .nav-toggle{ display:inline-grid; position:absolute; right:12px; }
+            .main-nav{
+                position:fixed; top:var(--header-h); left:0; right:0; display:grid; gap:8px; padding:10px;
+                background:linear-gradient(180deg, rgba(11,16,32,0.14) 0%, rgba(11,16,32,0.06) 60%, rgba(11,16,32,0.02) 100%);
+                border:1px solid rgba(255,255,255,.10); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.45);
+                transform-origin:top center; transform:translateY(-8px) scale(.98); opacity:0; pointer-events:none;
+                transition: transform .18s ease, opacity .18s ease; z-index:10001;
             }
-            .nav-open .main-nav { opacity: 1; pointer-events: auto; transform: translateY(0) scale(1); }
-            .nav-open #navToggle .nav-toggle-bar{ background: transparent; }
-            .nav-open #navToggle .nav-toggle-bar::before{ top:0; transform: rotate(45deg); }
-            .nav-open #navToggle .nav-toggle-bar::after{ top:0; transform: rotate(-45deg); }
+            .nav-open .main-nav{ opacity:1; pointer-events:auto; transform:translateY(0) scale(1); }
+            .nav-open #navToggle .nav-toggle-bar{ background:transparent; }
+            .nav-open #navToggle .nav-toggle-bar::before{ top:0; transform:rotate(45deg); }
+            .nav-open #navToggle .nav-toggle-bar::after{ top:0; transform:rotate(-45deg); }
         }
 
-        /*intro */
-        .sky-gradient1 {
-            background: radial-gradient(900px 520px at 65% 10%, rgba(255,255,255,.18) 0, rgba(255,255,255,0) 60%),
-            linear-gradient(180deg,#7B8CF1 0%,#6FA2FA 28%,#699BD8 100%);
+        /* intro */
+        .sky-gradient1{
+            background:
+                    radial-gradient(900px 520px at 65% 10%, rgba(255,255,255,.18) 0, rgba(255,255,255,0) 60%),
+                    linear-gradient(180deg,#7B8CF1 0%,#6FA2FA 28%,#699BD8 100%);
         }
-        .sky-gradient2 { background: linear-gradient(180deg,#699BD8 0%,#82ABDD 28%,#ACBEB4 100%); }
+        .sky-gradient2{ background:linear-gradient(180deg,#699BD8 0%,#82ABDD 28%,#ACBEB4 100%); }
 
-        .intro { position: relative; height: var(--intro-h); overflow: hidden; }
-        .intro-logo { position: absolute; left: 50%; top: 16vh; transform: translateX(-50%); z-index: 3; pointer-events: none; }
-        .intro-logo img { width: min(48vmax,760px); height: auto; filter: drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
-
-        .intro .cloud { position: absolute; z-index: 2; filter: drop-shadow(0 6px 14px rgba(0,0,0,.12)); }
-        .intro .cloud img { height: 22vh; width: auto; }
+        .intro{ position:relative; height:var(--intro-h); overflow:hidden; }
+        .intro-logo{ position:absolute; left:50%; top:16vh; transform:translateX(-50%); z-index:3; pointer-events:none; }
+        .intro-logo img{ width:min(48vmax,760px); height:auto; filter:drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
+        .intro .cloud{ position:absolute; z-index:2; filter:drop-shadow(0 6px 14px rgba(0,0,0,.12)); }
+        .intro .cloud img{ height:22vh; width:auto; }
         .cloud--lt{ left:6vw; top:22vh; } .cloud--rt{ right:6vw; top:22vh; }
         .cloud--lb{ left:12vw; bottom:40vh; } .cloud--rb{ right:12vw; bottom:40vh; }
 
-        .stage { position: relative; height: var(--stage-h); overflow: hidden; }
-        .layer { position: absolute; inset: 0; pointer-events: none; }
-        .band { position: absolute; left: 0; bottom: 0; height: 100%; min-width: 100%; display: flex; align-items: flex-end; white-space: nowrap; will-change: transform; transform: translateZ(0); }
-        .band::after { content:""; flex:0 0 0; }
+        /* stage */
+        .stage{ position:relative; height:var(--stage-h); overflow:hidden; }
+        .layer{ position:absolute; inset:0; pointer-events:none; }
+        .band{ position:absolute; left:0; bottom:0; height:100%; min-width:100%; display:flex; align-items:flex-end; white-space:nowrap; will-change:transform; transform:translateZ(0); }
+        .band::after{ content:""; flex:0 0 0; }
 
         #sky{ z-index:1 } #sun{ z-index:2 } #mountains{ z-index:4 } #streetGround{ z-index:5 } #streetSnow{ z-index:6 } #houses{ z-index:7 } #chars{ z-index:8; pointer-events:auto; }
 
@@ -126,103 +96,67 @@
             content:""; position:absolute; left:50%; top:6vh; transform:translateX(-50%);
             width:64vmin; height:64vmin; border-radius:50%;
             background: radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
-            filter: blur(16px); opacity:.22;
+            filter:blur(16px); opacity:.22;
         }
 
         #sun{ display:grid; place-items:center; }
-        .sunImg{ width:min(22vmax,420px); height:auto; position:absolute; left:50%; transform:translateX(-50%); bottom: calc(var(--ground-h)*var(--sun-k) + 8vh); opacity:.93; filter:blur(.2px); }
-        @media (max-width:780px){ .sunImg{ bottom: calc(var(--ground-h)*var(--sun-k) + 19vh); } }
+        .sunImg{ width:min(22vmax,420px); height:auto; position:absolute; left:50%; transform:translateX(-50%); bottom:calc(var(--ground-h)*var(--sun-k) + 8vh); opacity:.93; filter:blur(.2px); }
+        @media (max-width:780px){ .sunImg{ bottom:calc(var(--ground-h)*var(--sun-k) + 19vh); } }
 
         .mountainsImg{ height:32vh; width:auto; margin:0 0 10vh; }
-        #mountains .mountainsImg:first-child{ margin-left: var(--mountains-lead); }
-        #mountainsBand{ bottom: calc(var(--ground-h) * var(--mountains-k)); }
+        #mountains .mountainsImg:first-child{ margin-left:var(--mountains-lead); }
+        #mountainsBand{ bottom:calc(var(--ground-h) * var(--mountains-k)); }
         #mountains .mountainsImg:nth-of-type(2){ margin-left:-2px; }
 
-        .houseImg{ height:44vh; width:auto; margin:0 36px 0; filter: drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
-        #houses .houseImg:first-child{ margin-left: var(--houses-lead); }
-        #housesBand{ bottom: var(--ground-h); }
+        .houseImg{ height:44vh; width:auto; margin:0 36px 0; filter:drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
+        #houses .houseImg:first-child{ margin-left:var(--houses-lead); }
+        #housesBand{ bottom:var(--ground-h); }
 
-        /* Будинок-білборд: така сама висота, ті самі відступи, як у .houseImg */
+        /* billboard */
         .houseBillboard{
-            position: relative;
-            height: 44vh;               /* як .houseImg */
-            aspect-ratio: 16 / 9;       /* пропорції рамки */
-            margin: 0 36px 0;           /* як .houseImg */
-            flex: 0 0 auto;
-            background: url("./assets/bigboard.svg") center/contain no-repeat;
-            filter: drop-shadow(0 10px 26px rgba(0,0,0,.28));
+            position:relative; height:44vh; aspect-ratio:16/9; margin:0 36px 0; flex:0 0 auto;
+            background:url("./assets/bigboard.svg") center/contain no-repeat;
+            filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));
+            pointer-events:auto;
         }
-
-        /* Внутрішній “екран” (вікно) всередині рамки білборда */
         .houseBillboard .billboard-screen{
-            position: absolute;
-            left: 12.5%;
-            top: 15%;
-            width: 75%;
-            height: 70%;
-            border-radius: 14px;
-            overflow: hidden;
-            background: #000;           /* на випадок без iframe */
-            box-shadow: 0 8px 24px rgba(0,0,0,.35) inset;
+            position:absolute; left:12.5%; top:15%; width:75%; height:70%;
+            border-radius:14px; overflow:hidden; background:#000; box-shadow:0 8px 24px rgba(0,0,0,.35) inset;
         }
-
-        /* Дозволимо кліки/тач саме для білборда (кадру і відео) */
-        #houses { pointer-events: auto; }                 /* батьківський шар */
-        .houseBillboard, .houseBillboard * { pointer-events: auto; }
+        #houses{ pointer-events:auto; }
         .houseBillboard iframe{ width:100%; height:100%; border:0; display:block; }
-
-        @media (max-width: 780px){
-            .houseBillboard{
-                height: auto;
-                margin: 0 12px;
-                max-width: calc(100vw - 24px);
-                width: 100%;
-                max-height: 44vh;
-            }
+        @media (max-width:780px){
+            .houseBillboard{ height:auto; margin:0 12px; max-width:calc(100vw - 24px); width:100%; max-height:44vh; }
         }
+        .bb-loader{ position:absolute; inset:0; display:grid; place-items:center; background:#0b0f1a; z-index:2; transition:opacity .25s ease; }
+        .bb-loader__spinner{ width:42px; height:42px; border-radius:50%; border:3px solid rgba(255,255,255,.25); border-top-color:#fff; animation:bbspin .9s linear infinite; }
+        @keyframes bbspin{ to{ transform:rotate(360deg) } }
+        .bb-loader.has-poster{ background:#000 center/cover no-repeat; }
 
-        .bb-loader{
-            position: absolute; inset: 0;
-            display: grid; place-items: center;
-            background: #0b0f1a;
-            z-index: 2;
-            transition: opacity .25s ease;
+        .houseBillboard{ z-index: 50; }
+        .houseBillboard, .houseBillboard * { pointer-events: auto; }
+
+        /* ground & snow – фон підставляємо з JS пізніше, щоб не конкурував з героями */
+        #streetGround .band{
+            background-repeat:repeat-x; background-position:left bottom; background-size:auto var(--ground-h);
         }
-
-        .bb-loader__spinner{
-            width: 42px; height: 42px;
-            border-radius: 50%;
-            border: 3px solid rgba(255,255,255,.25);
-            border-top-color: #fff;
-            animation: bbspin 0.9s linear infinite;
-        }
-        @keyframes bbspin{ to { transform: rotate(360deg); } }
-
-        .bb-loader.has-poster{
-            background: #000 center/cover no-repeat;
-        }
-
-        #streetGround .band{ background:url("./assets/street_ground.jpg") repeat-x left bottom; background-size:auto var(--ground-h); }
         .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
         #streetSnow .band{ position:relative; }
         #streetSnow .snowLine{ position:absolute; left:0; right:0; bottom:var(--ground-h); height:var(--snow-h); background:#fff; pointer-events:none; }
         .streetSnowSpacer{ width:600vw; height:0; }
 
-        .charImg{ position:relative; display:inline-block; width:240px; margin:0 90px 0; transform: translateY(var(--char-drop)); filter: drop-shadow(0 12px 34px rgba(0,0,0,.35)); vertical-align:bottom; will-change:transform; }
+        .charImg{ position:relative; display:inline-block; width:240px; margin:0 90px 0; transform:translateY(var(--char-drop)); filter:drop-shadow(0 12px 34px rgba(0,0,0,.35)); vertical-align:bottom; will-change:transform; }
         .charImg.sm{ width:200px; } .charImg.lg{ width:280px; }
         .charImg>img.base{ display:block; width:100%; height:auto; position:relative; z-index:2; }
-        .charImg>img.hover{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition: opacity .18s ease; object-fit:contain; object-position:center bottom; z-index:2; }
-        .charImg:hover>img.hover, .charImg:focus-visible>img.hover, .charImg.is-touch>img.hover{ opacity:1; }
-        :root { --first-char-extra-gap: 0px; }
-        #charsBand > .charImg:first-child{
-            margin-left: calc(5vw + var(--first-char-extra-gap));
-        }
+        .charImg>img.hover{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease; object-fit:contain; object-position:center bottom; z-index:2; }
+        .charImg:hover>img.hover,.charImg:focus-visible>img.hover,.charImg.is-touch>img.hover{ opacity:1; }
+        #charsBand>.charImg:first-child{ margin-left: calc(5vw + var(--first-char-extra-gap)); }
 
-        .charPlate{ position:absolute; left:50%; transform:translateX(-50%); top: calc(100% + 15px); z-index:1; pointer-events:none; background:#111; color:#fff; padding:20px; border-radius:14px; box-shadow:0 0 0 3px #fff, 0 8px 18px rgba(0,0,0,.35); display:none; }
+        .charPlate{ position:absolute; left:50%; transform:translateX(-50%); top:calc(100% + 15px); z-index:1; pointer-events:none; background:#111; color:#fff; padding:20px; border-radius:14px; box-shadow:0 0 0 3px #fff, 0 8px 18px rgba(0,0,0,.35); display:none; }
         .charPlate__inner{ display:flex; column-gap:15px; }
         .charPlate__inner p{ margin:0; }
-        .charPlate::before, .charPlate::after{
-            content:""; position:absolute; left: var(--plate-tip-x,50%); transform:translateX(-50%); width:0; height:0;
+        .charPlate::before,.charPlate::after{
+            content:""; position:absolute; left:var(--plate-tip-x,50%); transform:translateX(-50%); width:0; height:0;
             border-left:10px solid transparent; border-right:10px solid transparent; pointer-events:none;
         }
         .charPlate::before{ top:-13px; border-bottom:13px solid #fff; }
@@ -231,11 +165,11 @@
         .charPlate .column_1>div,.charPlate .column_2>div{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #ffffff; }
         .charPlate p{ font-size:14px; line-height:1em; font-family:'Lucznik', sans-serif; }
         .charPlate span{ display:block; margin-left:10px; font-size:12px; line-height:12px; font-family:'Gotham', sans-serif; }
-        .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate{ display:block; }
+        .charImg:hover .charPlate,.charImg:focus-visible .charPlate,.charImg.is-touch .charPlate{ display:block; }
         #charsBand>.charImg:first-child .charPlate{ left:20px; right:auto; transform:none; --plate-tip-x:28px; }
         #charsBand>.charImg:last-child .charPlate{ left:auto; right:20px; transform:none; --plate-tip-x: calc(100% - 28px); }
 
-        @media (max-width: 780px){
+        @media (max-width:780px){
             .charPlate{ padding:10px 5px; top:100%; }
             .charPlate__inner{ flex-direction:column; row-gap:5px; }
             .charPlate .column_1,.charPlate .column_2{ row-gap:5px; }
@@ -249,33 +183,23 @@
 
         .tail{ min-height:70vh; display:grid; place-items:center; background: radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%); color:#cfd6ff; }
 
-        /* картка-затвор тільки над сценою */
+        /* gate (без блокування скролу) */
         #stageGate[hidden]{ display:none }
         #stageGate{
             position:absolute; inset:0; display:grid; place-items:center;
             background: radial-gradient(900px 520px at 60% 15%, rgba(11,16,32,.65), rgba(11,16,32,.35));
-            z-index: 9000; /* вище шарів сцени (1..8), нижче хедера (10000) */
-            backdrop-filter: blur(6px) saturate(120%);
-            -webkit-backdrop-filter: blur(6px) saturate(120%);
-            opacity: 0; transition: opacity .22s ease;
+            z-index:9000; opacity:0; transition:opacity .22s ease;
+            backdrop-filter: blur(6px) saturate(120%); -webkit-backdrop-filter: blur(6px) saturate(120%);
         }
-        #stageGate.on{ opacity: 1; }
-
+        #stageGate.on{ opacity:1; }
         #stageGate .gate-card{
             padding:16px 18px; border-radius:14px;
-            background: rgba(255,255,255,.08);
-            border: 1px solid rgba(255,255,255,.18);
-            box-shadow: 0 10px 26px rgba(0,0,0,.35);
-            display:flex; align-items:center; gap:12px;
-            font-family: 'Lucznik', system-ui; letter-spacing:.2px;
+            background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
+            box-shadow:0 10px 26px rgba(0,0,0,.35); display:flex; align-items:center; gap:12px;
+            font-family:'Lucznik', system-ui; letter-spacing:.2px;
         }
-        .gate-spinner{
-            width:28px; height:28px; border-radius:50%;
-            border:3px solid rgba(255,255,255,.25);
-            border-top-color:#fff; animation:spin .8s linear infinite;
-        }
+        .gate-spinner{ width:28px; height:28px; border-radius:50%; border:3px solid rgba(255,255,255,.25); border-top-color:#fff; animation:spin .8s linear infinite; }
         @keyframes spin{ to{ transform:rotate(360deg) } }
-
     </style>
 </head>
 <body>
@@ -283,7 +207,6 @@
     <button class="nav-toggle" id="navToggle" aria-label="Відкрити меню" aria-controls="primaryNav" aria-expanded="false">
         <span class="nav-toggle-bar" aria-hidden="true"></span>
     </button>
-
     <nav class="main-nav" id="primaryNav" aria-label="Main">
         <a class="nav-link" href="#intro" data-target="#intro">Особливості</a>
         <a class="nav-link" href="#tail" data-target="#tail">Досліджуй</a>
@@ -307,18 +230,18 @@
 
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
-            <img class="mountainsImg" src="./assets/mountains_1.svg" alt="">
-            <img class="mountainsImg" src="./assets/mountains_2.svg" alt="">
+            <img class="mountainsImg" src="./assets/mountains_1.svg" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="mountainsImg" src="./assets/mountains_2.svg" alt="" loading="lazy" fetchpriority="low" decoding="async">
         </div>
     </div>
 
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png" alt="">
-            <img class="houseImg" src="./assets/house2.png" alt="">
-            <img class="houseImg" src="./assets/house3.png" alt="">
-            <img class="houseImg" src="./assets/house4.png" alt="">
-            <!-- ▼ Білборд як ще один «будинок» у стрічці -->
+            <img class="houseImg" src="./assets/house1.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house2.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house3.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house4.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <!-- ▼ білборд -->
             <div class="houseBillboard" aria-label="Відео-білборд">
                 <div class="billboard-screen">
                     <div class="bb-loader" id="bbLoader" aria-live="polite">
@@ -336,9 +259,9 @@
                 </div>
             </div>
             <!-- ▲ кінець білборда -->
-            <img class="houseImg" src="./assets/house5.png" alt="">
-            <img class="houseImg" src="./assets/house6.png" alt="">
-            <img class="houseImg" src="./assets/house7.png" alt="">
+            <img class="houseImg" src="./assets/house5.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house6.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house7.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
         </div>
     </div>
 
@@ -351,6 +274,7 @@
 
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
+            <!-- width/height виставимо з JS; першим N дадемо high priority -->
             <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" data-plate-title="SNIPER" data-plate-text="Я можу все і навіть трохи більше!">
             <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla" data-plate-title="GORILLA" data-plate-text="Я можу все і навіть трохи більше!">
             <img class="charImg" src="./assets/Mobster.svg" alt="Mobster" data-plate-title="MOBSTER" data-plate-text="Я можу все і навіть трохи більше!">
@@ -363,7 +287,7 @@
         </div>
     </div>
 
-    <!-- гейт всередині #stage -->
+    <!-- gate всередині #stage -->
     <div id="stageGate" aria-live="polite" hidden>
         <div class="gate-card">
             <div class="gate-spinner" aria-hidden="true"></div>
@@ -379,122 +303,88 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
 <script>
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-    gsap.config({nullTargetWarn: false});
+    gsap.config({nullTargetWarn:false});
 </script>
+
 <script>
-    /* ===== ХМАРКИ В INTRO (виїжджають назовні) ===== */
-    (function introClouds() {
-        const tl = gsap.timeline({
-            scrollTrigger: {trigger: "#intro", start: "top top", end: "bottom top", scrub: 1}
-        });
-        const push = () => Math.max(innerWidth * 0.28, 280);
-        tl.to(".intro .cloud.cloud--lt", {x: -push(), ease: "none"}, 0);
-        tl.to(".intro .cloud.cloud--rt", {x: push(), ease: "none"}, 0);
-        tl.to(".intro .cloud.cloud--lb", {x: -push() * 0.8, ease: "none"}, 0);
-        tl.to(".intro .cloud.cloud--rb", {x: push() * 0.8, ease: "none"}, 0);
-        tl.to(".intro-logo", {y: -40, opacity: 0.92, ease: "none"}, 0);
+    /* ===== Intro clouds ===== */
+    (function introClouds(){
+        const tl = gsap.timeline({ scrollTrigger:{ trigger:"#intro", start:"top top", end:"bottom top", scrub:1 }});
+        const push = () => Math.max(innerWidth*0.28, 280);
+        tl.to(".intro .cloud.cloud--lt", {x:-push(), ease:"none"}, 0);
+        tl.to(".intro .cloud.cloud--rt", {x: push(), ease:"none"}, 0);
+        tl.to(".intro .cloud.cloud--lb", {x:-push()*0.8, ease:"none"}, 0);
+        tl.to(".intro .cloud.cloud--rb", {x: push()*0.8, ease:"none"}, 0);
+        tl.to(".intro-logo", {y:-40, opacity:0.92, ease:"none"}, 0);
     })();
 
-    function waitImgs(sel) {
-        const imgs = Array.from(document.querySelectorAll(sel + ' img'));
-        return Promise.all(imgs.map(i => i.complete ? 1 : new Promise(r => i.addEventListener('load', r, {once: true}))));
-    }
-
-    const bandFull = (sel) => {
-        const el = document.querySelector(sel);
-        if (!el) return 0;
+    const bandFull = (sel)=>{
+        const el = document.querySelector(sel); if(!el) return 0;
         const w = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
         return Math.max(0, w - innerWidth);
     };
-    const startOffset = (sel, k) => -(bandFull(sel) * (1 - k));
-    const endOffset = (sel) => -(bandFull(sel));
-    const leadPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
+    const startOffset = (sel,k)=> -(bandFull(sel)*(1-k));
+    const endOffset   = (sel)=>  -(bandFull(sel));
+    const leadPx      = (sel,k)=> Math.round(bandFull(sel)*(1-k));
 
-    function recalcStageDims() {
-        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
-        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
-        document.querySelector('.streetGroundSpacer')?.style && (document.querySelector('.streetGroundSpacer').style.width = baseWidth + 'px');
-        document.querySelector('.streetSnowSpacer')?.style && (document.querySelector('.streetSnowSpacer').style.width = baseWidth + 'px');
-
-        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
-        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
+    function recalcStageDims(){
+        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth*3;
+        const baseWidth = Math.round(Math.max(charsW*1.05, innerWidth*3.5));
+        const g = document.querySelector('.streetGroundSpacer'); if(g) g.style.width = baseWidth+'px';
+        const s = document.querySelector('.streetSnowSpacer');   if(s) s.style.width = baseWidth+'px';
+        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand',0.28)+'px');
+        document.documentElement.style.setProperty('--houses-lead',    leadPx('#housesBand',   0.72)+'px');
     }
-
     ScrollTrigger.addEventListener('refreshInit', recalcStageDims);
 
-    function initStage() {
-        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
+    function initStage(){
+        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth*3;
+        const baseWidth = Math.round(Math.max(charsW*1.05, innerWidth*3.5));
+        document.querySelector('.streetGroundSpacer')?.style && (document.querySelector('.streetGroundSpacer').style.width = baseWidth+'px');
+        document.querySelector('.streetSnowSpacer')?.style && (document.querySelector('.streetSnowSpacer').style.width = baseWidth+'px');
 
-        const groundSpacer = document.querySelector('.streetGroundSpacer');
-        const snowSpacer = document.querySelector('.streetSnowSpacer');
-        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
-        if (groundSpacer) groundSpacer.style.width = baseWidth + 'px';
-        if (snowSpacer) snowSpacer.style.width = baseWidth + 'px';
-
-        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
-        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
+        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand',0.28)+'px');
+        document.documentElement.style.setProperty('--houses-lead',    leadPx('#housesBand',   0.72)+'px');
 
         const tl = gsap.timeline({
-            scrollTrigger: {
-                id: "stageParallax",
-                trigger: "#stage",
-                start: "top top",
-                end: () => {
-                    const w = bandFull('#charsBand');
-                    return "+=" + Math.max(1600, Math.round(w * 1.15));
-                },
-                pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true
+            scrollTrigger:{
+                id:"stageParallax",
+                trigger:"#stage",
+                start:"top top",
+                end: ()=> { const w = bandFull('#charsBand'); return "+="+Math.max(1600, Math.round(w*1.15)); },
+                pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
             }
         });
 
-        /* легка динаміка сонця */
-        tl.to('.sunImg', {yPercent: -6, scale: 0.98, ease: 'none', duration: 18}, 0);
+        tl.to('.sunImg', {yPercent:-6, scale:0.98, ease:'none', duration:18}, 0);
 
-        const durChars      = 75;
-        const durGround     = 88;
-        const durHouses     = 110;
-        const durMountains  = 130;
+        const durChars=75, durGround=88, durHouses=110, durMountains=130;
+        const cssVarPx = (name)=> parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name))||0;
 
-        const cssVarPx = (name) =>
-            parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
-
-        /* ГОРИ — старт із урахуванням lead, повільні */
         tl.fromTo('#mountainsBand',
-            {x: () => -cssVarPx('--mountains-lead')},
-            {x: () => endOffset('#mountainsBand'), ease: 'none', duration: durMountains},
-            0
-        );
+            {x: ()=> -cssVarPx('--mountains-lead')},
+            {x: ()=>  endOffset('#mountainsBand'), ease:'none', duration:durMountains}, 0);
 
-        /* БУДИНКИ — повільніші за персонажів */
         tl.fromTo('#housesBand',
-            {x: () => -cssVarPx('--houses-lead')},
-            {x: () => endOffset('#housesBand'), ease: 'none', duration: durHouses},
-            0
-        );
+            {x: ()=> -cssVarPx('--houses-lead')},
+            {x: ()=>  endOffset('#housesBand'), ease:'none', duration:durHouses}, 0);
 
-        /* ЗЕМЛЯ/СНІГ — близький план */
         tl.fromTo('#streetGroundBand',
-            {x: () => startOffset('#streetGroundBand', 0.90)},
-            {x: () => endOffset('#streetGroundBand'), ease: 'none', duration: durGround},
-            0
-        );
+            {x: ()=> startOffset('#streetGroundBand',0.90)},
+            {x: ()=> endOffset('#streetGroundBand'), ease:'none', duration:durGround}, 0);
+
         tl.fromTo('#streetSnowBand',
-            {x: () => startOffset('#streetSnowBand', 0.90)},
-            {x: () => endOffset('#streetSnowBand'), ease: 'none', duration: durGround},
-            0
-        );
+            {x: ()=> startOffset('#streetSnowBand',0.90)},
+            {x: ()=> endOffset('#streetSnowBand'), ease:'none', duration:durGround}, 0);
 
-        /* ПЕРСОНАЖІ — найшвидші */
         tl.fromTo('#charsBand',
-            {x: () => startOffset('#charsBand', 1.00)},
-            {x: () => endOffset('#charsBand'), ease: 'none', duration: durChars},
-            0
-        );
+            {x: ()=> startOffset('#charsBand',1.00)},
+            {x: ()=> endOffset('#charsBand'), ease:'none', duration:durChars}, 0);
 
-        addEventListener('resize', () => ScrollTrigger.refresh());
+        addEventListener('resize', ()=> ScrollTrigger.refresh());
     }
 
-    /* ====== ПЛЕЙТИ НА ПЕРСОНАЖАХ ====== */
+    /* ====== Плейти на персонажах ====== */
     const charData = [
         {'price':'83,33 TON','max profit':'up to 204,17 TON','max roi':'up to 245%','daily profit':'2,1250 TON','daily roi':'2,55%','feeding':'1.57 TON'},
         {'price':'33,33 TON','max profit':'up to 76,67 TON','max roi':'up to 230%','daily profit':'0,8167 TON','daily roi':'2,45%','feeding':'0.57 TON'},
@@ -508,281 +398,239 @@
         {'price':'free','max profit':'up to 0,17 TON','max roi':'up to 100%','daily profit':'0,0020 TON','daily roi':'1.2%','feeding':'0.004 TON'}
     ];
 
-    (function attachPlates() {
-        const band = document.getElementById('charsBand');
-        if (!band) return;
-
+    (function attachPlates(){
+        const band = document.getElementById('charsBand'); if(!band) return;
         const cards = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
-
-        cards.forEach((baseImg, idx) => {
+        cards.forEach((baseImg, idx)=>{
             const data = charData[idx] || null;
 
             const wrap = document.createElement('span');
-            wrap.className = baseImg.className;
-            wrap.tabIndex = 0;
-            if (baseImg.style.margin) { wrap.style.margin = baseImg.style.margin; baseImg.style.margin = ''; }
+            wrap.className = baseImg.className; wrap.tabIndex = 0;
+            if (baseImg.style.margin){ wrap.style.margin = baseImg.style.margin; baseImg.style.margin = ''; }
             baseImg.className = 'base';
 
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
             const hoverImg = new Image();
             hoverImg.className = 'hover';
             hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
+            hoverImg.decoding = 'async';
             hoverImg.src = hoverSrc;
-            const pre = new Image(); pre.src = hoverSrc;
 
-            const plate = document.createElement('div');
-            plate.className = 'charPlate';
+            // НЕ прелоадимо hover на повільній мережі; на швидкій — під час idle
+            const poor = isPoorNet();
+            if(!poor && 'requestIdleCallback' in window){
+                requestIdleCallback(()=>{ const pre = new Image(); pre.decoding='async'; pre.src = hoverSrc; });
+            }
 
-            if (data) {
-                const inner = document.createElement('div'); inner.className = 'charPlate__inner';
-                const col1 = document.createElement('div'); col1.className = 'column_1';
-                const col2 = document.createElement('div'); col2.className = 'column_2';
-
+            const plate = document.createElement('div'); plate.className = 'charPlate';
+            if(data){
+                const inner = document.createElement('div'); inner.className='charPlate__inner';
+                const col1 = document.createElement('div'); col1.className='column_1';
+                const col2 = document.createElement('div'); col2.className='column_2';
                 const entries = Object.entries(data);
-                const buildItems = (pairs) => pairs.map(([k, v]) => {
+                const buildItems = (pairs)=> pairs.map(([k,v])=>{
                     const item = document.createElement('div');
                     const p = document.createElement('p'); p.textContent = String(k).toUpperCase();
                     const span = document.createElement('span'); span.textContent = v;
                     item.appendChild(p); item.appendChild(span); return item;
                 });
-
-                buildItems(entries.slice(0,3)).forEach(el => col1.appendChild(el));
-                buildItems(entries.slice(3,6)).forEach(el => col2.appendChild(el));
-
+                buildItems(entries.slice(0,3)).forEach(el=> col1.appendChild(el));
+                buildItems(entries.slice(3,6)).forEach(el=> col2.appendChild(el));
                 inner.appendChild(col1); inner.appendChild(col2); plate.appendChild(inner);
             }
 
             baseImg.parentNode.insertBefore(wrap, baseImg);
             wrap.appendChild(baseImg);
             wrap.appendChild(hoverImg);
-            if (data) wrap.appendChild(plate);
+            if(data) wrap.appendChild(plate);
 
-            wrap.addEventListener('touchstart', () => {
-                wrap.classList.add('is-touch');
-                clearTimeout(wrap._t);
-                wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 900);
-            }, {passive: true});
+            wrap.addEventListener('touchstart', ()=>{
+                wrap.classList.add('is-touch'); clearTimeout(wrap._t);
+                wrap._t = setTimeout(()=> wrap.classList.remove('is-touch'), 900);
+            }, {passive:true});
         });
     })();
 
-    /* ===== Зсув першого персонажа ===== */
-    function setFirstCharExtraGap(mult = 1) {
-        const band   = document.getElementById('charsBand');
-        const first  = band?.querySelector('.charImg');
+    /* ===== Перший слот героя ===== */
+    function setFirstCharExtraGap(mult=1){
+        const band = document.getElementById('charsBand');
+        const first = band?.querySelector('.charImg');
         const second = first?.nextElementSibling;
-        if (!band || !first || !second) return;
-
-        const cs1 = getComputedStyle(first);
-        const cs2 = getComputedStyle(second);
-
-        const w1  = first.getBoundingClientRect().width;
-        const mr1 = parseFloat(cs1.marginRight) || 0;
-        const ml2 = parseFloat(cs2.marginLeft)  || 0;
-
-        const baseSlot = Math.round((w1 + mr1 + ml2) * mult);
-        const fiveVwPx = innerWidth * 0.05;
-
+        if(!band || !first || !second) return;
+        const cs1 = getComputedStyle(first), cs2 = getComputedStyle(second);
+        const w1 = first.getBoundingClientRect().width;
+        const mr1 = parseFloat(cs1.marginRight)||0;
+        const ml2 = parseFloat(cs2.marginLeft)||0;
+        const baseSlot = Math.round((w1+mr1+ml2)*mult);
+        const fiveVwPx = innerWidth*0.05;
         let extra = baseSlot;
-
-        if (matchMedia('(max-width:780px)').matches) {
+        if(matchMedia('(max-width:780px)').matches){
             const SAFE_PAD = 12;
             const maxWithoutOverflow = innerWidth - fiveVwPx - w1 - SAFE_PAD;
             const tuned = Math.max(0, Math.min(baseSlot, maxWithoutOverflow));
-            extra = Math.round(tuned * 0.98);
+            extra = Math.round(tuned*0.98);
         }
-
-        document.documentElement.style.setProperty('--first-char-extra-gap', extra + 'px');
+        document.documentElement.style.setProperty('--first-char-extra-gap', extra+'px');
     }
-
     setFirstCharExtraGap(1);
-    addEventListener('resize', () => setFirstCharExtraGap(1));
-    ScrollTrigger.addEventListener('refreshInit', () => setFirstCharExtraGap(1));
+    addEventListener('resize', ()=> setFirstCharExtraGap(1));
+    ScrollTrigger.addEventListener('refreshInit', ()=> setFirstCharExtraGap(1));
 
     /* ==== Smart gate only for slow networks ==== */
 
-    // 0) захист від подвійної ініціалізації
     let STAGE_INITTED = false;
-    function initStageOnce(){
-        if (STAGE_INITTED) return;
-        STAGE_INITTED = true;
-        initStage();
-        ScrollTrigger.refresh();
-    }
+    function initStageOnce(){ if(STAGE_INITTED) return; STAGE_INITTED = true; initStage(); ScrollTrigger.refresh(); }
 
-    // 1) Визначаємо, чи мережа повільна
-    function isPoorNet() {
-        // Dev-перемикачі: ?gate=1 / ?gate=0 (для ручного тесту)
+    function isPoorNet(){
         const q = new URLSearchParams(location.search);
-        if (q.get('gate') === '1') return true;
-        if (q.get('gate') === '0') return false;
-
+        if (q.get('gate')==='1') return true;
+        if (q.get('gate')==='0') return false;
         const c = navigator.connection;
-        const et = c?.effectiveType;                 // 'slow-2g'|'2g'|'3g'|'4g' (грубо)
+        const et = c?.effectiveType;
         const save = c?.saveData === true;
-        const down = typeof c?.downlink === 'number' ? c.downlink : Infinity; // Мбіт/с
-        const rtt  = typeof c?.rtt === 'number' ? c.rtt : 0;                  // мс
-
-        // Якщо явна економія трафіку або дуже повільні типи — вмикаємо гейт
-        if (save || et === 'slow-2g' || et === '2g' || et === '3g') return true;
-
-        // Для '4g' дивимось на реальні метрики:
-        // - повільний реальний канал
-        // - або висока затримка
+        const down = typeof c?.downlink === 'number' ? c.downlink : Infinity;
+        const rtt  = typeof c?.rtt === 'number' ? c.rtt : 0;
+        if (save || et==='slow-2g' || et==='2g' || et==='3g') return true;
         if (down < 1.2 || rtt > 300) return true;
-
-        return false; // інакше — нормальна мережа, гейт не показуємо
+        return false;
     }
 
-    // 2) Критичні селектори
-    const CRITICAL_SEL = [
-        '#sun .sunImg',
-        '#mountains .mountainsImg',
-        '#houses .houseImg:nth-of-type(1)',
-        '#houses .houseImg:nth-of-type(2)',
-        '#streetGround .streetGroundSpacer',
-        '#charsBand .charImg:nth-of-type(1)',
-        '#charsBand .charImg:nth-of-type(2)'
-    ].join(',');
-
-    function collectCriticalImgs() {
-        const nodes = Array.from(document.querySelectorAll(CRITICAL_SEL));
-        return nodes.flatMap(el => el.tagName === 'IMG'
-            ? [el]
-            : Array.from(el.querySelectorAll('img')));
+    // критичні — перші N героїв, які одразу у вьюпорті
+    function criticalCharNodes(){
+        const all = Array.from(document.querySelectorAll('#charsBand .charImg'));
+        const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
+        return all.slice(0, N);
     }
+    function collectCriticalImgs(){ return criticalCharNodes(); }
 
-    // 3) Очікування критичних зображень (із «стелею» і «порогом» готовності)
-    function waitCritical({minShow=200, maxWait=5000, readyRatio=0.8} = {}) {
-        const imgs = collectCriticalImgs();
-        const need = imgs.length;
-        const start = performance.now();
-
-        const allSettled = new Promise(resolve => {
-            if (!need) return resolve();
+    // чекати частку критичних
+    function waitCritical({minShow=220, maxWait=5000, readyRatio=0.5} = {}){
+        const imgs = collectCriticalImgs(); const need = imgs.length; const start = performance.now();
+        const allSettled = new Promise(resolve=>{
+            if(!need) return resolve();
             let loaded = 0;
-            const mark = () => {
-                loaded++;
-                const ratio = loaded / need;
-                if (ratio >= readyRatio) resolve();
-            };
-            imgs.forEach(img => {
+            const mark = ()=>{ loaded++; if (loaded/need >= readyRatio) resolve(); };
+            imgs.forEach(img=>{
                 if (img.complete) mark();
                 else img.addEventListener('load', mark, {once:true});
                 img.addEventListener('error', mark, {once:true});
             });
         });
-
-        const minDelay = new Promise(r => setTimeout(r, minShow));
-        const maxDelay = new Promise(r => setTimeout(r, maxWait));
-
-        return Promise.race([Promise.all([allSettled, minDelay]), maxDelay]).then(() => {
+        const minDelay = new Promise(r=> setTimeout(r, minShow));
+        const maxDelay = new Promise(r=> setTimeout(r, maxWait));
+        return Promise.race([Promise.all([allSettled, minDelay]), maxDelay]).then(()=>{
             const spent = performance.now() - start;
-            if (spent < minShow) return new Promise(r => setTimeout(r, minShow - spent));
+            if (spent < minShow) return new Promise(r=> setTimeout(r, minShow - spent));
         });
     }
 
-    // 4) Увімкнення/вимкнення гейта
-    function enableGate() {
-        const gate = document.getElementById('stageGate');
-        if (!gate) return;
-        gate.hidden = false;
-        requestAnimationFrame(() => gate.classList.add('on'));
-        // Прибрано: body.gate-lock, window.__gateBlockers, addEventListener('wheel'/'touchmove'...)
+    // ground bg — підключаємо коли вже можна
+    function ensureGroundBg(){
+        const g = document.getElementById('streetGroundBand');
+        if (g && !g.style.backgroundImage){
+            g.style.backgroundImage = 'url("./assets/street_ground.jpg")';
+        }
     }
 
-    function disableGate() {
-        const gate = document.getElementById('stageGate');
-        if (!gate) return;
-        gate.classList.remove('on');
-        setTimeout(() => { gate.hidden = true; }, 220);
-        // Прибрано: body.gate-lock, зняття window.__gateBlockers
+    function enableGate(){
+        const gate = document.getElementById('stageGate'); if(!gate) return;
+        gate.hidden = false; requestAnimationFrame(()=> gate.classList.add('on'));
+    }
+    function disableGate(){
+        const gate = document.getElementById('stageGate'); if(!gate) return;
+        gate.classList.remove('on'); setTimeout(()=>{ gate.hidden = true; }, 220);
+        ensureGroundBg(); // підставляємо фон землі одразу після гейта
     }
 
-    // 5) Smart boot
+    // bump пріоритетів героїв (не впливає на швидку мережу, лише допомагає)
+    (function bumpHeroPriority(){
+        const chars = Array.from(document.querySelectorAll('#charsBand .charImg'));
+        const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
+        chars.forEach((img, i)=>{
+            img.setAttribute('decoding', 'async');
+            // орієнтовні числа, щоб браузер міг зарезервувати місце
+            const w = Math.round(img.getBoundingClientRect().width || 240);
+            const h = matchMedia('(max-width:780px)').matches ? 220 : 280;
+            img.setAttribute('width', w); img.setAttribute('height', h);
+            if (i < N){ img.setAttribute('loading','eager'); img.setAttribute('fetchpriority','high'); }
+            else      { img.setAttribute('loading','lazy');  img.setAttribute('fetchpriority','low');  }
+        });
+    })();
+
     (async function bootStageSmart(){
         const poor = isPoorNet();
         const critImgs = collectCriticalImgs();
-        const ready = critImgs.length &&
-            critImgs.filter(i => i.complete).length / critImgs.length >= 0.8;
+        const ready = critImgs.length && critImgs.filter(i=> i.complete).length / critImgs.length >= 0.8;
 
-        if (poor && !ready) {
+        if (poor && !ready){
             enableGate();
-            await waitCritical({minShow: 300, maxWait: 5000, readyRatio: 0.8});
+            await waitCritical({minShow:220, maxWait:5000, readyRatio:0.5});
             disableGate();
         } else {
-            // анти-блимач для дуже швидких (мінімальний)
-            await new Promise(r => setTimeout(r, ready ? 180 : 280));
+            // fast path — короткий анти-блимач + одразу фон землі
+            await new Promise(r=> setTimeout(r, ready ? 140 : 200));
+            ensureGroundBg();
         }
 
         initStageOnce();
     })();
 </script>
+
 <script>
     /* ===== Fixed Header logic ===== */
-    (function () {
+    (function(){
         const header = document.getElementById('siteHeader');
-        const headerH = () => header ? Math.round(header.getBoundingClientRect().height) : 64;
-
+        const headerH = ()=> header ? Math.round(header.getBoundingClientRect().height) : 64;
         function syncHeaderVar(){ document.documentElement.style.setProperty('--header-h', headerH() + 'px'); }
         syncHeaderVar();
-        addEventListener('resize', () => { syncHeaderVar(); ScrollTrigger.refresh(); });
+        addEventListener('resize', ()=>{ syncHeaderVar(); ScrollTrigger.refresh(); });
 
         function setActiveById(id){
-            document.querySelectorAll('.nav-link').forEach(a => {
+            document.querySelectorAll('.nav-link').forEach(a=>{
                 const target = a.dataset.target || a.getAttribute('href');
-                a.classList.toggle('active', target === id);
+                a.classList.toggle('active', target===id);
             });
         }
 
-        document.querySelectorAll('.nav-link').forEach(a => {
-            a.addEventListener('click', (e) => {
+        document.querySelectorAll('.nav-link').forEach(a=>{
+            a.addEventListener('click', (e)=>{
                 e.preventDefault();
                 const sel = a.dataset.target || a.getAttribute('href');
                 setActiveById(sel);
-                gsap.to(window, { duration: 0.8, ease: 'power2.out', scrollTo: {y: sel, offsetY: headerH()} });
+                gsap.to(window, { duration:0.8, ease:'power2.out', scrollTo:{ y:sel, offsetY:headerH() } });
                 document.documentElement.classList.remove('nav-open');
-                document.getElementById('navToggle')?.setAttribute('aria-expanded', 'false');
+                document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
             });
         });
 
-        const SECTIONS = ['#intro', '#tail', '#gallery', '#templates', '#faq'];
+        const SECTIONS = ['#intro','#tail','#gallery','#templates','#faq'];
         let currentActive = null, rafRunning = false;
-
-        function updateActive() {
+        function updateActive(){
             rafRunning = false;
-            const y = headerH();
-            const hysteresis = 10;
-            let winner = null;
-
-            for (const id of SECTIONS) {
-                const el = document.querySelector(id);
-                if (!el) continue;
+            const y = headerH(), hysteresis = 10; let winner = null;
+            for (const id of SECTIONS){
+                const el = document.querySelector(id); if(!el) continue;
                 const r = el.getBoundingClientRect();
-                if (r.top <= y + hysteresis && r.bottom > y + hysteresis) { winner = id; break; }
+                if (r.top <= y + hysteresis && r.bottom > y + hysteresis){ winner = id; break; }
             }
-            if (!winner) {
+            if(!winner){
                 let best = Infinity;
-                for (const id of SECTIONS) {
-                    const el = document.querySelector(id);
-                    if (!el) continue;
+                for (const id of SECTIONS){
+                    const el = document.querySelector(id); if(!el) continue;
                     const dist = Math.abs(el.getBoundingClientRect().top - y);
-                    if (dist < best) { best = dist; winner = id; }
+                    if (dist < best){ best = dist; winner = id; }
                 }
             }
-            if (winner && winner !== currentActive) {
-                currentActive = winner;
-                setActiveById(winner);
-            }
+            if (winner && winner !== currentActive){ currentActive = winner; setActiveById(winner); }
         }
+        function onScroll(){ if(!rafRunning){ rafRunning = true; requestAnimationFrame(updateActive); } }
 
-        function onScroll(){ if (!rafRunning){ rafRunning = true; requestAnimationFrame(updateActive); } }
-
-        addEventListener('scroll', onScroll, {passive: true});
+        addEventListener('scroll', onScroll, {passive:true});
         addEventListener('resize', updateActive);
-        addEventListener('load', () => {
+        addEventListener('load', ()=>{
             const hash = window.location.hash;
-            if (hash && document.querySelector(hash)) {
-                gsap.set(window, {scrollTo: {y: hash, offsetY: headerH(), autoKill: false}});
+            if (hash && document.querySelector(hash)){
+                gsap.set(window, {scrollTo:{ y:hash, offsetY:headerH(), autoKill:false }});
             }
             updateActive();
             ScrollTrigger.refresh();
@@ -791,74 +639,90 @@
         const navToggle = document.getElementById('navToggle');
         function closeNav(){ document.documentElement.classList.remove('nav-open'); navToggle?.setAttribute('aria-expanded','false'); }
         function openNav(){ document.documentElement.classList.add('nav-open'); navToggle?.setAttribute('aria-expanded','true'); }
-        function toggleNav(){ if (document.documentElement.classList.contains('nav-open')) closeNav(); else openNav(); }
+        function toggleNav(){ document.documentElement.classList.contains('nav-open') ? closeNav() : openNav(); }
         navToggle?.addEventListener('click', toggleNav);
-        addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNav(); });
-        addEventListener('resize', () => { if (matchMedia('(min-width:781px)').matches) closeNav(); });
+        addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeNav(); });
+        addEventListener('resize', ()=>{ if (matchMedia('(min-width:781px)').matches) closeNav(); });
     })();
 </script>
+
 <script>
-    /* ===== СВАЙП ДЛЯ МОБІЛОК НА СЦЕНІ #stage ===== */
-    (function () {
-        if (!window.matchMedia('(max-width:780px)').matches) return;
-
-        const stage = document.getElementById('stage');
-        if (!stage) return;
-
-        let x0 = null, y0 = null;
-
-        function onStart(e) {
-            const t = e.touches && e.touches[0];
-            if (!t) return; x0 = t.clientX; y0 = t.clientY;
-        }
-
-        function onEnd(e) {
-            if (x0 == null) return;
-            const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
-            x0 = x0 ?? 0; y0 = y0 ?? 0;
-            if (!t) { x0 = y0 = null; return; }
-
-            const dx = t.clientX - x0;
-            const dy = Math.abs(t.clientY - y0 || 0);
-
-            if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2) {
+    /* ===== Mobile swipe on #stage ===== */
+    (function(){
+        if(!matchMedia('(max-width:780px)').matches) return;
+        const stage = document.getElementById('stage'); if(!stage) return;
+        let x0=null, y0=null;
+        function onStart(e){ const t=e.touches&&e.touches[0]; if(!t) return; x0=t.clientX; y0=t.clientY; }
+        function onEnd(e){
+            if (x0==null) return;
+            const t=(e.changedTouches&&e.changedTouches[0])||e.touches?.[0]; x0=x0??0; y0=y0??0; if(!t){ x0=y0=null; return; }
+            const dx=t.clientX-x0; const dy=Math.abs(t.clientY-y0||0);
+            if (Math.abs(dx)>40 && Math.abs(dx)>dy*1.2){
                 const ST = ScrollTrigger.getById('stageParallax');
                 const curr = window.scrollY;
-                const step = Math.max(innerHeight * 0.45, Math.min(innerHeight * 0.9, Math.abs(dx) * 8));
-                const delta = dx < 0 ? step : -step;
+                const step = Math.max(innerHeight*0.45, Math.min(innerHeight*0.9, Math.abs(dx)*8));
+                const delta = dx<0 ? step : -step;
                 let target = curr + delta;
-
-                if (dx < 0 && ST && curr >= (ST.end - 4)) {
-                    document.querySelector('.tail')?.scrollIntoView({behavior: 'smooth'});
+                if (dx<0 && ST && curr >= (ST.end - 4)){
+                    document.querySelector('.tail')?.scrollIntoView({behavior:'smooth'});
                 } else {
-                    if (ST) { target = Math.max(ST.start, Math.min(ST.end, target)); }
-                    window.scrollTo({top: target, behavior: 'smooth'});
+                    if (ST){ target = Math.max(ST.start, Math.min(ST.end, target)); }
+                    window.scrollTo({top:target, behavior:'smooth'});
                 }
             }
-            x0 = y0 = null;
+            x0=y0=null;
         }
-
-        stage.addEventListener('touchstart', onStart, {passive: true});
-        stage.addEventListener('touchend', onEnd, {passive: true});
+        stage.addEventListener('touchstart', onStart, {passive:true});
+        stage.addEventListener('touchend',   onEnd,   {passive:true});
     })();
 </script>
-<script>
-    /* ===== Billboard loader ===== */
-    (function(){
-        const loader  = document.getElementById('bbLoader');
-        const iframe  = document.getElementById('bbFrame');
 
+<script>
+    /* ===== Billboard loader (знімаємо оверлей по load і по першому тапу) ===== */
+    (function(){
+        const loader = document.getElementById('bbLoader');
+        const iframe = document.getElementById('bbFrame');
         if (!loader || !iframe) return;
 
         function hideLoader(){
-            if (!loader) return;
+            if (!loader || loader._hidden) return;
+            loader._hidden = true;
             loader.style.opacity = '0';
-            setTimeout(() => loader.remove(), 280);
+            setTimeout(() => loader.remove(), 180);
         }
 
-        iframe.addEventListener('load', hideLoader, { once: true });
+        // якщо користувач тицяє — прибираємо оверлей одразу
+        loader.addEventListener('pointerdown', hideLoader, { once:true });
+        loader.addEventListener('touchstart', hideLoader, { once:true, passive:true });
+
+        // коли iframe готовий — теж прибираємо
+        iframe.addEventListener('load', hideLoader, { once:true });
+
+        // запасний таймаут
         setTimeout(hideLoader, 8000);
     })();
 </script>
+<script>
+    /* ===== Billboard click-through fix ===== */
+    (function(){
+        const frame  = document.getElementById('bbFrame');
+        const screen = frame?.parentElement;  // .billboard-screen
+
+        if (!screen) return;
+
+        // Не даємо подіям піднятися до #stage/вікна
+        const stop = e => { e.stopPropagation(); };
+        ['pointerdown','pointerup','click','touchstart','touchend'].forEach(ev => {
+            screen.addEventListener(ev, stop, { capture:true, passive: ev.startsWith('touch') });
+        });
+
+        // На мобільних: рух пальцем по відео не має скролити сторінку
+        screen.addEventListener('touchmove', stop, { passive:true });
+
+        // Трохи допоможемо браузеру з фокусом iframe
+        screen.addEventListener('pointerdown', () => frame.focus && frame.focus());
+    })();
+</script>
+
 </body>
 </html>
