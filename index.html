@@ -171,6 +171,28 @@
         .houseBillboard, .houseBillboard * { pointer-events: auto; }
         .houseBillboard iframe{ width:100%; height:100%; border:0; display:block; }
 
+        .bb-loader{
+            position: absolute; inset: 0;
+            display: grid; place-items: center;
+            background: #0b0f1a; /* темний фон */
+            z-index: 2;          /* вище за iframe */
+            transition: opacity .25s ease;
+        }
+
+        .bb-loader__spinner{
+            width: 42px; height: 42px;
+            border-radius: 50%;
+            border: 3px solid rgba(255,255,255,.25);
+            border-top-color: #fff;
+            animation: bbspin 0.9s linear infinite;
+        }
+        @keyframes bbspin{ to { transform: rotate(360deg); } }
+
+        /* (необов’язково) показати постер замість чорного фону */
+        .bb-loader.has-poster{
+            background: #000 center/cover no-repeat;
+        }
+
         #streetGround .band{ background:url("./assets/street_ground.jpg") repeat-x left bottom; background-size:auto var(--ground-h); }
         .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
         #streetSnow .band{ position:relative; }
@@ -271,6 +293,19 @@
 <!--                            allow="autoplay; encrypted-media; picture-in-picture; web-share"-->
 <!--                            allowfullscreen>-->
 <!--                    </iframe>-->
+                    <div class="bb-loader" id="bbLoader" aria-live="polite">
+                        <div class="bb-loader__spinner" aria-hidden="true"></div>
+                    </div>
+                    <iframe
+                            id="bbFrame"
+                            src="https://www.youtube-nocookie.com/embed/xWf9Ha7vdqw?rel=0&modestbranding=1&playsinline=1&controls=1"
+                            title="Комікси — коротке відео"
+                            loading="lazy"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allow="encrypted-media; picture-in-picture; web-share"
+                            allowfullscreen>
+                    </iframe>
+
                     <iframe
                             src="https://www.youtube-nocookie.com/embed/xWf9Ha7vdqw?rel=0&modestbranding=1&playsinline=1&controls=1"
                             title="Комікси — коротке відео"
@@ -721,6 +756,33 @@
         }, {passive: true});
     })();
 </script>
+<script>
+    (function(){
+        const loader  = document.getElementById('bbLoader');
+        const iframe  = document.getElementById('bbFrame');
+
+        if (!loader || !iframe) return;
+
+        // (опціонально) підкласти постер, поки вантажиться
+        // розкоментуй рядок нижче:
+        // loader.style.backgroundImage = "url('https://i.ytimg.com/vi/xWf9Ha7vdqw/hqdefault.jpg')";
+        // loader.classList.add('has-poster');
+
+        function hideLoader(){
+            if (!loader) return;
+            loader.style.opacity = '0';
+            // прибрати з DOM трохи пізніше, щоб спрацював fade
+            setTimeout(() => loader.remove(), 280);
+        }
+
+        // коли iframe завантажив плеєр — ховаємо лоадер
+        iframe.addEventListener('load', hideLoader, { once: true });
+
+        // підстраховка: якщо щось пішло не так — сховати через N секунд
+        setTimeout(hideLoader, 8000);
+    })();
+</script>
+
 
 </body>
 </html>
