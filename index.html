@@ -703,26 +703,49 @@
     })();
 </script>
 <script>
-    /* ===== Billboard click-through fix ===== */
-    (function(){
-        const frame  = document.getElementById('bbFrame');
-        const screen = frame?.parentElement;  // .billboard-screen
+    /* ===== Billboard hit-test → вмикаємо кліки по YouTube ===== */
+    (function billboardHitTest(){
+        const charsLayer = document.getElementById('chars');
+        const billboard  = document.querySelector('.houseBillboard');          // уся рамка
+        const screen     = document.querySelector('.houseBillboard .billboard-screen'); // «вікно» з iframe
 
-        if (!screen) return;
+        if (!charsLayer || !billboard || !screen) return;
 
-        // Не даємо подіям піднятися до #stage/вікна
-        const stop = e => { e.stopPropagation(); };
-        ['pointerdown','pointerup','click','touchstart','touchend'].forEach(ev => {
-            screen.addEventListener(ev, stop, { capture:true, passive: ev.startsWith('touch') });
-        });
+        // допоміжне: ми над білбордом?
+        const overBillboard = (x, y) => {
+            const stack = document.elementsFromPoint(x, y);
+            return stack.some(el => el === billboard || el === screen || el.closest?.('.houseBillboard'));
+        };
 
-        // На мобільних: рух пальцем по відео не має скролити сторінку
-        screen.addEventListener('touchmove', stop, { passive:true });
+        // вкл/викл перехоплення подій шаром з героями
+        const setCharsPE = (enabled) => { charsLayer.style.pointerEvents = enabled ? 'auto' : 'none'; };
 
-        // Трохи допоможемо браузеру з фокусом iframe
-        screen.addEventListener('pointerdown', () => frame.focus && frame.focus());
+        // Миша/трекпад: поки курсор над білбордом — вимикаємо перехоплення у #chars
+        document.addEventListener('pointermove', (e) => {
+            setCharsPE(!overBillboard(e.clientX, e.clientY));
+        }, { passive: true });
+
+        // Сенсор: вимикаємо під пальцем на старт, повертаємо трохи пізніше
+        let touched = false;
+        document.addEventListener('touchstart', (e) => {
+            const t = e.touches && e.touches[0]; if (!t) return;
+            touched = true;
+            setCharsPE(!overBillboard(t.clientX, t.clientY));
+        }, { passive: true });
+
+        document.addEventListener('touchend', () => {
+            if (!touched) return;
+            touched = false;
+            // невелика затримка — щоб YouTube встиг з’їсти тап
+            setTimeout(() => setCharsPE(true), 450);
+        }, { passive: true });
+
+        // Страховка: якщо курсор входить/виходить саме з «екрану»
+        screen.addEventListener('pointerenter', () => setCharsPE(false));
+        screen.addEventListener('pointerleave', () => setCharsPE(true));
     })();
 </script>
+
 
 </body>
 </html>
