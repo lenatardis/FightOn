@@ -142,6 +142,35 @@
         #houses .houseImg:first-child{ margin-left: var(--houses-lead); }
         #housesBand{ bottom: var(--ground-h); }
 
+        /* Будинок-білборд: така сама висота, ті самі відступи, як у .houseImg */
+        .houseBillboard{
+            position: relative;
+            height: 44vh;               /* як .houseImg */
+            aspect-ratio: 16 / 9;       /* пропорції рамки */
+            margin: 0 36px 0;           /* як .houseImg */
+            flex: 0 0 auto;
+            background: url("./assets/bigboard.svg") center/contain no-repeat;
+            filter: drop-shadow(0 10px 26px rgba(0,0,0,.28));
+        }
+
+        /* Внутрішній “екран” (вікно) всередині рамки білборда */
+        .houseBillboard .billboard-screen{
+            position: absolute;
+            left: 12.5%;
+            top: 15%;
+            width: 75%;
+            height: 70%;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #000;           /* на випадок без iframe */
+            box-shadow: 0 8px 24px rgba(0,0,0,.35) inset;
+        }
+
+        /* Дозволимо кліки/тач саме для білборда (кадру і відео) */
+        #houses { pointer-events: auto; }                 /* батьківський шар */
+        .houseBillboard, .houseBillboard * { pointer-events: auto; }
+        .houseBillboard iframe{ width:100%; height:100%; border:0; display:block; }
+
         #streetGround .band{ background:url("./assets/street_ground.jpg") repeat-x left bottom; background-size:auto var(--ground-h); }
         .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
         #streetSnow .band{ position:relative; }
@@ -231,10 +260,32 @@
             <img class="houseImg" src="./assets/house2.png" alt="">
             <img class="houseImg" src="./assets/house3.png" alt="">
             <img class="houseImg" src="./assets/house4.png" alt="">
+            <!-- ▼ Білборд як ще один «будинок» у стрічці -->
+            <div class="houseBillboard" aria-label="Відео-білборд">
+                <div class="billboard-screen">
+<!--                    <iframe-->
+<!--                            src="https://www.youtube-nocookie.com/embed/xWf9Ha7vdqw?rel=0&modestbranding=1&playsinline=1&autoplay=1&mute=1&loop=1&playlist=xWf9Ha7vdqw"-->
+<!--                            title="Комікси — коротке відео"-->
+<!--                            loading="lazy"-->
+<!--                            referrerpolicy="strict-origin-when-cross-origin"-->
+<!--                            allow="autoplay; encrypted-media; picture-in-picture; web-share"-->
+<!--                            allowfullscreen>-->
+<!--                    </iframe>-->
+                    <iframe
+                            src="https://www.youtube-nocookie.com/embed/xWf9Ha7vdqw?rel=0&modestbranding=1&playsinline=1&controls=1"
+                            title="Комікси — коротке відео"
+                            loading="lazy"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allow="encrypted-media; picture-in-picture; web-share"
+                            allowfullscreen>
+                    </iframe>
+                </div>
+            </div>
+            <!-- ▲ кінець білборда -->
             <img class="houseImg" src="./assets/house5.png" alt="">
             <img class="houseImg" src="./assets/house6.png" alt="">
             <img class="houseImg" src="./assets/house7.png" alt="">
-            <img class="houseImg" src="./assets/house8.png" alt="">
+          <!--  <img class="houseImg" src="./assets/house8.png" alt="">-->
           <!--  <img class="houseImg" src="./assets/house9.png" alt="">
             <img class="houseImg" src="./assets/house10.png" alt="">-->
         </div>
@@ -634,5 +685,42 @@
         addEventListener('resize', () => { if (matchMedia('(min-width:781px)').matches) closeNav(); });
     })();
 </script>
+<script>
+    (function () {
+        const chars = document.getElementById('chars');
+        const billboard = document.querySelector('.houseBillboard');
+        if (!chars || !billboard) return;
+
+        let armed = false; // невеличкий троттлінг для сенсорних
+
+        function toggleByPoint(x, y){
+            if (!chars) return;
+            const stack = document.elementsFromPoint(x, y);
+            const overBB = stack.some(el => el === billboard || el.closest?.('.houseBillboard'));
+            chars.style.pointerEvents = overBB ? 'none' : 'auto';
+        }
+
+        // миша/трекпад
+        document.addEventListener('pointermove', (e) => {
+            toggleByPoint(e.clientX, e.clientY);
+        }, {passive: true});
+
+        // сенсорні: вимикаємо під пальцем на старт і повертаємо після жесту
+        document.addEventListener('touchstart', (e) => {
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            armed = true;
+            toggleByPoint(t.clientX, t.clientY);
+        }, {passive: true});
+
+        document.addEventListener('touchend', () => {
+            if (!armed) return;
+            armed = false;
+            // невелика затримка — щоб YouTube встиг прийняти тап
+            setTimeout(() => { if (chars) chars.style.pointerEvents = 'auto'; }, 450);
+        }, {passive: true});
+    })();
+</script>
+
 </body>
 </html>
