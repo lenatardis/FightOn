@@ -259,10 +259,10 @@
 
     <div class="layer" id="houses">
         <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house2.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house3.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house4.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house1.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house2.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house3.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house4.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <!-- ▼ білборд -->
             <div class="houseBillboard" aria-label="Відео-білборд">
                 <div class="billboard-screen">
@@ -281,9 +281,9 @@
                 </div>
             </div>
             <!-- ▲ кінець білборда -->
-            <img class="houseImg" src="./assets/house5.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house6.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house7.png" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house5.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house6.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="houseImg" src="./assets/house4.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
         </div>
     </div>
 
@@ -542,7 +542,11 @@
     function ensureGroundBg(){
         const g = document.getElementById('streetGroundBand');
         if (g && !g.style.backgroundImage){
-            g.style.backgroundImage = 'url("./assets/street_ground.jpg")';
+          /*  g.style.backgroundImage = 'url("./assets/street_ground.jpg")';*/
+            g.style.backgroundImage = 'image-set(' +
+                'url("./assets/street_ground.webp") type("image/webp") 1x, ' +
+                'url("./assets/street_ground.jpg") type("image/jpeg") 1x' +
+                ')';
         }
     }
 
