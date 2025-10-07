@@ -20,8 +20,8 @@
             --houses-lead: 0px;
             --first-char-extra-gap: 0px;
             /* базовий розмір і відступ хмаринки */
-            --top-h: clamp(84px, 9.5vmin, 132px);
-            --top-gap: 3px;
+            --top-h: clamp(110px, 11vmin, 160px);
+            --top-gap: 0px;
             --top-font: clamp(16px, 2.2vmin, 24px);
             --top-pad-x: 12px;
         }
@@ -652,34 +652,45 @@
         }
 
         /* верхня хмаринка */
-        .charTop{
-            position:absolute;
-            left:50%;
+        .charTop {
+            position: absolute;
+            left: 50%;
             bottom: calc(100% + var(--top-gap));
-            transform: translateX(-50%) translateY(6px) scale(var(--top-scale,1));
+            transform: translateX(-50%) translateY(6px) scale(var(--top-scale, 1));
             transform-origin: center bottom;
-            z-index:30;
-            pointer-events:none;
-            opacity:0;
+            z-index: 30;
+            pointer-events: none;
+            opacity: 0;
             transition: opacity .18s ease, transform .18s ease;
         }
-        .charTop__img{ display:block; height: var(--top-h); width:auto; }
-        .charTop__label{
-            position:absolute; left:50%;  font-size: var(--top-font);
+
+        .charTop__img {
+            display: block;
+            height: var(--top-h);
+            width: auto;
+        }
+
+        .charTop__label {
+            position: absolute;
+            left: 50%;
+            font-size: var(--top-font);
+            top: 50%;
             padding: 0 var(--top-pad-x);
-            transform:translate(-50%,-50%);
-            font-family:'Lucznik',sans-serif; font-weight:700;
-            text-transform:uppercase; letter-spacing:.6px;
-            line-height:1;
-            color:#2b1e1e; /* підлаштуй під свою SVG */
-            white-space:nowrap;
+            transform: translate(-50%, -50%);
+            font-family: 'Lucznik', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            line-height: 1;
+            color: #2b1e1e;
+            white-space: nowrap;
         }
 
         .charImg:hover .charTop,
         .charImg:focus-visible .charTop,
-        .charImg.is-touch .charTop{
-            opacity:1;
-            transform: translateX(-50%) translateY(0) scale(var(--top-scale,1));
+        .charImg.is-touch .charTop {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0) scale(var(--top-scale, 1));
             --top-scale: calc(1 / var(--char-scale));
         }
 
@@ -1168,8 +1179,12 @@
             wrap.appendChild(top);
 
 
-            if(!poor && 'requestIdleCallback' in window){
-                requestIdleCallback(()=>{ const preTop = new Image(); preTop.decoding='async'; preTop.src = topImg.src; });
+            if (!poor && 'requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    const preTop = new Image();
+                    preTop.decoding = 'async';
+                    preTop.src = topImg.src;
+                });
             }
 
             wrap.addEventListener('touchstart', () => {
