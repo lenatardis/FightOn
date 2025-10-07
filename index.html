@@ -6,216 +6,751 @@
     <title>FightON</title>
     <link type="text/css" rel="stylesheet" href="assets/fonts/fonts.css">
     <style>
-        :root{
-            --header-h:64px;
-            --intro-h:120vh;
-            --stage-h:108vh;
-            --ground-h:40vh;
-            --snow-h:50px;
-            --mountains-k:0.85;
-            --sun-k:0.90;
-            --char-drop:-33.25vh;
-            --mountains-lead:0px;
-            --houses-lead:0px;
-            --first-char-extra-gap:0px;
+        :root {
+            --header-h: 64px;
+            --intro-h: 120vh;
+            --stage-h: 108vh;
+            --ground-h: 40vh;
+            --snow-h: 50px;
+            --mountains-k: 0.85;
+            --sun-k: 0.90;
+            --char-drop: -33.25vh;
+            --char-scale: 1.5;
+            --mountains-lead: 0px;
+            --houses-lead: 0px;
+            --first-char-extra-gap: 0px;
         }
 
-        html,body{ margin:0; background:#7B8CF1; color:#fff; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; }
-        body{ padding-top:var(--header-h); }
+        html, body {
+            margin: 0;
+            background: #7B8CF1;
+            color: #fff;
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+        }
+
+        body {
+            padding-top: var(--header-h);
+        }
 
         /* header */
-        .site-header{
-            position:fixed; inset:0 0 auto 0; height:var(--header-h); z-index:10000;
-            display:flex; align-items:center; justify-content:center; gap:16px; padding:0 18px;
-            backdrop-filter:saturate(140%) blur(10px); -webkit-backdrop-filter:saturate(140%) blur(10px);
-            background:linear-gradient(180deg, rgba(11,16,32,0.14) 0%, rgba(11,16,32,0.06) 60%, rgba(11,16,32,0.02) 100%);
-            border-bottom:1px solid rgba(255,255,255,0.06);
+        .site-header {
+            position: fixed;
+            inset: 0 0 auto 0;
+            height: var(--header-h);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            padding: 0 18px;
+            backdrop-filter: saturate(140%) blur(10px);
+            -webkit-backdrop-filter: saturate(140%) blur(10px);
+            background: linear-gradient(180deg, rgba(11, 16, 32, 0.14) 0%, rgba(11, 16, 32, 0.06) 60%, rgba(11, 16, 32, 0.02) 100%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
         }
-        .main-nav{ display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
-        .nav-link{
-            position:relative; display:inline-flex; align-items:center; height:36px; padding:0 12px; border-radius:10px;
-            color:#e9f2ff; font-family:'Lucznik',sans-serif; text-transform:uppercase; text-decoration:none; font-weight:700; letter-spacing:.2px;
-            background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.10);
+
+        .main-nav {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .nav-link {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            height: 36px;
+            padding: 0 12px;
+            border-radius: 10px;
+            color: #e9f2ff;
+            font-family: 'Lucznik', sans-serif;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 700;
+            letter-spacing: .2px;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid rgba(255, 255, 255, .10);
             transition: transform .15s ease, background .15s ease, border-color .15s ease;
         }
-        .nav-link:hover{ transform:translateY(-1px); background:rgba(255,255,255,.10); }
 
-        .intro,.stage,section{ scroll-margin-top:var(--header-h); }
-
-        .nav-toggle{
-            display:none; margin-left:0; width:40px; height:40px; border:1px solid rgba(255,255,255,.12);
-            background:rgba(255,255,255,.06); border-radius:10px; cursor:pointer; align-items:center; justify-content:center;
+        .nav-link:hover {
+            transform: translateY(-1px);
+            background: rgba(255, 255, 255, .10);
         }
-        .nav-toggle-bar{ display:block; width:22px; height:2px; background:#fff; border-radius:2px; position:relative; }
-        .nav-toggle-bar::before,.nav-toggle-bar::after{ content:""; position:absolute; left:0; right:0; height:2px; background:#fff; border-radius:2px; }
-        .nav-toggle-bar::before{ top:-7px; } .nav-toggle-bar::after{ top:7px; }
 
-        @media (max-width:780px){
-            .site-header{ height:58px; padding:0 12px; }
-            body{ padding-top:58px; }
-            .nav-link{ height:44px; padding:0 12px; font-size:15px; }
-            .nav-toggle{ display:inline-grid; position:absolute; right:12px; }
-            .main-nav{
-                position:fixed; top:var(--header-h); left:0; right:0; display:grid; gap:8px; padding:10px;
-                background:linear-gradient(180deg, rgba(11,16,32,0.14) 0%, rgba(11,16,32,0.06) 60%, rgba(11,16,32,0.02) 100%);
-                border:1px solid rgba(255,255,255,.10); border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,.45);
-                transform-origin:top center; transform:translateY(-8px) scale(.98); opacity:0; pointer-events:none;
-                transition: transform .18s ease, opacity .18s ease; z-index:10001;
+        .intro, .stage, section {
+            scroll-margin-top: var(--header-h);
+        }
+
+        .nav-toggle {
+            display: none;
+            margin-left: 0;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, .12);
+            background: rgba(255, 255, 255, .06);
+            border-radius: 10px;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-toggle-bar {
+            display: block;
+            width: 22px;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .nav-toggle-bar::before, .nav-toggle-bar::after {
+            content: "";
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #fff;
+            border-radius: 2px;
+        }
+
+        .nav-toggle-bar::before {
+            top: -7px;
+        }
+
+        .nav-toggle-bar::after {
+            top: 7px;
+        }
+
+        @media (max-width: 780px) {
+            .site-header {
+                height: 58px;
+                padding: 0 12px;
             }
-            .nav-open .main-nav{ opacity:1; pointer-events:auto; transform:translateY(0) scale(1); }
-            .nav-open #navToggle .nav-toggle-bar{ background:transparent; }
-            .nav-open #navToggle .nav-toggle-bar::before{ top:0; transform:rotate(45deg); }
-            .nav-open #navToggle .nav-toggle-bar::after{ top:0; transform:rotate(-45deg); }
+
+            body {
+                padding-top: 58px;
+            }
+
+            .nav-link {
+                height: 44px;
+                padding: 0 12px;
+                font-size: 15px;
+            }
+
+            .nav-toggle {
+                display: inline-grid;
+                position: absolute;
+                right: 12px;
+            }
+
+            .main-nav {
+                position: fixed;
+                top: var(--header-h);
+                left: 0;
+                right: 0;
+                display: grid;
+                gap: 8px;
+                padding: 10px;
+                background: linear-gradient(180deg, rgba(11, 16, 32, 0.14) 0%, rgba(11, 16, 32, 0.06) 60%, rgba(11, 16, 32, 0.02) 100%);
+                border: 1px solid rgba(255, 255, 255, .10);
+                border-radius: 12px;
+                box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
+                transform-origin: top center;
+                transform: translateY(-8px) scale(.98);
+                opacity: 0;
+                pointer-events: none;
+                transition: transform .18s ease, opacity .18s ease;
+                z-index: 10001;
+            }
+
+            .nav-open .main-nav {
+                opacity: 1;
+                pointer-events: auto;
+                transform: translateY(0) scale(1);
+            }
+
+            .nav-open #navToggle .nav-toggle-bar {
+                background: transparent;
+            }
+
+            .nav-open #navToggle .nav-toggle-bar::before {
+                top: 0;
+                transform: rotate(45deg);
+            }
+
+            .nav-open #navToggle .nav-toggle-bar::after {
+                top: 0;
+                transform: rotate(-45deg);
+            }
         }
 
         /* intro */
-        .sky-gradient1{
-            background:
-                    radial-gradient(900px 520px at 65% 10%, rgba(255,255,255,.18) 0, rgba(255,255,255,0) 60%),
-                    linear-gradient(180deg,#7B8CF1 0%,#6FA2FA 28%,#699BD8 100%);
+        .sky-gradient1 {
+            background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0, rgba(255, 255, 255, 0) 60%),
+            linear-gradient(180deg, #7B8CF1 0%, #6FA2FA 28%, #699BD8 100%);
         }
-        .sky-gradient2{ background:linear-gradient(180deg,#699BD8 0%,#82ABDD 28%,#ACBEB4 100%); }
 
-        .intro{ position:relative; height:var(--intro-h); overflow:hidden; }
-        .intro-logo{ position:absolute; left:50%; top:16vh; transform:translateX(-50%); z-index:3; pointer-events:none; }
-        .intro-logo img{ width:min(48vmax,760px); height:auto; filter:drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
-        .intro .cloud{ position:absolute; z-index:2; filter:drop-shadow(0 6px 14px rgba(0,0,0,.12)); }
-        .intro .cloud img{ height:22vh; width:auto; }
-        .cloud--lt{ left:6vw; top:22vh; } .cloud--rt{ right:6vw; top:22vh; }
-        .cloud--lb{ left:12vw; bottom:40vh; } .cloud--rb{ right:12vw; bottom:40vh; }
+        .sky-gradient2 {
+            background: linear-gradient(180deg, #699BD8 0%, #82ABDD 28%, #ACBEB4 100%);
+        }
+
+        .intro {
+            position: relative;
+            height: var(--intro-h);
+            overflow: hidden;
+        }
+
+        .intro-logo {
+            position: absolute;
+            left: 50%;
+            top: 16vh;
+            transform: translateX(-50%);
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .intro-logo img {
+            width: min(48vmax, 760px);
+            height: auto;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+        }
+
+        .intro .cloud {
+            position: absolute;
+            z-index: 2;
+            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .12));
+        }
+
+        .intro .cloud img {
+            height: 22vh;
+            width: auto;
+        }
+
+        .cloud--lt {
+            left: 6vw;
+            top: 22vh;
+        }
+
+        .cloud--rt {
+            right: 6vw;
+            top: 22vh;
+        }
+
+        .cloud--lb {
+            left: 12vw;
+            bottom: 40vh;
+        }
+
+        .cloud--rb {
+            right: 12vw;
+            bottom: 40vh;
+        }
 
         /* stage */
-        .stage{ position:relative; height:var(--stage-h); overflow:hidden; }
-        .layer{ position:absolute; inset:0; pointer-events:none; }
-        .band{ position:absolute; left:0; bottom:0; height:100%; min-width:100%; display:flex; align-items:flex-end; white-space:nowrap; will-change:transform; transform:translateZ(0); }
-        .band::after{ content:""; flex:0 0 0; }
-
-        #sky{ z-index:1 } #sun{ z-index:2 } #mountains{ z-index:4 } #streetGround{ z-index:5 } #streetSnow{ z-index:6 } #houses{ z-index:7 } #chars{ z-index:8; pointer-events:auto; }
-
-        #sky::before{
-            content:""; position:absolute; left:50%; top:6vh; transform:translateX(-50%);
-            width:64vmin; height:64vmin; border-radius:50%;
-            background: radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
-            filter:blur(16px); opacity:.22;
+        .stage {
+            position: relative;
+            height: var(--stage-h);
+            overflow: hidden;
         }
 
-        #sun{ display:grid; place-items:center; }
-        .sunImg{ width:min(22vmax,420px); height:auto; position:absolute; left:50%; transform:translateX(-50%); bottom:calc(var(--ground-h)*var(--sun-k) + 8vh); opacity:.93; filter:blur(.2px); }
-        @media (max-width:780px){ .sunImg{ bottom:calc(var(--ground-h)*var(--sun-k) + 19vh); } }
+        .layer {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
 
-        .mountainsImg{ height:32vh; width:auto; margin:0 0 10vh; }
-        #mountains .mountainsImg:first-child{ margin-left:var(--mountains-lead); }
-        #mountainsBand{ bottom:calc(var(--ground-h) * var(--mountains-k)); }
-        #mountains .mountainsImg:nth-of-type(2){ margin-left:-2px; }
+        .band {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 100%;
+            min-width: 100%;
+            display: flex;
+            align-items: flex-end;
+            white-space: nowrap;
+            will-change: transform;
+            transform: translateZ(0);
+        }
 
-        .houseImg{ height:44vh; width:auto; margin:0 36px 0; filter:drop-shadow(0 10px 26px rgba(0,0,0,.28)); }
-        #houses .houseImg:first-child{ margin-left:var(--houses-lead); }
-        #housesBand{ bottom:var(--ground-h); }
+        .band::after {
+            content: "";
+            flex: 0 0 0;
+        }
+
+        #sky {
+            z-index: 1
+        }
+
+        #sun {
+            z-index: 2
+        }
+
+        #mountains {
+            z-index: 4
+        }
+
+        #streetGround {
+            z-index: 5
+        }
+
+        #streetSnow {
+            z-index: 6
+        }
+
+        #houses {
+            z-index: 7
+        }
+
+        #chars {
+            z-index: 8;
+            pointer-events: auto;
+        }
+
+        #sky::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 6vh;
+            transform: translateX(-50%);
+            width: 64vmin;
+            height: 64vmin;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
+            filter: blur(16px);
+            opacity: .22;
+        }
+
+        #sun {
+            display: grid;
+            place-items: center;
+        }
+
+        .sunImg {
+            width: min(22vmax, 420px);
+            height: auto;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            bottom: calc(var(--ground-h) * var(--sun-k) + 8vh);
+            opacity: .93;
+            filter: blur(.2px);
+        }
+
+        @media (max-width: 780px) {
+            .sunImg {
+                bottom: calc(var(--ground-h) * var(--sun-k) + 19vh);
+            }
+        }
+
+        .mountainsImg {
+            height: 32vh;
+            width: auto;
+            margin: 0 0 10vh;
+        }
+
+        #mountains .mountainsImg:first-child {
+            margin-left: var(--mountains-lead);
+        }
+
+        #mountainsBand {
+            bottom: calc(var(--ground-h) * var(--mountains-k));
+        }
+
+        #mountains .mountainsImg:nth-of-type(2) {
+            margin-left: -2px;
+        }
+
+        .houseImg {
+            height: 44vh;
+            width: auto;
+            margin: 0 36px 0;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+        }
+
+        #houses .houseImg:first-child {
+            margin-left: var(--houses-lead);
+        }
+
+        #housesBand {
+            bottom: var(--ground-h);
+        }
 
         /* billboard */
-        .houseBillboard{
-            position:relative; height:44vh; aspect-ratio:16/9; margin:0 36px 0; flex:0 0 auto;
-            background:url("./assets/bigboard.svg") center/contain no-repeat;
-            filter:drop-shadow(0 10px 26px rgba(0,0,0,.28));
-            pointer-events:auto;
+        .houseBillboard {
+            position: relative;
+            height: 44vh;
+            aspect-ratio: 16/9;
+            margin: 0 36px 0;
+            flex: 0 0 auto;
+            background: url("./assets/bigboard.svg") center/contain no-repeat;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+            pointer-events: auto;
         }
-        .houseBillboard .billboard-screen{
-            position:absolute; left:12.5%; top:15%; width:75%; height:70%;
-            border-radius:14px; overflow:hidden; background:#000; box-shadow:0 8px 24px rgba(0,0,0,.35) inset;
-        }
-        #houses{ pointer-events:auto; }
-        .houseBillboard iframe{ width:100%; height:100%; border:0; display:block; }
-        @media (max-width:780px){
-            .houseBillboard{ height:auto; margin:0 12px; max-width:calc(100vw - 24px); width:100%; max-height:44vh; }
-        }
-        .bb-loader{ position:absolute; inset:0; display:grid; place-items:center; background:#0b0f1a; z-index:2; transition:opacity .25s ease; }
-        .bb-loader__spinner{ width:42px; height:42px; border-radius:50%; border:3px solid rgba(255,255,255,.25); border-top-color:#fff; animation:bbspin .9s linear infinite; }
-        @keyframes bbspin{ to{ transform:rotate(360deg) } }
-        .bb-loader.has-poster{ background:#000 center/cover no-repeat; }
 
-        .houseBillboard{ z-index: 50; }
-        .houseBillboard, .houseBillboard * { pointer-events: auto; }
+        .houseBillboard .billboard-screen {
+            position: absolute;
+            left: 12.5%;
+            top: 15%;
+            width: 75%;
+            height: 70%;
+            border-radius: 14px;
+            overflow: hidden;
+            background: #000;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .35) inset;
+        }
+
+        #houses {
+            pointer-events: auto;
+        }
+
+        .houseBillboard iframe {
+            width: 100%;
+            height: 100%;
+            border: 0;
+            display: block;
+        }
+
+        @media (max-width: 780px) {
+            .houseBillboard {
+                height: auto;
+                margin: 0 12px;
+                max-width: calc(100vw - 24px);
+                width: 100%;
+                max-height: 44vh;
+            }
+        }
+
+        .bb-loader {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: #0b0f1a;
+            z-index: 2;
+            transition: opacity .25s ease;
+        }
+
+        .bb-loader__spinner {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, .25);
+            border-top-color: #fff;
+            animation: bbspin .9s linear infinite;
+        }
+
+        @keyframes bbspin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        .bb-loader.has-poster {
+            background: #000 center/cover no-repeat;
+        }
+
+        .houseBillboard {
+            z-index: 50;
+        }
+
+        .houseBillboard, .houseBillboard * {
+            pointer-events: auto;
+        }
 
         /* ground & snow – фон підставляємо з JS пізніше, щоб не конкурував з героями */
-        #streetGround .band{
-            background-repeat:repeat-x; background-position:left bottom; background-size:auto var(--ground-h);
-        }
-        .streetGroundSpacer{ width:600vw; height:var(--ground-h); }
-        #streetSnow .band{ position:relative; }
-        #streetSnow .snowLine{ position:absolute; left:0; right:0; bottom:var(--ground-h); height:var(--snow-h); background:#fff; pointer-events:none; }
-        .streetSnowSpacer{ width:600vw; height:0; }
-
-        .charImg{ position:relative; display:inline-block; width:240px; margin:0 90px 0; transform:translateY(var(--char-drop)); filter:drop-shadow(0 12px 34px rgba(0,0,0,.35)); vertical-align:bottom; will-change:transform; }
-        .charImg.sm{ width:200px; } .charImg.lg{ width:280px; }
-        .charImg>img.base{ display:block; width:100%; height:auto; position:relative; z-index:2; }
-        .charImg>img.hover{ position:absolute; left:50%; bottom:0; transform:translateX(-50%); height:100%; width:auto; margin:0; opacity:0; pointer-events:none; transition:opacity .18s ease; object-fit:contain; object-position:center bottom; z-index:2; }
-        .charImg:hover>img.hover,.charImg:focus-visible>img.hover,.charImg.is-touch>img.hover{ opacity:1; }
-        #charsBand>.charImg:first-child{ margin-left: calc(5vw + var(--first-char-extra-gap)); }
-
-        .charPlate{ position:absolute; left:50%; transform:translateX(-50%); top:calc(100% + 15px); z-index:1; pointer-events:none; background:#111; color:#fff; padding:20px; border-radius:14px; box-shadow:0 0 0 3px #fff, 0 8px 18px rgba(0,0,0,.35); display:none; }
-        .charPlate__inner{ display:flex; column-gap:15px; }
-        .charPlate__inner p{ margin:0; }
-        .charPlate::before,.charPlate::after{
-            content:""; position:absolute; left:var(--plate-tip-x,50%); transform:translateX(-50%); width:0; height:0;
-            border-left:10px solid transparent; border-right:10px solid transparent; pointer-events:none;
-        }
-        .charPlate::before{ top:-13px; border-bottom:13px solid #fff; }
-        .charPlate::after{ top:-11px; border-bottom:11px solid #ffffff; }
-        .charPlate .column_1,.charPlate .column_2{ display:flex; flex-direction:column; row-gap:12px; width:100%; }
-        .charPlate .column_1>div,.charPlate .column_2>div{ display:flex; justify-content:space-between; align-items:center; border-bottom:1px dashed #ffffff; }
-        .charPlate p{ font-size:14px; line-height:1em; font-family:'Lucznik', sans-serif; }
-        .charPlate span{ display:block; margin-left:10px; font-size:12px; line-height:12px; font-family:'Gotham', sans-serif; }
-        .charImg:hover .charPlate,.charImg:focus-visible .charPlate,.charImg.is-touch .charPlate{ display:block; }
-        #charsBand>.charImg:first-child .charPlate{ left:20px; right:auto; transform:none; --plate-tip-x:28px; }
-        #charsBand>.charImg:last-child .charPlate{ left:auto; right:20px; transform:none; --plate-tip-x: calc(100% - 28px); }
-
-        @media (max-width:780px){
-            .charPlate{ padding:10px 5px; top:100%; }
-            .charPlate__inner{ flex-direction:column; row-gap:5px; }
-            .charPlate .column_1,.charPlate .column_2{ row-gap:5px; }
+        #streetGround .band {
+            background-repeat: repeat-x;
+            background-position: left bottom;
+            background-size: auto var(--ground-h);
         }
 
-        .stage::after{
-            content:""; position:absolute; left:-5vw; right:-5vw; bottom:-6vh; height:18vh;
-            background: radial-gradient(120% 150% at 50% 115%, rgba(0,0,0,.35) 0%, rgba(0,0,0,.18) 38%, rgba(0,0,0,0) 72%);
-            pointer-events:none; z-index:3;
+        .streetGroundSpacer {
+            width: 600vw;
+            height: var(--ground-h);
         }
 
-        .tail{ min-height:70vh; display:grid; place-items:center; background: radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%); color:#cfd6ff; }
+        #streetSnow .band {
+            position: relative;
+        }
+
+        #streetSnow .snowLine {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: var(--ground-h);
+            height: var(--snow-h);
+            background: #fff;
+            pointer-events: none;
+        }
+
+        .streetSnowSpacer {
+            width: 600vw;
+            height: 0;
+        }
+
+        .charImg {
+            position: relative;
+            display: inline-block;
+            width: 240px;
+            margin: 0 90px 0;
+            transform: translateY(var(--char-drop)) translateZ(0);
+            transform-origin: center bottom;
+            transition: transform .2s ease, filter .2s ease;
+            filter: drop-shadow(0 12px 34px rgba(0, 0, 0, .35));
+            vertical-align: bottom;
+            will-change: transform;
+        }
+
+        .charImg.sm {
+            width: 200px;
+        }
+
+        .charImg.lg {
+            width: 280px;
+        }
+
+        .charImg > img.base {
+            display: block;
+            width: 100%;
+            height: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .charImg > img.hover {
+            position: absolute;
+            left: 50%;
+            bottom: 0;
+            transform: translateX(-50%);
+            height: 100%;
+            width: auto;
+            margin: 0;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .18s ease;
+            object-fit: contain;
+            object-position: center bottom;
+            z-index: 2;
+        }
+
+        .charImg:hover > img.hover, .charImg:focus-visible > img.hover, .charImg.is-touch > img.hover {
+            opacity: 1;
+        }
+
+        #charsBand > .charImg:first-child {
+            margin-left: calc(5vw + var(--first-char-extra-gap));
+        }
+
+        .charImg:hover,
+        .charImg:focus-visible,
+        .charImg.is-touch {
+            transform: translateY(var(--char-drop)) scale(var(--char-scale));
+            z-index: 20;
+        }
+
+        .charPlate {
+            position: absolute;
+            left: 50%;
+            top: calc(100% + 15px);
+            transform: translateX(-50%) scale(var(--plate-scale, 1));
+            transform-origin: center top;
+            z-index: 1;
+            pointer-events: none;
+            background: #111;
+            color: #fff;
+            padding: 20px;
+            border-radius: 14px;
+            box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0, 0, 0, .35);
+            display: none;
+        }
+
+        .charPlate__inner {
+            display: flex;
+            column-gap: 15px;
+        }
+
+        .charPlate__inner p {
+            margin: 0;
+        }
+
+        .charPlate::before, .charPlate::after {
+            content: "";
+            position: absolute;
+            left: var(--plate-tip-x, 50%);
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            pointer-events: none;
+        }
+
+        .charPlate::before {
+            top: -13px;
+            border-bottom: 13px solid #fff;
+        }
+
+        .charPlate::after {
+            top: -11px;
+            border-bottom: 11px solid #ffffff;
+        }
+
+        .charPlate .column_1, .charPlate .column_2 {
+            display: flex;
+            flex-direction: column;
+            row-gap: 12px;
+            width: 100%;
+        }
+
+        .charPlate .column_1 > div, .charPlate .column_2 > div {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px dashed #ffffff;
+        }
+
+        .charPlate p {
+            font-size: 14px;
+            line-height: 1em;
+            font-family: 'Lucznik', sans-serif;
+        }
+
+        .charPlate span {
+            display: block;
+            margin-left: 10px;
+            font-size: 12px;
+            line-height: 12px;
+            font-family: 'Gotham', sans-serif;
+        }
+
+        .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate {
+            display: block;
+            --plate-scale: calc(1 / var(--char-scale));
+        }
+
+        #charsBand > .charImg:first-child .charPlate {
+            left: 20px;
+            right: auto;
+            transform: translateX(0) scale(var(--plate-scale, 1)); /* ← зберігаємо інверсію */
+            transform-origin: center top;
+            --plate-tip-x: 28px;
+        }
+
+        #charsBand > .charImg:last-child .charPlate {
+            left: auto;
+            right: 20px;
+            transform: translateX(0) scale(var(--plate-scale, 1)); /* ← зберігаємо інверсію */
+            transform-origin: center top;
+            --plate-tip-x: calc(100% - 28px);
+        }
+
+        @media (max-width: 780px) {
+            .charPlate {
+                padding: 10px 5px;
+                top: 100%;
+            }
+
+            .charPlate__inner {
+                flex-direction: column;
+                row-gap: 5px;
+            }
+
+            .charPlate .column_1, .charPlate .column_2 {
+                row-gap: 5px;
+            }
+        }
+
+        .stage::after {
+            content: "";
+            position: absolute;
+            left: -5vw;
+            right: -5vw;
+            bottom: -6vh;
+            height: 18vh;
+            background: radial-gradient(120% 150% at 50% 115%, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, .18) 38%, rgba(0, 0, 0, 0) 72%);
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        .tail {
+            min-height: 70vh;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%);
+            color: #cfd6ff;
+        }
 
         /* gate (без блокування скролу) */
-        #stageGate[hidden]{ display:none }
-        #stageGate{
-            position:absolute; inset:0; display:grid; place-items:center;
-            background: radial-gradient(900px 520px at 60% 15%, rgba(11,16,32,.65), rgba(11,16,32,.35));
-            z-index:9000; opacity:0; transition:opacity .22s ease;
-            backdrop-filter: blur(6px) saturate(120%); -webkit-backdrop-filter: blur(6px) saturate(120%);
+        #stageGate[hidden] {
+            display: none
         }
-        #stageGate.on{ opacity:1; }
-        #stageGate .gate-card{
-            padding:16px 18px; border-radius:14px;
-            background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.18);
-            box-shadow:0 10px 26px rgba(0,0,0,.35); display:flex; align-items:center; gap:12px;
-            font-family:'Lucznik', system-ui; letter-spacing:.2px;
+
+        #stageGate {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            background: radial-gradient(900px 520px at 60% 15%, rgba(11, 16, 32, .65), rgba(11, 16, 32, .35));
+            z-index: 9000;
+            opacity: 0;
+            transition: opacity .22s ease;
+            backdrop-filter: blur(6px) saturate(120%);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
         }
-        .gate-spinner{ width:28px; height:28px; border-radius:50%; border:3px solid rgba(255,255,255,.25); border-top-color:#fff; animation:spin .8s linear infinite; }
-        @keyframes spin{ to{ transform:rotate(360deg) } }
 
+        #stageGate.on {
+            opacity: 1;
+        }
 
-        .brand--mobile{ display:none; }
-        @media (max-width:780px){
-            .brand--mobile{
-                display:inline-flex;
-                align-items:center;
-                position:absolute;
-                left:12px;
-                height:58px;
-                z-index:10002;
+        #stageGate .gate-card {
+            padding: 16px 18px;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, .08);
+            border: 1px solid rgba(255, 255, 255, .18);
+            box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Lucznik', system-ui;
+            letter-spacing: .2px;
+        }
+
+        .gate-spinner {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 3px solid rgba(255, 255, 255, .25);
+            border-top-color: #fff;
+            animation: spin .8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
             }
-            .brand--mobile img{
-                height:40px;
-                width:auto;
-                filter: drop-shadow(0 2px 6px rgba(0,0,0,.25));
+        }
+
+
+        .brand--mobile {
+            display: none;
+        }
+
+        @media (max-width: 780px) {
+            .brand--mobile {
+                display: inline-flex;
+                align-items: center;
+                position: absolute;
+                left: 12px;
+                height: 58px;
+                z-index: 10002;
+            }
+
+            .brand--mobile img {
+                height: 40px;
+                width: auto;
+                filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .25));
             }
         }
 
@@ -226,7 +761,8 @@
     <a class="brand brand--mobile" href="#intro" aria-label="FightON">
         <img src="./assets/fighton.png" alt="FightON" width="36" height="36" loading="eager" decoding="async">
     </a>
-    <button class="nav-toggle" id="navToggle" aria-label="Відкрити меню" aria-controls="primaryNav" aria-expanded="false">
+    <button class="nav-toggle" id="navToggle" aria-label="Відкрити меню" aria-controls="primaryNav"
+            aria-expanded="false">
         <span class="nav-toggle-bar" aria-hidden="true"></span>
     </button>
     <nav class="main-nav" id="primaryNav" aria-label="Main">
@@ -247,13 +783,17 @@
 </section>
 
 <div class="stage" id="stage">
-    <div class="layer sky-gradient2" id="sky"><div class="band"></div></div>
+    <div class="layer sky-gradient2" id="sky">
+        <div class="band"></div>
+    </div>
     <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
 
     <div class="layer" id="mountains">
         <div class="band" id="mountainsBand">
-            <img class="mountainsImg" src="./assets/mountains_1.svg" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="mountainsImg" src="./assets/mountains_2.svg" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="mountainsImg" src="./assets/mountains_1.svg" alt="" loading="lazy" fetchpriority="low"
+                 decoding="async">
+            <img class="mountainsImg" src="./assets/mountains_2.svg" alt="" loading="lazy" fetchpriority="low"
+                 decoding="async">
         </div>
     </div>
 
@@ -288,23 +828,36 @@
     </div>
 
     <div class="layer" id="streetGround">
-        <div class="band" id="streetGroundBand"><div class="streetGroundSpacer"></div></div>
+        <div class="band" id="streetGroundBand">
+            <div class="streetGroundSpacer"></div>
+        </div>
     </div>
     <div class="layer" id="streetSnow">
-        <div class="band" id="streetSnowBand"><div class="snowLine"></div><div class="streetSnowSpacer"></div></div>
+        <div class="band" id="streetSnowBand">
+            <div class="snowLine"></div>
+            <div class="streetSnowSpacer"></div>
+        </div>
     </div>
 
     <div class="layer" id="chars">
         <div class="band" id="charsBand">
-            <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" data-plate-title="SNIPER" data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla" data-plate-title="GORILLA" data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster" data-plate-title="MOBSTER" data-plate-text="Я можу все і навіть трохи більше!">
+            <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" data-plate-title="SNIPER"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla" data-plate-title="GORILLA"
+                 data-plate-text="Я можу все і навіть трохи більше!">
+            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster" data-plate-title="MOBSTER"
+                 data-plate-text="Я можу все і навіть трохи більше!">
             <img class="charImg" src="./assets/Snap.svg" alt="Snap" data-plate-title="SNAP" data-plate-text="...">
-            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA" data-plate-text="...">
-            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN" data-plate-text="...">
-            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO" data-plate-text="...">
-            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO" data-plate-text="...">
-            <img class="charImg" src="./assets/Golfer.svg" alt="Golfer" data-plate-title="GOLFER" data-plate-text="..." style="margin-right:6vw">
+            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO"
+                 data-plate-text="...">
+            <img class="charImg" src="./assets/Golfer.svg" alt="Golfer" data-plate-title="GOLFER" data-plate-text="..."
+                 style="margin-right:6vw">
         </div>
     </div>
 
@@ -324,109 +877,191 @@
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
 <script>
     gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-    gsap.config({nullTargetWarn:false});
+    gsap.config({nullTargetWarn: false});
 </script>
 
 <script>
     /* ===== Intro clouds ===== */
-    (function introClouds(){
-        const tl = gsap.timeline({ scrollTrigger:{ trigger:"#intro", start:"top top", end:"bottom top", scrub:1 }});
-        const push = () => Math.max(innerWidth*0.28, 280);
-        tl.to(".intro .cloud.cloud--lt", {x:-push(), ease:"none"}, 0);
-        tl.to(".intro .cloud.cloud--rt", {x: push(), ease:"none"}, 0);
-        tl.to(".intro .cloud.cloud--lb", {x:-push()*0.8, ease:"none"}, 0);
-        tl.to(".intro .cloud.cloud--rb", {x: push()*0.8, ease:"none"}, 0);
-        tl.to(".intro-logo", {y:-40, opacity:0.92, ease:"none"}, 0);
+    (function introClouds() {
+        const tl = gsap.timeline({scrollTrigger: {trigger: "#intro", start: "top top", end: "bottom top", scrub: 1}});
+        const push = () => Math.max(innerWidth * 0.28, 280);
+        tl.to(".intro .cloud.cloud--lt", {x: -push(), ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--rt", {x: push(), ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--lb", {x: -push() * 0.8, ease: "none"}, 0);
+        tl.to(".intro .cloud.cloud--rb", {x: push() * 0.8, ease: "none"}, 0);
+        tl.to(".intro-logo", {y: -40, opacity: 0.92, ease: "none"}, 0);
     })();
 
-    const bandFull = (sel)=>{
-        const el = document.querySelector(sel); if(!el) return 0;
+    const bandFull = (sel) => {
+        const el = document.querySelector(sel);
+        if (!el) return 0;
         const w = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
         return Math.max(0, w - innerWidth);
     };
-    const startOffset = (sel,k)=> -(bandFull(sel)*(1-k));
-    const endOffset   = (sel)=>  -(bandFull(sel));
-    const leadPx      = (sel,k)=> Math.round(bandFull(sel)*(1-k));
+    const startOffset = (sel, k) => -(bandFull(sel) * (1 - k));
+    const endOffset = (sel) => -(bandFull(sel));
+    const leadPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
 
-    function recalcStageDims(){
-        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth*3;
-        const baseWidth = Math.round(Math.max(charsW*1.05, innerWidth*3.5));
-        const g = document.querySelector('.streetGroundSpacer'); if(g) g.style.width = baseWidth+'px';
-        const s = document.querySelector('.streetSnowSpacer');   if(s) s.style.width = baseWidth+'px';
-        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand',0.28)+'px');
-        document.documentElement.style.setProperty('--houses-lead',    leadPx('#housesBand',   0.72)+'px');
+    function recalcStageDims() {
+        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
+        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
+        const g = document.querySelector('.streetGroundSpacer');
+        if (g) g.style.width = baseWidth + 'px';
+        const s = document.querySelector('.streetSnowSpacer');
+        if (s) s.style.width = baseWidth + 'px';
+        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
+        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
     }
+
     ScrollTrigger.addEventListener('refreshInit', recalcStageDims);
 
-    function initStage(){
-        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth*3;
-        const baseWidth = Math.round(Math.max(charsW*1.05, innerWidth*3.5));
-        document.querySelector('.streetGroundSpacer')?.style && (document.querySelector('.streetGroundSpacer').style.width = baseWidth+'px');
-        document.querySelector('.streetSnowSpacer')?.style && (document.querySelector('.streetSnowSpacer').style.width = baseWidth+'px');
+    function initStage() {
+        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
+        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
+        document.querySelector('.streetGroundSpacer')?.style && (document.querySelector('.streetGroundSpacer').style.width = baseWidth + 'px');
+        document.querySelector('.streetSnowSpacer')?.style && (document.querySelector('.streetSnowSpacer').style.width = baseWidth + 'px');
 
-        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand',0.28)+'px');
-        document.documentElement.style.setProperty('--houses-lead',    leadPx('#housesBand',   0.72)+'px');
+        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
+        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
 
         const tl = gsap.timeline({
-            scrollTrigger:{
-                id:"stageParallax",
-                trigger:"#stage",
-                start:"top top",
-                end: ()=> { const w = bandFull('#charsBand'); return "+="+Math.max(1600, Math.round(w*1.15)); },
-                pin:true, scrub:1, anticipatePin:1, invalidateOnRefresh:true
+            scrollTrigger: {
+                id: "stageParallax",
+                trigger: "#stage",
+                start: "top top",
+                end: () => {
+                    const w = bandFull('#charsBand');
+                    return "+=" + Math.max(1600, Math.round(w * 1.15));
+                },
+                pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true
             }
         });
 
-        tl.to('.sunImg', {yPercent:-6, scale:0.98, ease:'none', duration:18}, 0);
+        tl.to('.sunImg', {yPercent: -6, scale: 0.98, ease: 'none', duration: 18}, 0);
 
-        const durChars=75, durGround=88, durHouses=110, durMountains=130;
-        const cssVarPx = (name)=> parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name))||0;
+        const durChars = 75, durGround = 88, durHouses = 110, durMountains = 130;
+        const cssVarPx = (name) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
 
         tl.fromTo('#mountainsBand',
-            {x: ()=> -cssVarPx('--mountains-lead')},
-            {x: ()=>  endOffset('#mountainsBand'), ease:'none', duration:durMountains}, 0);
+            {x: () => -cssVarPx('--mountains-lead')},
+            {x: () => endOffset('#mountainsBand'), ease: 'none', duration: durMountains}, 0);
 
         tl.fromTo('#housesBand',
-            {x: ()=> -cssVarPx('--houses-lead')},
-            {x: ()=>  endOffset('#housesBand'), ease:'none', duration:durHouses}, 0);
+            {x: () => -cssVarPx('--houses-lead')},
+            {x: () => endOffset('#housesBand'), ease: 'none', duration: durHouses}, 0);
 
         tl.fromTo('#streetGroundBand',
-            {x: ()=> startOffset('#streetGroundBand',0.90)},
-            {x: ()=> endOffset('#streetGroundBand'), ease:'none', duration:durGround}, 0);
+            {x: () => startOffset('#streetGroundBand', 0.90)},
+            {x: () => endOffset('#streetGroundBand'), ease: 'none', duration: durGround}, 0);
 
         tl.fromTo('#streetSnowBand',
-            {x: ()=> startOffset('#streetSnowBand',0.90)},
-            {x: ()=> endOffset('#streetSnowBand'), ease:'none', duration:durGround}, 0);
+            {x: () => startOffset('#streetSnowBand', 0.90)},
+            {x: () => endOffset('#streetSnowBand'), ease: 'none', duration: durGround}, 0);
 
         tl.fromTo('#charsBand',
-            {x: ()=> startOffset('#charsBand',1.00)},
-            {x: ()=> endOffset('#charsBand'), ease:'none', duration:durChars}, 0);
+            {x: () => startOffset('#charsBand', 1.00)},
+            {x: () => endOffset('#charsBand'), ease: 'none', duration: durChars}, 0);
 
-        addEventListener('resize', ()=> ScrollTrigger.refresh());
+        addEventListener('resize', () => ScrollTrigger.refresh());
     }
 
     const charData = [
-        {'price':'83,33 TON','max profit':'up to 204,17 TON','max roi':'up to 245%','daily profit':'2,1250 TON','daily roi':'2,55%','feeding':'1.57 TON'},
-        {'price':'33,33 TON','max profit':'up to 76,67 TON','max roi':'up to 230%','daily profit':'0,8167 TON','daily roi':'2,45%','feeding':'0.57 TON'},
-        {'price':'16,67 TON','max profit':'up to 35,83 TON','max roi':'up to 215%','daily profit':'0,3917 TON','daily roi':'2,35%','feeding':'0.25 TON'},
-        {'price':'16,67 TON','max profit':'up to 35,83 TON','max roi':'up to 215%','daily profit':'0,3917 TON','daily roi':'2,35%','feeding':'0.25 TON'},
-        {'price':'8,33 TON','max profit':'up to 16,67 TON','max roi':'up to 200%','daily profit':'0,1917 TON','daily roi':'2,3%','feeding':'0.1 TON'},
-        {'price':'3,33 TON','max profit':'up to 6,17 TON','max roi':'up to 185%','daily profit':'0,0750 TON','daily roi':'2,25%','feeding':'0.004 TON'},
-        {'price':'1,67 TON','max profit':'up to 2,92 TON','max roi':'up to 175%','daily profit':'0,0750 TON','daily roi':'2,25%','feeding':'0.004 TON'},
-        {'price':'1 TON','max profit':'up to 1,60 TON','max roi':'up to 160%','daily profit':'0,0210 TON','daily roi':'2,1%','feeding':'0.008 TON'},
-        {'price':'0.33 TON','max profit':'up to 0,50 TON','max roi':'up to 150%','daily profit':'0,0067 TON','daily roi':'2%','feeding':'0.002 TON'},
-        {'price':'free','max profit':'up to 0,17 TON','max roi':'up to 100%','daily profit':'0,0020 TON','daily roi':'1.2%','feeding':'0.004 TON'}
+        {
+            'price': '83,33 TON',
+            'max profit': 'up to 204,17 TON',
+            'max roi': 'up to 245%',
+            'daily profit': '2,1250 TON',
+            'daily roi': '2,55%',
+            'feeding': '1.57 TON'
+        },
+        {
+            'price': '33,33 TON',
+            'max profit': 'up to 76,67 TON',
+            'max roi': 'up to 230%',
+            'daily profit': '0,8167 TON',
+            'daily roi': '2,45%',
+            'feeding': '0.57 TON'
+        },
+        {
+            'price': '16,67 TON',
+            'max profit': 'up to 35,83 TON',
+            'max roi': 'up to 215%',
+            'daily profit': '0,3917 TON',
+            'daily roi': '2,35%',
+            'feeding': '0.25 TON'
+        },
+        {
+            'price': '16,67 TON',
+            'max profit': 'up to 35,83 TON',
+            'max roi': 'up to 215%',
+            'daily profit': '0,3917 TON',
+            'daily roi': '2,35%',
+            'feeding': '0.25 TON'
+        },
+        {
+            'price': '8,33 TON',
+            'max profit': 'up to 16,67 TON',
+            'max roi': 'up to 200%',
+            'daily profit': '0,1917 TON',
+            'daily roi': '2,3%',
+            'feeding': '0.1 TON'
+        },
+        {
+            'price': '3,33 TON',
+            'max profit': 'up to 6,17 TON',
+            'max roi': 'up to 185%',
+            'daily profit': '0,0750 TON',
+            'daily roi': '2,25%',
+            'feeding': '0.004 TON'
+        },
+        {
+            'price': '1,67 TON',
+            'max profit': 'up to 2,92 TON',
+            'max roi': 'up to 175%',
+            'daily profit': '0,0750 TON',
+            'daily roi': '2,25%',
+            'feeding': '0.004 TON'
+        },
+        {
+            'price': '1 TON',
+            'max profit': 'up to 1,60 TON',
+            'max roi': 'up to 160%',
+            'daily profit': '0,0210 TON',
+            'daily roi': '2,1%',
+            'feeding': '0.008 TON'
+        },
+        {
+            'price': '0.33 TON',
+            'max profit': 'up to 0,50 TON',
+            'max roi': 'up to 150%',
+            'daily profit': '0,0067 TON',
+            'daily roi': '2%',
+            'feeding': '0.002 TON'
+        },
+        {
+            'price': 'free',
+            'max profit': 'up to 0,17 TON',
+            'max roi': 'up to 100%',
+            'daily profit': '0,0020 TON',
+            'daily roi': '1.2%',
+            'feeding': '0.004 TON'
+        }
     ];
 
-    (function attachPlates(){
-        const band = document.getElementById('charsBand'); if(!band) return;
+    (function attachPlates() {
+        const band = document.getElementById('charsBand');
+        if (!band) return;
         const cards = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
-        cards.forEach((baseImg, idx)=>{
+        cards.forEach((baseImg, idx) => {
             const data = charData[idx] || null;
 
             const wrap = document.createElement('span');
-            wrap.className = baseImg.className; wrap.tabIndex = 0;
-            if (baseImg.style.margin){ wrap.style.margin = baseImg.style.margin; baseImg.style.margin = ''; }
+            wrap.className = baseImg.className;
+            wrap.tabIndex = 0;
+            if (baseImg.style.margin) {
+                wrap.style.margin = baseImg.style.margin;
+                baseImg.style.margin = '';
+            }
             baseImg.className = 'base';
 
             const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
@@ -437,111 +1072,141 @@
             hoverImg.src = hoverSrc;
 
             const poor = isPoorNet();
-            if(!poor && 'requestIdleCallback' in window){
-                requestIdleCallback(()=>{ const pre = new Image(); pre.decoding='async'; pre.src = hoverSrc; });
+            if (!poor && 'requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                    const pre = new Image();
+                    pre.decoding = 'async';
+                    pre.src = hoverSrc;
+                });
             }
 
-            const plate = document.createElement('div'); plate.className = 'charPlate';
-            if(data){
-                const inner = document.createElement('div'); inner.className='charPlate__inner';
-                const col1 = document.createElement('div'); col1.className='column_1';
-                const col2 = document.createElement('div'); col2.className='column_2';
+            const plate = document.createElement('div');
+            plate.className = 'charPlate';
+            if (data) {
+                const inner = document.createElement('div');
+                inner.className = 'charPlate__inner';
+                const col1 = document.createElement('div');
+                col1.className = 'column_1';
+                const col2 = document.createElement('div');
+                col2.className = 'column_2';
                 const entries = Object.entries(data);
-                const buildItems = (pairs)=> pairs.map(([k,v])=>{
+                const buildItems = (pairs) => pairs.map(([k, v]) => {
                     const item = document.createElement('div');
-                    const p = document.createElement('p'); p.textContent = String(k).toUpperCase();
-                    const span = document.createElement('span'); span.textContent = v;
-                    item.appendChild(p); item.appendChild(span); return item;
+                    const p = document.createElement('p');
+                    p.textContent = String(k).toUpperCase();
+                    const span = document.createElement('span');
+                    span.textContent = v;
+                    item.appendChild(p);
+                    item.appendChild(span);
+                    return item;
                 });
-                buildItems(entries.slice(0,3)).forEach(el=> col1.appendChild(el));
-                buildItems(entries.slice(3,6)).forEach(el=> col2.appendChild(el));
-                inner.appendChild(col1); inner.appendChild(col2); plate.appendChild(inner);
+                buildItems(entries.slice(0, 3)).forEach(el => col1.appendChild(el));
+                buildItems(entries.slice(3, 6)).forEach(el => col2.appendChild(el));
+                inner.appendChild(col1);
+                inner.appendChild(col2);
+                plate.appendChild(inner);
             }
 
             baseImg.parentNode.insertBefore(wrap, baseImg);
             wrap.appendChild(baseImg);
             wrap.appendChild(hoverImg);
-            if(data) wrap.appendChild(plate);
+            if (data) wrap.appendChild(plate);
 
-            wrap.addEventListener('touchstart', ()=>{
-                wrap.classList.add('is-touch'); clearTimeout(wrap._t);
-                wrap._t = setTimeout(()=> wrap.classList.remove('is-touch'), 900);
-            }, {passive:true});
+            wrap.addEventListener('touchstart', () => {
+                wrap.classList.add('is-touch');
+                clearTimeout(wrap._t);
+                wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 900);
+            }, {passive: true});
         });
     })();
 
-    function setFirstCharExtraGap(mult=1){
+    function setFirstCharExtraGap(mult = 1) {
         const band = document.getElementById('charsBand');
         const first = band?.querySelector('.charImg');
         const second = first?.nextElementSibling;
-        if(!band || !first || !second) return;
+        if (!band || !first || !second) return;
         const cs1 = getComputedStyle(first), cs2 = getComputedStyle(second);
         const w1 = first.getBoundingClientRect().width;
-        const mr1 = parseFloat(cs1.marginRight)||0;
-        const ml2 = parseFloat(cs2.marginLeft)||0;
-        const baseSlot = Math.round((w1+mr1+ml2)*mult);
-        const fiveVwPx = innerWidth*0.05;
+        const mr1 = parseFloat(cs1.marginRight) || 0;
+        const ml2 = parseFloat(cs2.marginLeft) || 0;
+        const baseSlot = Math.round((w1 + mr1 + ml2) * mult);
+        const fiveVwPx = innerWidth * 0.05;
         let extra = baseSlot;
-        if(matchMedia('(max-width:780px)').matches){
+        if (matchMedia('(max-width:780px)').matches) {
             const SAFE_PAD = 12;
             const maxWithoutOverflow = innerWidth - fiveVwPx - w1 - SAFE_PAD;
             const tuned = Math.max(0, Math.min(baseSlot, maxWithoutOverflow));
-            extra = Math.round(tuned*0.98);
+            extra = Math.round(tuned * 0.98);
         }
-        document.documentElement.style.setProperty('--first-char-extra-gap', extra+'px');
+        document.documentElement.style.setProperty('--first-char-extra-gap', extra + 'px');
     }
+
     setFirstCharExtraGap(1);
-    addEventListener('resize', ()=> setFirstCharExtraGap(1));
-    ScrollTrigger.addEventListener('refreshInit', ()=> setFirstCharExtraGap(1));
+    addEventListener('resize', () => setFirstCharExtraGap(1));
+    ScrollTrigger.addEventListener('refreshInit', () => setFirstCharExtraGap(1));
 
     let STAGE_INITTED = false;
-    function initStageOnce(){ if(STAGE_INITTED) return; STAGE_INITTED = true; initStage(); ScrollTrigger.refresh(); }
 
-    function isPoorNet(){
+    function initStageOnce() {
+        if (STAGE_INITTED) return;
+        STAGE_INITTED = true;
+        initStage();
+        ScrollTrigger.refresh();
+    }
+
+    function isPoorNet() {
         const q = new URLSearchParams(location.search);
-        if (q.get('gate')==='1') return true;
-        if (q.get('gate')==='0') return false;
+        if (q.get('gate') === '1') return true;
+        if (q.get('gate') === '0') return false;
         const c = navigator.connection;
         const et = c?.effectiveType;
         const save = c?.saveData === true;
         const down = typeof c?.downlink === 'number' ? c.downlink : Infinity;
-        const rtt  = typeof c?.rtt === 'number' ? c.rtt : 0;
-        if (save || et==='slow-2g' || et==='2g' || et==='3g') return true;
+        const rtt = typeof c?.rtt === 'number' ? c.rtt : 0;
+        if (save || et === 'slow-2g' || et === '2g' || et === '3g') return true;
         if (down < 1.2 || rtt > 300) return true;
         return false;
     }
 
-    function criticalCharNodes(){
+    function criticalCharNodes() {
         const all = Array.from(document.querySelectorAll('#charsBand .charImg'));
         const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
         return all.slice(0, N);
     }
-    function collectCriticalImgs(){ return criticalCharNodes(); }
 
-    function waitCritical({minShow=220, maxWait=5000, readyRatio=0.5} = {}){
-        const imgs = collectCriticalImgs(); const need = imgs.length; const start = performance.now();
-        const allSettled = new Promise(resolve=>{
-            if(!need) return resolve();
+    function collectCriticalImgs() {
+        return criticalCharNodes();
+    }
+
+    function waitCritical({minShow = 220, maxWait = 5000, readyRatio = 0.5} = {}) {
+        const imgs = collectCriticalImgs();
+        const need = imgs.length;
+        const start = performance.now();
+        const allSettled = new Promise(resolve => {
+            if (!need) return resolve();
             let loaded = 0;
-            const mark = ()=>{ loaded++; if (loaded/need >= readyRatio) resolve(); };
-            imgs.forEach(img=>{
+            const mark = () => {
+                loaded++;
+                if (loaded / need >= readyRatio) resolve();
+            };
+            imgs.forEach(img => {
                 if (img.complete) mark();
-                else img.addEventListener('load', mark, {once:true});
-                img.addEventListener('error', mark, {once:true});
+                else img.addEventListener('load', mark, {once: true});
+                img.addEventListener('error', mark, {once: true});
             });
         });
-        const minDelay = new Promise(r=> setTimeout(r, minShow));
-        const maxDelay = new Promise(r=> setTimeout(r, maxWait));
-        return Promise.race([Promise.all([allSettled, minDelay]), maxDelay]).then(()=>{
+        const minDelay = new Promise(r => setTimeout(r, minShow));
+        const maxDelay = new Promise(r => setTimeout(r, maxWait));
+        return Promise.race([Promise.all([allSettled, minDelay]), maxDelay]).then(() => {
             const spent = performance.now() - start;
-            if (spent < minShow) return new Promise(r=> setTimeout(r, minShow - spent));
+            if (spent < minShow) return new Promise(r => setTimeout(r, minShow - spent));
         });
     }
 
-    function ensureGroundBg(){
+    function ensureGroundBg() {
         const g = document.getElementById('streetGroundBand');
-        if (g && !g.style.backgroundImage){
-          /*  g.style.backgroundImage = 'url("./assets/street_ground.jpg")';*/
+        if (g && !g.style.backgroundImage) {
+            /*  g.style.backgroundImage = 'url("./assets/street_ground.jpg")';*/
             g.style.backgroundImage = 'image-set(' +
                 'url("./assets/street_ground.webp") type("image/webp") 1x, ' +
                 'url("./assets/street_ground.png") type("image/jpeg") 1x' +
@@ -549,41 +1214,54 @@
         }
     }
 
-    function enableGate(){
-        const gate = document.getElementById('stageGate'); if(!gate) return;
-        gate.hidden = false; requestAnimationFrame(()=> gate.classList.add('on'));
+    function enableGate() {
+        const gate = document.getElementById('stageGate');
+        if (!gate) return;
+        gate.hidden = false;
+        requestAnimationFrame(() => gate.classList.add('on'));
     }
-    function disableGate(){
-        const gate = document.getElementById('stageGate'); if(!gate) return;
-        gate.classList.remove('on'); setTimeout(()=>{ gate.hidden = true; }, 220);
+
+    function disableGate() {
+        const gate = document.getElementById('stageGate');
+        if (!gate) return;
+        gate.classList.remove('on');
+        setTimeout(() => {
+            gate.hidden = true;
+        }, 220);
         ensureGroundBg(); // підставляємо фон землі одразу після гейта
     }
 
-    (function bumpHeroPriority(){
+    (function bumpHeroPriority() {
         const chars = Array.from(document.querySelectorAll('#charsBand .charImg'));
         const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
-        chars.forEach((img, i)=>{
+        chars.forEach((img, i) => {
             img.setAttribute('decoding', 'async');
             // орієнтовні числа, щоб браузер міг зарезервувати місце
             const w = Math.round(img.getBoundingClientRect().width || 240);
             const h = matchMedia('(max-width:780px)').matches ? 220 : 280;
-            img.setAttribute('width', w); img.setAttribute('height', h);
-            if (i < N){ img.setAttribute('loading','eager'); img.setAttribute('fetchpriority','high'); }
-            else      { img.setAttribute('loading','lazy');  img.setAttribute('fetchpriority','low');  }
+            img.setAttribute('width', w);
+            img.setAttribute('height', h);
+            if (i < N) {
+                img.setAttribute('loading', 'eager');
+                img.setAttribute('fetchpriority', 'high');
+            } else {
+                img.setAttribute('loading', 'lazy');
+                img.setAttribute('fetchpriority', 'low');
+            }
         });
     })();
 
-    (async function bootStageSmart(){
+    (async function bootStageSmart() {
         const poor = isPoorNet();
         const critImgs = collectCriticalImgs();
-        const ready = critImgs.length && critImgs.filter(i=> i.complete).length / critImgs.length >= 0.8;
+        const ready = critImgs.length && critImgs.filter(i => i.complete).length / critImgs.length >= 0.8;
 
-        if (poor && !ready){
+        if (poor && !ready) {
             enableGate();
-            await waitCritical({minShow:220, maxWait:5000, readyRatio:0.5});
+            await waitCritical({minShow: 220, maxWait: 5000, readyRatio: 0.5});
             disableGate();
         } else {
-            await new Promise(r=> setTimeout(r, ready ? 140 : 200));
+            await new Promise(r => setTimeout(r, ready ? 140 : 200));
             ensureGroundBg();
         }
 
@@ -592,111 +1270,171 @@
 </script>
 
 <script>
-    (function(){
+    (function () {
         const header = document.getElementById('siteHeader');
-        const headerH = ()=> header ? Math.round(header.getBoundingClientRect().height) : 64;
-        function syncHeaderVar(){ document.documentElement.style.setProperty('--header-h', headerH() + 'px'); }
-        syncHeaderVar();
-        addEventListener('resize', ()=>{ syncHeaderVar(); ScrollTrigger.refresh(); });
+        const headerH = () => header ? Math.round(header.getBoundingClientRect().height) : 64;
 
-        function setActiveById(id){
-            document.querySelectorAll('.nav-link').forEach(a=>{
+        function syncHeaderVar() {
+            document.documentElement.style.setProperty('--header-h', headerH() + 'px');
+        }
+
+        syncHeaderVar();
+        addEventListener('resize', () => {
+            syncHeaderVar();
+            ScrollTrigger.refresh();
+        });
+
+        function setActiveById(id) {
+            document.querySelectorAll('.nav-link').forEach(a => {
                 const target = a.dataset.target || a.getAttribute('href');
-                a.classList.toggle('active', target===id);
+                a.classList.toggle('active', target === id);
             });
         }
 
-        document.querySelectorAll('.nav-link').forEach(a=>{
-            a.addEventListener('click', (e)=>{
+        document.querySelectorAll('.nav-link').forEach(a => {
+            a.addEventListener('click', (e) => {
                 e.preventDefault();
                 const sel = a.dataset.target || a.getAttribute('href');
                 setActiveById(sel);
-                gsap.to(window, { duration:0.8, ease:'power2.out', scrollTo:{ y:sel, offsetY:headerH() } });
+                gsap.to(window, {duration: 0.8, ease: 'power2.out', scrollTo: {y: sel, offsetY: headerH()}});
                 document.documentElement.classList.remove('nav-open');
-                document.getElementById('navToggle')?.setAttribute('aria-expanded','false');
+                document.getElementById('navToggle')?.setAttribute('aria-expanded', 'false');
             });
         });
 
-        const SECTIONS = ['#intro','#tail','#gallery','#templates','#faq'];
+        const SECTIONS = ['#intro', '#tail', '#gallery', '#templates', '#faq'];
         let currentActive = null, rafRunning = false;
-        function updateActive(){
+
+        function updateActive() {
             rafRunning = false;
-            const y = headerH(), hysteresis = 10; let winner = null;
-            for (const id of SECTIONS){
-                const el = document.querySelector(id); if(!el) continue;
+            const y = headerH(), hysteresis = 10;
+            let winner = null;
+            for (const id of SECTIONS) {
+                const el = document.querySelector(id);
+                if (!el) continue;
                 const r = el.getBoundingClientRect();
-                if (r.top <= y + hysteresis && r.bottom > y + hysteresis){ winner = id; break; }
-            }
-            if(!winner){
-                let best = Infinity;
-                for (const id of SECTIONS){
-                    const el = document.querySelector(id); if(!el) continue;
-                    const dist = Math.abs(el.getBoundingClientRect().top - y);
-                    if (dist < best){ best = dist; winner = id; }
+                if (r.top <= y + hysteresis && r.bottom > y + hysteresis) {
+                    winner = id;
+                    break;
                 }
             }
-            if (winner && winner !== currentActive){ currentActive = winner; setActiveById(winner); }
+            if (!winner) {
+                let best = Infinity;
+                for (const id of SECTIONS) {
+                    const el = document.querySelector(id);
+                    if (!el) continue;
+                    const dist = Math.abs(el.getBoundingClientRect().top - y);
+                    if (dist < best) {
+                        best = dist;
+                        winner = id;
+                    }
+                }
+            }
+            if (winner && winner !== currentActive) {
+                currentActive = winner;
+                setActiveById(winner);
+            }
         }
-        function onScroll(){ if(!rafRunning){ rafRunning = true; requestAnimationFrame(updateActive); } }
 
-        addEventListener('scroll', onScroll, {passive:true});
+        function onScroll() {
+            if (!rafRunning) {
+                rafRunning = true;
+                requestAnimationFrame(updateActive);
+            }
+        }
+
+        addEventListener('scroll', onScroll, {passive: true});
         addEventListener('resize', updateActive);
-        addEventListener('load', ()=>{
+        addEventListener('load', () => {
             const hash = window.location.hash;
-            if (hash && document.querySelector(hash)){
-                gsap.set(window, {scrollTo:{ y:hash, offsetY:headerH(), autoKill:false }});
+            if (hash && document.querySelector(hash)) {
+                gsap.set(window, {scrollTo: {y: hash, offsetY: headerH(), autoKill: false}});
             }
             updateActive();
             ScrollTrigger.refresh();
         });
 
         const navToggle = document.getElementById('navToggle');
-        function closeNav(){ document.documentElement.classList.remove('nav-open'); navToggle?.setAttribute('aria-expanded','false'); }
-        function openNav(){ document.documentElement.classList.add('nav-open'); navToggle?.setAttribute('aria-expanded','true'); }
-        function toggleNav(){ document.documentElement.classList.contains('nav-open') ? closeNav() : openNav(); }
+
+        function closeNav() {
+            document.documentElement.classList.remove('nav-open');
+            navToggle?.setAttribute('aria-expanded', 'false');
+        }
+
+        function openNav() {
+            document.documentElement.classList.add('nav-open');
+            navToggle?.setAttribute('aria-expanded', 'true');
+        }
+
+        function toggleNav() {
+            document.documentElement.classList.contains('nav-open') ? closeNav() : openNav();
+        }
+
         navToggle?.addEventListener('click', toggleNav);
-        addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeNav(); });
-        addEventListener('resize', ()=>{ if (matchMedia('(min-width:781px)').matches) closeNav(); });
+        addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeNav();
+        });
+        addEventListener('resize', () => {
+            if (matchMedia('(min-width:781px)').matches) closeNav();
+        });
     })();
 </script>
 
 <script>
-    (function(){
-        if(!matchMedia('(max-width:780px)').matches) return;
-        const stage = document.getElementById('stage'); if(!stage) return;
-        let x0=null, y0=null;
-        function onStart(e){ const t=e.touches&&e.touches[0]; if(!t) return; x0=t.clientX; y0=t.clientY; }
-        function onEnd(e){
-            if (x0==null) return;
-            const t=(e.changedTouches&&e.changedTouches[0])||e.touches?.[0]; x0=x0??0; y0=y0??0; if(!t){ x0=y0=null; return; }
-            const dx=t.clientX-x0; const dy=Math.abs(t.clientY-y0||0);
-            if (Math.abs(dx)>40 && Math.abs(dx)>dy*1.2){
+    (function () {
+        if (!matchMedia('(max-width:780px)').matches) return;
+        const stage = document.getElementById('stage');
+        if (!stage) return;
+        let x0 = null, y0 = null;
+
+        function onStart(e) {
+            const t = e.touches && e.touches[0];
+            if (!t) return;
+            x0 = t.clientX;
+            y0 = t.clientY;
+        }
+
+        function onEnd(e) {
+            if (x0 == null) return;
+            const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
+            x0 = x0 ?? 0;
+            y0 = y0 ?? 0;
+            if (!t) {
+                x0 = y0 = null;
+                return;
+            }
+            const dx = t.clientX - x0;
+            const dy = Math.abs(t.clientY - y0 || 0);
+            if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2) {
                 const ST = ScrollTrigger.getById('stageParallax');
                 const curr = window.scrollY;
-                const step = Math.max(innerHeight*0.45, Math.min(innerHeight*0.9, Math.abs(dx)*8));
-                const delta = dx<0 ? step : -step;
+                const step = Math.max(innerHeight * 0.45, Math.min(innerHeight * 0.9, Math.abs(dx) * 8));
+                const delta = dx < 0 ? step : -step;
                 let target = curr + delta;
-                if (dx<0 && ST && curr >= (ST.end - 4)){
-                    document.querySelector('.tail')?.scrollIntoView({behavior:'smooth'});
+                if (dx < 0 && ST && curr >= (ST.end - 4)) {
+                    document.querySelector('.tail')?.scrollIntoView({behavior: 'smooth'});
                 } else {
-                    if (ST){ target = Math.max(ST.start, Math.min(ST.end, target)); }
-                    window.scrollTo({top:target, behavior:'smooth'});
+                    if (ST) {
+                        target = Math.max(ST.start, Math.min(ST.end, target));
+                    }
+                    window.scrollTo({top: target, behavior: 'smooth'});
                 }
             }
-            x0=y0=null;
+            x0 = y0 = null;
         }
-        stage.addEventListener('touchstart', onStart, {passive:true});
-        stage.addEventListener('touchend',   onEnd,   {passive:true});
+
+        stage.addEventListener('touchstart', onStart, {passive: true});
+        stage.addEventListener('touchend', onEnd, {passive: true});
     })();
 </script>
 
 <script>
-    (function(){
+    (function () {
         const loader = document.getElementById('bbLoader');
         const iframe = document.getElementById('bbFrame');
         if (!loader || !iframe) return;
 
-        function hideLoader(){
+        function hideLoader() {
             if (!loader || loader._hidden) return;
             loader._hidden = true;
             loader.style.opacity = '0';
@@ -704,21 +1442,21 @@
         }
 
         // якщо користувач тицяє — прибираємо оверлей одразу
-        loader.addEventListener('pointerdown', hideLoader, { once:true });
-        loader.addEventListener('touchstart', hideLoader, { once:true, passive:true });
+        loader.addEventListener('pointerdown', hideLoader, {once: true});
+        loader.addEventListener('touchstart', hideLoader, {once: true, passive: true});
 
         // коли iframe готовий — теж прибираємо
-        iframe.addEventListener('load', hideLoader, { once:true });
+        iframe.addEventListener('load', hideLoader, {once: true});
 
         // запасний таймаут
         setTimeout(hideLoader, 8000);
     })();
 </script>
 <script>
-    (function billboardHitTest(){
+    (function billboardHitTest() {
         const charsLayer = document.getElementById('chars');
-        const billboard  = document.querySelector('.houseBillboard');          // уся рамка
-        const screen     = document.querySelector('.houseBillboard .billboard-screen'); // «вікно» з iframe
+        const billboard = document.querySelector('.houseBillboard');          // уся рамка
+        const screen = document.querySelector('.houseBillboard .billboard-screen'); // «вікно» з iframe
 
         if (!charsLayer || !billboard || !screen) return;
 
@@ -727,25 +1465,28 @@
             return stack.some(el => el === billboard || el === screen || el.closest?.('.houseBillboard'));
         };
 
-        const setCharsPE = (enabled) => { charsLayer.style.pointerEvents = enabled ? 'auto' : 'none'; };
+        const setCharsPE = (enabled) => {
+            charsLayer.style.pointerEvents = enabled ? 'auto' : 'none';
+        };
 
         document.addEventListener('pointermove', (e) => {
             setCharsPE(!overBillboard(e.clientX, e.clientY));
-        }, { passive: true });
+        }, {passive: true});
 
         let touched = false;
         document.addEventListener('touchstart', (e) => {
-            const t = e.touches && e.touches[0]; if (!t) return;
+            const t = e.touches && e.touches[0];
+            if (!t) return;
             touched = true;
             setCharsPE(!overBillboard(t.clientX, t.clientY));
-        }, { passive: true });
+        }, {passive: true});
 
         document.addEventListener('touchend', () => {
             if (!touched) return;
             touched = false;
             // невелика затримка — щоб YouTube встиг з’їсти тап
             setTimeout(() => setCharsPE(true), 450);
-        }, { passive: true });
+        }, {passive: true});
 
         screen.addEventListener('pointerenter', () => setCharsPE(false));
         screen.addEventListener('pointerleave', () => setCharsPE(true));
