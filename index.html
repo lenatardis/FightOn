@@ -464,6 +464,17 @@
             pointer-events: auto;
         }
 
+        /* Поштова скринька в ряду будинків */
+        .housePostbox {
+            height: 18vh;
+            width: auto;
+            margin: 0 24px 0;
+            flex: 0 0 auto;
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+            pointer-events: auto;
+        }
+
+
         /* ground & snow – фон підставляємо з JS пізніше, щоб не конкурував з героями */
         #streetGround .band {
             background-repeat: repeat-x;
@@ -849,6 +860,8 @@
         <div class="band" id="housesBand">
             <img class="houseImg" src="./assets/house1.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <img class="houseImg" src="./assets/house2.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
+            <img class="housePostbox" src="./assets/postbox.svg" alt="Postbox" loading="lazy" fetchpriority="low"
+                 decoding="async">
             <img class="houseImg" src="./assets/house3.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <img class="houseImg" src="./assets/house4.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <!-- ▼ білборд -->
