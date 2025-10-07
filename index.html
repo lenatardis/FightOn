@@ -646,6 +646,60 @@
             --plate-tip-x: calc(100% - 28px);
         }
 
+        /* верхня хмаринка */
+        .charTop{
+            position:absolute;
+            left:50%;
+            bottom:calc(100% + 10px);
+            transform: translateX(-50%) translateY(6px) scale(var(--top-scale,1));
+            transform-origin: center bottom;
+            z-index:30;
+            pointer-events:none;
+            opacity:0;
+            transition: opacity .18s ease, transform .18s ease;
+        }
+        .charTop__img{ display:block; height:72px; width:auto; }
+        .charTop__label{
+            position:absolute; left:50%; top:50%;
+            transform:translate(-50%,-50%);
+            font-family:'Lucznik',sans-serif; font-weight:700;
+            text-transform:uppercase; letter-spacing:.6px;
+            font-size:18px; line-height:1;
+            color:#2b1e1e; /* підлаштуй під свою SVG */
+            white-space:nowrap;
+            padding:0 10px;
+        }
+
+        .charImg:hover .charTop,
+        .charImg:focus-visible .charTop,
+        .charImg.is-touch .charTop{
+            opacity:1;
+            transform: translateX(-50%) translateY(0) scale(var(--top-scale,1));
+            --top-scale: calc(1 / var(--char-scale));
+        }
+
+        #charsBand>.charImg:first-child .charTop{
+            left:20px; right:auto;
+            transform: translateX(0) translateY(6px) scale(var(--top-scale,1));
+            transform-origin:left bottom;
+        }
+        #charsBand>.charImg:last-child .charTop{
+            left:auto; right:20px;
+            transform: translateX(0) translateY(6px) scale(var(--top-scale,1));
+            transform-origin:right bottom;
+        }
+        #charsBand>.charImg:first-child:hover .charTop,
+        #charsBand>.charImg:first-child:focus-visible .charTop,
+        #charsBand>.charImg:first-child.is-touch .charTop{
+            transform: translateX(0) translateY(0) scale(var(--top-scale,1));
+        }
+        #charsBand>.charImg:last-child:hover .charTop,
+        #charsBand>.charImg:last-child:focus-visible .charTop,
+        #charsBand>.charImg:last-child.is-touch .charTop{
+            transform: translateX(0) translateY(0) scale(var(--top-scale,1));
+        }
+
+
         @media (max-width: 780px) {
             .charPlate {
                 padding: 10px 5px;
@@ -1111,6 +1165,29 @@
             wrap.appendChild(baseImg);
             wrap.appendChild(hoverImg);
             if (data) wrap.appendChild(plate);
+
+            // === верхня хмаринка (title bubble) ===
+            const top = document.createElement('div');
+            top.className = 'charTop';
+
+            const topImg = new Image();
+            topImg.className = 'charTop__img';
+            topImg.alt = '';
+            topImg.decoding = 'async';
+            topImg.src = './assets/top_bubble.svg';
+
+            const topLabel = document.createElement('span');
+            topLabel.className = 'charTop__label';
+            topLabel.textContent = (baseImg.dataset.plateTitle || baseImg.alt || '').toUpperCase();
+
+            top.appendChild(topImg);
+            top.appendChild(topLabel);
+            wrap.appendChild(top);
+
+
+            if(!poor && 'requestIdleCallback' in window){
+                requestIdleCallback(()=>{ const preTop = new Image(); preTop.decoding='async'; preTop.src = topImg.src; });
+            }
 
             wrap.addEventListener('touchstart', () => {
                 wrap.classList.add('is-touch');
