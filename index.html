@@ -1615,9 +1615,7 @@
         // Список машин з «вагою» появи
         const FLEET = [
             {src:'./assets/test-red-car.svg',  cls:'car', weight: 3},
-            {src:'./assets/test-blue-car.svg', cls:'car', weight: 3},
-            {src:'./assets/test-bus.svg',      cls:'van', weight: 2},
-            {src:'./assets/test-van.svg',      cls:'bus', weight: 1},
+            {src:'./assets/test-blue-car.svg', cls:'car', weight: 3}
         ];
 
         // утиліти
@@ -1643,7 +1641,7 @@
             const fleetItem = pickWeighted(FLEET);
             const dirLTR = Math.random() < 0.5;            // true = зліва направо
             const lane = Math.random() < 0.55 ? 1 : 2;     // 2 рівні «дороги»
-            const speed = rand(500, 600);                   // px/сек (потім конвертуємо)
+            const speed = rand(1000, 1200);                   // px/сек (потім конвертуємо)
             const pad = Math.max(innerWidth*0.22, 240);    // запас поза екраном
             const W = bandWidth();
 
