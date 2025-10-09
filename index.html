@@ -19,7 +19,6 @@
             --mountains-lead: 0px;
             --houses-lead: 0px;
             --first-char-extra-gap: 0px;
-            /* базовий розмір і відступ хмаринки */
             --top-h: clamp(110px, 11vmin, 160px);
             --top-gap: 0px;
             --top-font: clamp(16px, 2.2vmin, 24px);
@@ -464,7 +463,6 @@
             pointer-events: auto;
         }
 
-        /* Поштова скринька в ряду будинків */
         .housePostbox {
             height: 18vh;
             width: auto;
@@ -474,8 +472,6 @@
             pointer-events: auto;
         }
 
-
-        /* ground & snow – фон підставляємо з JS пізніше, щоб не конкурував з героями */
         #streetGround .band {
             background-repeat: repeat-x;
             background-position: left bottom;
@@ -649,7 +645,7 @@
         #charsBand > .charImg:first-child .charPlate {
             left: 20px;
             right: auto;
-            transform: translateX(0) scale(var(--plate-scale, 1)); /* ← зберігаємо інверсію */
+            transform: translateX(0) scale(var(--plate-scale, 1));
             transform-origin: center top;
             --plate-tip-x: 28px;
         }
@@ -657,12 +653,11 @@
         #charsBand > .charImg:last-child .charPlate {
             left: auto;
             right: 20px;
-            transform: translateX(0) scale(var(--plate-scale, 1)); /* ← зберігаємо інверсію */
+            transform: translateX(0) scale(var(--plate-scale, 1));
             transform-origin: center top;
             --plate-tip-x: calc(100% - 28px);
         }
 
-        /* верхня хмаринка */
         .charTop {
             position: absolute;
             left: 50%;
@@ -741,7 +736,6 @@
             color: #cfd6ff;
         }
 
-        /* gate (без блокування скролу) */
         #stageGate[hidden] {
             display: none
         }
@@ -813,26 +807,24 @@
             }
         }
 
-        /* Контейнер трафіку всередині ground-бенда */
         .trafficLayer{
             position: absolute;
             left: 0; right: 0; bottom: 0;
             height: var(--ground-h);
-            pointer-events: none;             /* не заважає клікам по сцені */
+            pointer-events: none;
         }
 
-        /* Окреме авто */
         .vehicle{
             position: absolute;
-            bottom: calc(var(--ground-h) * 0.25); /* «ліворяд» ближче до бордюру */
+            bottom: calc(var(--ground-h) * 0.25);
             will-change: transform;
             transform: translateX(-200px);
             filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
             pointer-events: none;
         }
-        .vehicle.lane2{ bottom: calc(var(--ground-h) * 0.3); } /* «правий ряд» трохи вище */
+        .vehicle.lane2{ bottom: calc(var(--ground-h) * 0.3); }
         .vehicle img{
-            height: 25vh;                      /* підлаштуй 10–16vh */
+            height: 25vh;
             width: auto;
             display: block;
         }
@@ -969,7 +961,6 @@
 </script>
 
 <script>
-    /* ===== Intro clouds ===== */
     (function introClouds() {
         const tl = gsap.timeline({scrollTrigger: {trigger: "#intro", start: "top top", end: "bottom top", scrub: 1}});
         const push = () => Math.max(innerWidth * 0.28, 280);
@@ -1321,7 +1312,6 @@
     function ensureGroundBg() {
         const g = document.getElementById('streetGroundBand');
         if (g && !g.style.backgroundImage) {
-            /*  g.style.backgroundImage = 'url("./assets/street_ground.jpg")';*/
             g.style.backgroundImage = 'image-set(' +
                 'url("./assets/street_ground.webp") type("image/webp") 1x, ' +
                 'url("./assets/street_ground.png") type("image/jpeg") 1x' +
