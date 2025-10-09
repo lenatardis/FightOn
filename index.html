@@ -813,6 +813,32 @@
             }
         }
 
+        /* Контейнер трафіку всередині ground-бенда */
+        .trafficLayer{
+            position: absolute;
+            left: 0; right: 0; bottom: 0;
+            height: var(--ground-h);
+            pointer-events: none;             /* не заважає клікам по сцені */
+        }
+
+        /* Окреме авто */
+        .vehicle{
+            position: absolute;
+            bottom: calc(var(--ground-h) * 0.25); /* «ліворяд» ближче до бордюру */
+            will-change: transform;
+            transform: translateX(-200px);
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+            pointer-events: none;
+        }
+        .vehicle.lane2{ bottom: calc(var(--ground-h) * 0.3); } /* «правий ряд» трохи вище */
+        .vehicle img{
+            height: 25vh;                      /* підлаштуй 10–16vh */
+            width: auto;
+            display: block;
+        }
+        .vehicle.flip img{ transform: scaleX(-1); }
+
+
     </style>
 </head>
 <body>
@@ -890,6 +916,7 @@
 
     <div class="layer" id="streetGround">
         <div class="band" id="streetGroundBand">
+            <div id="trafficLayer" class="trafficLayer" aria-hidden="true"></div>
             <div class="streetGroundSpacer"></div>
         </div>
     </div>
@@ -1580,6 +1607,92 @@
         screen.addEventListener('pointerleave', () => setCharsPE(true));
     })();
 </script>
+<script>
+    (function traffic(){
+        const trafficLayer = () => document.getElementById('trafficLayer');
+        if(!trafficLayer()) return;
+
+        // Список машин з «вагою» появи
+        const FLEET = [
+            {src:'./assets/test-red-car.svg',  cls:'car', weight: 3},
+            {src:'./assets/test-blue-car.svg', cls:'car', weight: 3},
+            {src:'./assets/test-bus.svg',      cls:'van', weight: 2},
+            {src:'./assets/test-van.svg',      cls:'bus', weight: 1},
+        ];
+
+        // утиліти
+        const pickWeighted = (arr) => {
+            const sum = arr.reduce((s,a)=>s+a.weight,0);
+            let r = Math.random()*sum;
+            for(const a of arr){ if((r-=a.weight)<=0) return a; }
+            return arr[0];
+        };
+        const rand = (a,b)=> a + Math.random()*(b-a);
+        const randInt = (a,b)=> Math.floor(rand(a,b+1));
+        const bandWidth = () => {
+            const band = document.getElementById('streetGroundBand');
+            return band ? Math.max(band.scrollWidth, innerWidth*3) : innerWidth*3;
+        };
+
+        let busy = false; // щоб не їхали назустріч і не наздоганяли
+
+        function spawnVehicle(){
+            if(busy) return scheduleNext();   // чекаємо, поки попередній доїде
+            busy = true;
+
+            const fleetItem = pickWeighted(FLEET);
+            const dirLTR = Math.random() < 0.5;            // true = зліва направо
+            const lane = Math.random() < 0.55 ? 1 : 2;     // 2 рівні «дороги»
+            const speed = rand(500, 600);                   // px/сек (потім конвертуємо)
+            const pad = Math.max(innerWidth*0.22, 240);    // запас поза екраном
+            const W = bandWidth();
+
+            // вузол
+            const box = document.createElement('div');
+            box.className = 'vehicle' + (lane===2?' lane2':'') + ' ' + fleetItem.cls;
+            const img = new Image();
+            img.src = fleetItem.src;
+            img.alt = fleetItem.cls;
+            box.appendChild(img);
+            trafficLayer().appendChild(box);
+
+            // старт/фініш по «світові» (#streetGroundBand)
+            const startX = dirLTR ? -pad : (W + pad);
+            const endX   = dirLTR ? (W + pad) : -pad;
+
+            // щоб машина «дивилась» у напрямку руху
+            if(!dirLTR) box.classList.add('flip');
+
+            // миттєво ставимо у старт
+            gsap.set(box, {x: startX});
+
+            // тривалість з урахуванням дистанції
+            const duration = Math.abs(endX - startX) / speed;
+
+            gsap.to(box, {
+                x: endX,
+                ease: "none",
+                duration,
+                onComplete(){
+                    box.remove();
+                    busy = false;
+                    scheduleNext();  // після доїзду — плануємо наступну появу
+                }
+            });
+        }
+
+        function scheduleNext(){
+            // наступна поява через 10–20 сек
+            const delay = rand(5,10);
+            setTimeout(spawnVehicle, delay*1000);
+        }
+
+        // старт після 1-ї ініціалізації сцени (коли відома ширина бенда)
+        addEventListener('load', () => scheduleNext());
+        // якщо розміри сцени зміняться — нічого робити не треба, маршрут береться динамічно
+    })();
+</script>
+
 
 
 </body>
