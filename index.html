@@ -807,28 +807,45 @@
             }
         }
 
-        .trafficLayer{
+        .trafficLayer {
             position: absolute;
-            left: 0; right: 0; bottom: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             height: var(--ground-h);
             pointer-events: none;
         }
 
-        .vehicle{
+        .vehicle {
             position: absolute;
             bottom: calc(var(--ground-h) * 0.25);
             will-change: transform;
             transform: translateX(-200px);
-            filter: drop-shadow(0 10px 20px rgba(0,0,0,.35));
+            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .35));
             pointer-events: none;
         }
-        .vehicle.lane2{ bottom: calc(var(--ground-h) * 0.3); }
-        .vehicle img{
-            height: 25vh;
+
+        .vehicle.lane2 {
+            bottom: calc(var(--ground-h) * 0.3);
+        }
+
+        .vehicle img {
+            height: 20vh;
             width: auto;
             display: block;
         }
-        .vehicle.flip img{ transform: scaleX(-1); }
+
+        .vehicle.longcar img {
+            height: 18vh;
+        }
+
+        .vehicle.bus img {
+            height: 21vh;
+        }
+
+        .vehicle.flip img {
+            transform: scaleX(-1);
+        }
 
 
     </style>
@@ -1598,45 +1615,51 @@
     })();
 </script>
 <script>
-    (function traffic(){
+    (function traffic() {
         const trafficLayer = () => document.getElementById('trafficLayer');
-        if(!trafficLayer()) return;
+        if (!trafficLayer()) return;
 
         // Список машин з «вагою» появи
         const FLEET = [
-            {src:'./assets/test-red-car.svg',  cls:'car', weight: 3},
-            {src:'./assets/test-blue-car.svg', cls:'car', weight: 3}
+            {src: './assets/car1.webp', cls: 'car', weight: 2},
+            {src: './assets/car2.webp', cls: 'car', weight: 3},
+            {src: './assets/car3.webp', cls: 'car', weight: 3},
+            {src: './assets/car4.webp', cls: 'longcar', weight: 3},
+            {src: './assets/bus.webp', cls: 'bus', weight: 1.2}
         ];
+
 
         // утиліти
         const pickWeighted = (arr) => {
-            const sum = arr.reduce((s,a)=>s+a.weight,0);
-            let r = Math.random()*sum;
-            for(const a of arr){ if((r-=a.weight)<=0) return a; }
+            const sum = arr.reduce((s, a) => s + a.weight, 0);
+            let r = Math.random() * sum;
+            for (const a of arr) {
+                if ((r -= a.weight) <= 0) return a;
+            }
             return arr[0];
         };
-        const rand = (a,b)=> a + Math.random()*(b-a);
+        const rand = (a, b) => a + Math.random() * (b - a);
         const bandWidth = () => {
             const band = document.getElementById('streetGroundBand');
-            return band ? Math.max(band.scrollWidth, innerWidth*3) : innerWidth*3;
+            return band ? Math.max(band.scrollWidth, innerWidth * 3) : innerWidth * 3;
         };
 
         let busy = false;
 
-        function spawnVehicle(){
-            if(busy) return scheduleNext();
+        function spawnVehicle() {
+            if (busy) return scheduleNext();
             busy = true;
 
             const fleetItem = pickWeighted(FLEET);
             const dirLTR = Math.random() < 0.5;
             const lane = Math.random() < 0.55 ? 1 : 2;
             const speed = rand(1500, 1800);
-            const pad = Math.max(innerWidth*0.22, 240);
+            const pad = Math.max(innerWidth * 0.22, 240);
             const W = bandWidth();
 
             // вузол
             const box = document.createElement('div');
-            box.className = 'vehicle' + (lane===2?' lane2':'') + ' ' + fleetItem.cls;
+            box.className = 'vehicle' + (lane === 2 ? ' lane2' : '') + ' ' + fleetItem.cls;
             const img = new Image();
             img.src = fleetItem.src;
             img.alt = fleetItem.cls;
@@ -1645,9 +1668,9 @@
 
 
             const startX = dirLTR ? -pad : (W + pad);
-            const endX   = dirLTR ? (W + pad) : -pad;
+            const endX = dirLTR ? (W + pad) : -pad;
 
-            if(!dirLTR) box.classList.add('flip');
+            if (!dirLTR) box.classList.add('flip');
 
 
             gsap.set(box, {x: startX});
@@ -1659,7 +1682,7 @@
                 x: endX,
                 ease: "none",
                 duration,
-                onComplete(){
+                onComplete() {
                     box.remove();
                     busy = false;
                     scheduleNext();
@@ -1667,18 +1690,17 @@
             });
         }
 
-        function scheduleNext(){
-            const delay = rand(5,10);
+        function scheduleNext() {
+            const delay = rand(5, 10);
             setTimeout(() => {
-                if(document.hidden) return scheduleNext();
+                if (document.hidden) return scheduleNext();
                 spawnVehicle();
-            }, delay*1000);
+            }, delay * 1000);
         }
 
         addEventListener('load', () => scheduleNext());
     })();
 </script>
-
 
 
 </body>
