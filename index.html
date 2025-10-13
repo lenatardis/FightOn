@@ -1888,8 +1888,19 @@
 
         const open = () => {
             overlay.hidden = false;
-            requestAnimationFrame(() => overlay.classList.add('on'));
-            document.documentElement.classList.add('modal-open');
+            requestAnimationFrame(() => {
+                overlay.classList.add('on');
+                document.documentElement.classList.add('modal-open');
+
+                const letter = overlay.querySelector('.mail-envelope .letter');
+                if (letter && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    gsap.killTweensOf(letter);
+                    gsap.set(letter, {y: 18}); // старт трохи нижче
+                    gsap.timeline()
+                        .to(letter, {y: -10, duration: 0.28, ease: 'power2.out'}) // підскок
+                        .to(letter, {y: 0,   duration: 0.36, ease: 'power1.out'}); // назад вниз
+                }
+            });
         };
         const close = () => {
             overlay.classList.remove('on');
