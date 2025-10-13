@@ -838,95 +838,101 @@
             transform: scaleX(-1);
         }
 
-        /* ==== MAIL POPUP (overlay + envelope) ==== */
-        .mail-overlay {
+
+
+        /* ===================== MAIL POPUP (overlay + envelope) ===================== */
+
+        /* --- оверлей --- */
+        .mail-overlay{
             position: fixed;
             inset: 0;
-            z-index: 12000; /* вище за гейт */
+            z-index: 12000;
             display: grid;
             place-items: center;
-            background: rgba(10, 14, 32, 0.55);
+            background: rgba(10,14,32,.55);
             backdrop-filter: blur(6px) saturate(120%);
             -webkit-backdrop-filter: blur(6px) saturate(120%);
             opacity: 0;
             pointer-events: none;
             transition: opacity .22s ease;
         }
-        .mail-overlay.on {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .mail-overlay.on{ opacity:1; pointer-events:auto; }
 
-        .mail-modal {
+        /* --- контейнер модалки --- */
+        .mail-modal{
             width: min(680px, 92vw);
             transform: translateY(8px) scale(.98);
             transition: transform .22s ease;
         }
-        .mail-overlay.on .mail-modal {
-            transform: translateY(0) scale(1);
+        .mail-overlay.on .mail-modal{ transform: translateY(0) scale(1); }
+
+        /* ======================= ENVELOPE (base + letter + flap) =================== */
+
+        /* керовані змінні (підкручуй у межах коментарів) */
+        :root{
+            --env-w: 88%;       /* 86–92%: синхронний «скейл» base і flap, щоб краї зійшлися */
+            --flap-lift: 13%;   /* 10–16%: наскільки підняти клапан у «декольте» */
+            --letter-w: calc(var(--env-w) * 0.78); /* 0.75–0.82: ширина листка відносно конверта */
+            --letter-top: 12%;  /* 10–15%: відступ листка зверху всередині конверта */
         }
 
-        /* Конверт як контейнер з фіксованими пропорціями */
-        .mail-envelope {
+        /* сам контейнер конверта із фіксованими пропорціями */
+        .mail-envelope{
             position: relative;
             width: 100%;
-            aspect-ratio: 5 / 4; /* піджени під свої svg, якщо інші пропорції */
+            aspect-ratio: 5/4;        /* залиш як є, якщо твої svg близькі за пропорціями */
         }
-        .mail-envelope > img {
-            position: absolute; inset: 0;
-            width: 100%; height: 100%;
+
+        /* ОБИДВА шари (base і flap) тягнемо однаково — ключ до «збігу країв» */
+        .mail-envelope > img{
+            position: absolute;
+            top: 0; left: 50%;
+            width: var(--env-w);
+            height: auto;
+            transform: translateX(-50%);
             object-fit: contain;
             user-select: none;
             -webkit-user-drag: none;
         }
-        /* ---- ENVELOPE LAYERS / Z-INDEX ---- */
-        .env-base { z-index: 4; }         /* база над усім, має «вікно», крізь яке видно листок */
-        .mail-envelope .letter { z-index: 3; } /* листок над клапаном */
-        .env-flap { z-index: 2; pointer-events: none; }
 
-        /* ---- Підняти клапан у «декольте» ---- */
-        /* керована змінна – зручно підкрутити число (10–18%) під свій SVG */
-        :root { --flap-lift: 14%; }
+        /* порядки шарів */
+        .env-base{ z-index: 2; }                    /* низ (жовто-оранжева «кишка») */
+        .mail-envelope .letter{ z-index: 3; }       /* листок — між base і flap */
+        .env-flap{ z-index: 4; pointer-events: none; } /* клапан зверху, неклікабельний */
 
+        /* підйом клапана, аби вершина «зайшла» у V */
         .env-flap{
-            position: absolute;
-            inset: 0;
-            /* піднімаємо клапан угору, щоб його верхній трикутник «зайшов» у V */
-            transform: translateY(calc(-1 * var(--flap-lift)));
+            /* так само центрований, як і base (left:50% + translateX(-50%)) */
+            transform: translateX(-50%) translateY(calc(-1 * var(--flap-lift)));
         }
 
-        /* ---- Позиція/розмір листка, щоб сідав у вікно ---- */
-        :root{
-            --letter-top: 12%;   /* 10–15% залежно від твого base.svg */
-            --letter-w: 78%;     /* 75–82% */
-        }
-
+        /* листок (тут буде форма) — акуратно вписуємо у «вікно» конверта */
         .mail-envelope .letter{
-            position: absolute;        /* ← обов’язково */
+            position: absolute;
+            top: var(--letter-top);
             left: 50%;
-            top: var(--letter-top);    /* 12% за замовчуванням */
-            width: var(--letter-w);    /* 78% */
+            width: var(--letter-w);
             transform: translateX(-50%);
-            z-index: 3;                /* над flap, під base */
-            display: grid;             /* щоб центрнути .letter-card */
+            display: grid;
             place-items: center;
-            background: #ffffff;
         }
 
-
-        /* (опційно) – підрізаємо низ листка м’яким трикутником,
-           аби він «занурювався» в V і не вилізав понад краї */
-        .mail-envelope .letter.clip-v{
-            clip-path: polygon(12% 0, 88% 0, 50% 90%);
-        }
-
-        /* невелика тінь, як у фігмі */
+        /* власне «картка» листка */
         .letter-card{
+            position: relative;
+            width: 100%;
+            background: #fff;
+            color: #1c243a;
+            border-radius: 16px;
+            padding: 20px 18px 22px;
+            outline: 6px solid #BFE5FF;   /* синій кант як у макеті */
+            outline-offset: -6px;
             box-shadow: 0 14px 34px rgba(0,0,0,.28);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
         }
 
-        /* Хрестик закриття */
-        .letter-close {
+        /* хрестик закриття */
+        .letter-close{
             position: absolute;
             right: 8px; top: 8px;
             width: 34px; height: 34px;
@@ -938,21 +944,22 @@
             cursor: pointer;
             transition: transform .15s ease, background .15s ease;
         }
-        .letter-close:hover { transform: translateY(-1px); background: rgba(0,0,0,.06); }
+        .letter-close:hover{ transform: translateY(-1px); background: rgba(0,0,0,.06); }
 
-        @media (max-width: 520px) {
-            .mail-modal { width: min(520px, 94vw); }
-            .mail-envelope .letter { top: 10%; width: 82%; }
-            .letter-card { padding: 16px 14px 18px; outline-width: 5px; outline-offset: -5px; }
+        /* адаптивні дрібниці */
+        @media (max-width: 520px){
+            .mail-modal{ width: min(520px, 94vw); }
+            :root{
+                /* на вузьких екранах можна трохи збільшити листок у вікні */
+                --letter-w: calc(var(--env-w) * 0.82);
+                --letter-top: 10%;
+            }
+            .letter-card{ padding: 16px 14px 18px; outline-width: 5px; outline-offset: -5px; }
         }
 
-        /* (опційно) ілюзія «листок заходить у V» — м’яко підрізаємо низ */
-        .mail-envelope .letter.clip-v {
-            /* піджени координати polygon під форму «декольте» (можна з інспектором) */
-            clip-path: polygon(12% 0, 88% 0, 50% 90%);
-        }
+        /* коли модалка відкрита — блокуємо прокрутку фону (залиш, якщо треба) */
+        html.modal-open, html.modal-open body{ overflow: hidden; }
 
-        html.modal-open, html.modal-open body { overflow: hidden; }
 
         /* ==== FLOATING POSTBOX ==== */
         .postbox-fab{
