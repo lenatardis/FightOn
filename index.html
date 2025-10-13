@@ -463,15 +463,6 @@
             pointer-events: auto;
         }
 
-        .housePostbox {
-            height: 18vh;
-            width: auto;
-            margin: 0 24px 0;
-            flex: 0 0 auto;
-            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
-            pointer-events: auto;
-        }
-
         #streetGround .band {
             background-repeat: repeat-x;
             background-position: left bottom;
@@ -847,6 +838,150 @@
             transform: scaleX(-1);
         }
 
+        /* ==== MAIL POPUP (overlay + envelope) ==== */
+        .mail-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000; /* вище за гейт */
+            display: grid;
+            place-items: center;
+            background: rgba(10, 14, 32, 0.55);
+            backdrop-filter: blur(6px) saturate(120%);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .22s ease;
+        }
+        .mail-overlay.on {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .mail-modal {
+            width: min(680px, 92vw);
+            transform: translateY(8px) scale(.98);
+            transition: transform .22s ease;
+        }
+        .mail-overlay.on .mail-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        /* Конверт як контейнер з фіксованими пропорціями */
+        .mail-envelope {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 5 / 4; /* піджени під свої svg, якщо інші пропорції */
+        }
+        .mail-envelope > img {
+            position: absolute; inset: 0;
+            width: 100%; height: 100%;
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .env-base { z-index: 1; }
+        .env-flap { z-index: 3; pointer-events: none; }
+
+        /* Листок (всередині — майбутня форма) */
+        .mail-envelope .letter {
+            position: absolute;
+            left: 50%;
+            top: 14%;               /* підженеш під макет */
+            transform: translateX(-50%);
+            width: 76%;             /* safe-area листка в конверті */
+            z-index: 2;             /* між base і flap */
+            display: grid;
+            place-items: center;
+        }
+
+        .letter-card {
+            position: relative;
+            width: 100%;
+            background: #fff;
+            color: #1c243a;
+            border-radius: 16px;
+            padding: 20px 18px 22px;
+            /* синій кант і тінь (заміна «галочній тіні») */
+            outline: 6px solid #BFE5FF;
+            outline-offset: -6px;
+            box-shadow: 0 14px 34px rgba(0,0,0,.28);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+        }
+
+        /* Хрестик закриття */
+        .letter-close {
+            position: absolute;
+            right: 8px; top: 8px;
+            width: 34px; height: 34px;
+            border-radius: 10px;
+            border: 1px solid rgba(0,0,0,.08);
+            background: rgba(0,0,0,.04);
+            font-size: 22px;
+            line-height: 1;
+            cursor: pointer;
+            transition: transform .15s ease, background .15s ease;
+        }
+        .letter-close:hover { transform: translateY(-1px); background: rgba(0,0,0,.06); }
+
+        @media (max-width: 520px) {
+            .mail-modal { width: min(520px, 94vw); }
+            .mail-envelope .letter { top: 10%; width: 82%; }
+            .letter-card { padding: 16px 14px 18px; outline-width: 5px; outline-offset: -5px; }
+        }
+
+        /* (опційно) ілюзія «листок заходить у V» — м’яко підрізаємо низ */
+        .mail-envelope .letter.clip-v {
+            /* піджени координати polygon під форму «декольте» (можна з інспектором) */
+            clip-path: polygon(12% 0, 88% 0, 50% 90%);
+        }
+
+        html.modal-open, html.modal-open body { overflow: hidden; }
+
+        /* ==== FLOATING POSTBOX ==== */
+        .postbox-fab{
+            position: fixed;
+            right: clamp(12px, 3vw, 28px);
+            bottom: max(12px, env(safe-area-inset-bottom, 0px) + 12px);
+            z-index: 12010; /* вище персонажів і будинків */
+            display: grid;
+            place-items: center;
+            width: clamp(54px, 9vmin, 84px);
+            height: clamp(54px, 9vmin, 84px);
+            border-radius: 16px;
+            background: transparent; /* саму кнопку не видно, видно лише svg */
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: transform .15s ease, opacity .18s ease, filter .18s ease;
+            opacity: 0;              /* за замовчуванням прихована */
+            pointer-events: none;    /* не ловить кліки, доки невидима */
+        }
+        .postbox-fab img{
+            display:block;
+            width: auto;
+            height: clamp(72px, 18vh, 136px); /* масштаб по Figma, сідає на землю */
+            filter: drop-shadow(0 10px 26px rgba(0,0,0,.35));
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+        .postbox-fab.on{
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .postbox-fab:active{ transform: translateY(1px) scale(.98); }
+
+        @media (max-width:780px){
+            .postbox-fab{
+                right: 12px;
+                bottom: max(10px, env(safe-area-inset-bottom, 0px) + 10px);
+                width: clamp(48px, 12vw, 68px);
+                height: clamp(48px, 12vw, 68px);
+            }
+            .postbox-fab img{
+                height: clamp(72px, 15vh, 120px);
+            }
+        }
+
 
     </style>
 </head>
@@ -895,8 +1030,6 @@
         <div class="band" id="housesBand">
             <img class="houseImg" src="./assets/house1.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <img class="houseImg" src="./assets/house2.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="housePostbox" src="./assets/postbox.svg" alt="Postbox" loading="lazy" fetchpriority="low"
-                 decoding="async">
             <img class="houseImg" src="./assets/house3.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <img class="houseImg" src="./assets/house4.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <!-- ▼ білборд -->
@@ -968,6 +1101,31 @@
 </div>
 
 <section class="tail" id="tail"><h2>Далі контент</h2></section>
+
+<!-- ▼ MAIL OVERLAY (popup) -->
+<div class="mail-overlay" id="mailOverlay" hidden>
+    <div class="mail-modal" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
+        <div class="mail-envelope">
+            <img class="env-base" src="./assets/base.svg" alt="" aria-hidden="true">
+            <div class="letter">
+                <div class="letter-card">
+                    <button class="letter-close" type="button" aria-label="Закрити">&times;</button>
+                    <h3 id="mailTitle">Підписка</h3>
+                    <p>Тут буде форма. Поки — заглушка, щоб підігнати верстку листка.</p>
+                </div>
+            </div>
+            <img class="env-flap" src="./assets/flap.svg" alt="" aria-hidden="true">
+        </div>
+    </div>
+</div>
+<!-- ▲ MAIL OVERLAY -->
+<!-- ▼ FLOATING POSTBOX (лише для першого екрана) -->
+<button class="postbox-fab" id="postboxFab" aria-label="Відкрити скриньку">
+    <img src="./assets/postbox.svg" alt="" width="64" height="64" decoding="async">
+</button>
+<!-- ▲ FLOATING POSTBOX -->
+
+
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
@@ -1701,7 +1859,69 @@
         addEventListener('load', () => scheduleNext());
     })();
 </script>
+<script>
+    // === MAIL OVERLAY CONTROLLER (єдиний) ===
+    (function () {
+        const overlay = document.getElementById('mailOverlay');
+        if (!overlay) return;
 
+        const open = () => {
+            overlay.hidden = false;
+            requestAnimationFrame(() => overlay.classList.add('on'));
+            document.documentElement.classList.add('modal-open');
+        };
+        const close = () => {
+            overlay.classList.remove('on');
+            setTimeout(() => { overlay.hidden = true; }, 220);
+            document.documentElement.classList.remove('modal-open');
+        };
 
+        // API для інших скриптів
+        window.__mail = { open, close };
+
+        // клік по фону
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close();
+        });
+
+        // клік по хрестику
+        overlay.addEventListener('click', (e) => {
+            const btn = e.target.closest('.letter-close');
+            if (btn) close();
+        });
+
+        // Esc
+        addEventListener('keydown', (e) => {
+            if (!overlay.hidden && e.key === 'Escape') close();
+        });
+    })();
+    (function floatingPostbox(){
+        const fab = document.getElementById('postboxFab');
+        if(!fab) return;
+
+        // відкриття через єдиний контролер
+        fab.addEventListener('click', () => window.__mail?.open && window.__mail.open());
+
+        const run = () => {
+            const st = ScrollTrigger.getById('stageParallax');
+            if(!st){ requestAnimationFrame(run); return; }
+
+            const HIDE_AFTER = 0.12; // доки progress <= 0.12 — FAB видимий
+            const sync = () => {
+                const active = (scrollY >= st.start && scrollY <= st.end);
+                const firstScreen = st.progress <= HIDE_AFTER + 0.0001;
+                if (active && firstScreen) fab.classList.add('on');
+                else fab.classList.remove('on');
+            };
+
+            // первинний стан + підписки
+            sync();
+            ScrollTrigger.addEventListener('update', sync); // не чіпаємо st.vars.onUpdate
+            addEventListener('resize', sync);
+            addEventListener('scroll', sync, {passive:true});
+        };
+        run();
+    })();
+</script>
 </body>
 </html>
