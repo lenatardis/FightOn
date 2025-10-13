@@ -838,17 +838,15 @@
             transform: scaleX(-1);
         }
 
-
-
-        /* ===================== MAIL POPUP (overlay + envelope) ===================== */
-
-        /* --- оверлей --- */
+        /* ==== OVERLAY + MODAL (жорстке центрування) ==== */
         .mail-overlay{
             position: fixed;
             inset: 0;
             z-index: 12000;
             display: grid;
-            place-items: center;
+            place-items: center;          /* центр по X/Y */
+            place-content: center;        /* дод. гарантія */
+            padding: 0;                   /* нічого не штовхає вгору */
             background: rgba(10,14,32,.55);
             backdrop-filter: blur(6px) saturate(120%);
             -webkit-backdrop-filter: blur(6px) saturate(120%);
@@ -857,36 +855,34 @@
             transition: opacity .22s ease;
         }
         .mail-overlay.on{ opacity:1; pointer-events:auto; }
-
-        /* --- контейнер модалки --- */
         .mail-modal{
+            display: grid;
+            place-items: center;
             width: min(680px, 92vw);
-            transform: translateY(8px) scale(.98);
-            transition: transform .22s ease;
+            max-width: 92vw;
+            max-height: 90dvh;            /* щоб ніколи не вилазило за екран */
         }
-        .mail-overlay.on .mail-modal{ transform: translateY(0) scale(1); }
 
-        /* ======================= ENVELOPE (base + letter + flap) =================== */
-
-        /* керовані змінні (підкручуй у межах коментарів) */
+        /* ==== ENVELOPE (base + letter + flap) ==== */
+        /* підкручувані змінні */
         :root{
-            --env-w: 88%;       /* 86–92%: синхронний «скейл» base і flap, щоб краї зійшлися */
-            --flap-lift: 13%;   /* 10–16%: наскільки підняти клапан у «декольте» */
-            --letter-w: calc(var(--env-w) * 0.78); /* 0.75–0.82: ширина листка відносно конверта */
-            --letter-top: 12%;  /* 10–15%: відступ листка зверху всередині конверта */
+            --env-w: 88%;          /* однаковий масштаб для base і flap (86–92%) */
+            --flap-lift: 12.5%;    /* підйом клапана у V (10–16%) */
+            --letter-w: calc(var(--env-w) * 0.78); /* ширина листка */
+            --letter-top: 12%;     /* відступ листка зверху в конверті */
         }
 
-        /* сам контейнер конверта із фіксованими пропорціями */
         .mail-envelope{
             position: relative;
             width: 100%;
-            aspect-ratio: 5/4;        /* залиш як є, якщо твої svg близькі за пропорціями */
+            aspect-ratio: 5 / 4;   /* якщо твої svg з іншими пропорціями — підлаштуй */
         }
 
-        /* ОБИДВА шари (base і flap) тягнемо однаково — ключ до «збігу країв» */
+        /* ОБИДВА зображення масштабуємо ІДЕНТИЧНО → краї сходяться */
         .mail-envelope > img{
             position: absolute;
-            top: 0; left: 50%;
+            top: 0;
+            left: 50%;
             width: var(--env-w);
             height: auto;
             transform: translateX(-50%);
@@ -895,18 +891,17 @@
             -webkit-user-drag: none;
         }
 
-        /* порядки шарів */
-        .env-base{ z-index: 2; }                    /* низ (жовто-оранжева «кишка») */
-        .mail-envelope .letter{ z-index: 3; }       /* листок — між base і flap */
-        .env-flap{ z-index: 4; pointer-events: none; } /* клапан зверху, неклікабельний */
+        /* Порядок шарів — як ти просила: base > letter > flap */
+        .env-base { z-index: 4; }                /* найвище */
+        .mail-envelope .letter { z-index: 3; }   /* середина */
+        .env-flap { z-index: 2; pointer-events: none; } /* знизу */
 
-        /* підйом клапана, аби вершина «зайшла» у V */
+        /* Піднімаємо ТІЛЬКИ клапан (не весь конверт) */
         .env-flap{
-            /* так само центрований, як і base (left:50% + translateX(-50%)) */
             transform: translateX(-50%) translateY(calc(-1 * var(--flap-lift)));
         }
 
-        /* листок (тут буде форма) — акуратно вписуємо у «вікно» конверта */
+        /* Листок (контент/форма) */
         .mail-envelope .letter{
             position: absolute;
             top: var(--letter-top);
@@ -915,9 +910,11 @@
             transform: translateX(-50%);
             display: grid;
             place-items: center;
+            /* Маска під V-«декольте», щоб не було «зірки» */
+            /* Підіграй 48–52% і 86–92% під форму вирізу у твоєму base.svg */
+            clip-path: polygon(12% 0, 88% 0, 88% 86%, 52% 92%, 48% 92%, 12% 86%);
         }
 
-        /* власне «картка» листка */
         .letter-card{
             position: relative;
             width: 100%;
@@ -925,13 +922,12 @@
             color: #1c243a;
             border-radius: 16px;
             padding: 20px 18px 22px;
-            outline: 6px solid #BFE5FF;   /* синій кант як у макеті */
+            outline: 6px solid #BFE5FF;
             outline-offset: -6px;
             box-shadow: 0 14px 34px rgba(0,0,0,.28);
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
         }
 
-        /* хрестик закриття */
+        /* Хрестик */
         .letter-close{
             position: absolute;
             right: 8px; top: 8px;
@@ -946,19 +942,18 @@
         }
         .letter-close:hover{ transform: translateY(-1px); background: rgba(0,0,0,.06); }
 
-        /* адаптивні дрібниці */
+        /* Блокуємо прокрутку фону, коли відкрита модалка */
+        html.modal-open, html.modal-open body{ overflow: hidden; }
+
+        /* Responsive дрібниці */
         @media (max-width: 520px){
             .mail-modal{ width: min(520px, 94vw); }
             :root{
-                /* на вузьких екранах можна трохи збільшити листок у вікні */
                 --letter-w: calc(var(--env-w) * 0.82);
                 --letter-top: 10%;
             }
             .letter-card{ padding: 16px 14px 18px; outline-width: 5px; outline-offset: -5px; }
         }
-
-        /* коли модалка відкрита — блокуємо прокрутку фону (залиш, якщо треба) */
-        html.modal-open, html.modal-open body{ overflow: hidden; }
 
 
         /* ==== FLOATING POSTBOX ==== */
