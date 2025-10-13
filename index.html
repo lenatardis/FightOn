@@ -941,7 +941,7 @@
         .postbox-fab{
             position: fixed;
             right: clamp(12px, 3vw, 28px);
-            bottom: calc(env(safe-area-inset-bottom, 0px));;
+            bottom: 0;
             z-index: 12010;
             display: grid;
             place-items: end center;
@@ -973,12 +973,9 @@
         @media (max-width:780px){
             .postbox-fab{
                 right: 12px;
-                bottom: calc(env(safe-area-inset-bottom, 0px));;
+                bottom: 0;
                 width: clamp(48px, 12vw, 68px);
                 height: clamp(48px, 12vw, 68px);
-            }
-            .postbox-fab img{
-                height: clamp(72px, 15vh, 120px);
             }
         }
 
