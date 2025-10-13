@@ -1008,6 +1008,20 @@
             padding: 10px 0;
         }
 
+        .submitForm input, .submitForm select {
+            display: block;
+            width: 100%;
+            height: 40px;
+            border: 1px solid #8C8C8C;
+            box-sizing: border-box;
+            background: #ffffff;
+            font-family: 'Gotham', sans-serif;
+            font-size: 14px;
+            line-height: 100%;
+            color: #D9D9D9;
+            border-radius: 5px;
+        }
+
         .submitBtn {
             display: flex;
             background: #086597;
@@ -1026,6 +1040,7 @@
             transition: transform .15s ease, background .15s ease;
         }
 
+
         .submitBtn span {
             letter-spacing: 1px;
         }
@@ -1034,6 +1049,11 @@
             cursor: pointer;
             transform: translateY(-1px);
             background:  #7B8CF1;
+        }
+
+        .submitBtn__wrap {
+            display: flex;
+            justify-content: center;
         }
 
         /* ==== FLOATING POSTBOX ==== */
@@ -1235,8 +1255,9 @@
                                 <input type="text" id="email" placeholder="Ваш email"/>
                             </div>
                         </div>
-                        <a class="submitBtn"><span>Відправити</span></a>
-
+                        <div class="submitBtn__wrap">
+                            <a class="submitBtn"><span>Відправити</span></a>
+                        </div>
                     </form>
                 </div>
             </div>
