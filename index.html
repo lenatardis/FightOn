@@ -941,25 +941,25 @@
         .postbox-fab{
             position: fixed;
             right: clamp(12px, 3vw, 28px);
-            bottom: max(12px, env(safe-area-inset-bottom, 0px) + 12px);
-            z-index: 12010; /* вище персонажів і будинків */
+            bottom: calc(env(safe-area-inset-bottom, 0px));;
+            z-index: 12010;
             display: grid;
-            place-items: center;
+            place-items: end center;
             width: clamp(54px, 9vmin, 84px);
-            height: clamp(54px, 9vmin, 84px);
+            height: clamp(72px, 18vh, 136px);
             border-radius: 16px;
-            background: transparent; /* саму кнопку не видно, видно лише svg */
+            background: transparent;
             border: 0;
             padding: 0;
             cursor: pointer;
             transition: transform .15s ease, opacity .18s ease, filter .18s ease;
-            opacity: 0;              /* за замовчуванням прихована */
-            pointer-events: none;    /* не ловить кліки, доки невидима */
+            opacity: 0;
+            pointer-events: none;
         }
         .postbox-fab img{
             display:block;
             width: auto;
-            height: clamp(72px, 18vh, 136px); /* масштаб по Figma, сідає на землю */
+            height: clamp(72px, 18vh, 136px);
             filter: drop-shadow(0 10px 26px rgba(0,0,0,.35));
             -webkit-user-drag: none;
             user-select: none;
@@ -973,7 +973,7 @@
         @media (max-width:780px){
             .postbox-fab{
                 right: 12px;
-                bottom: max(10px, env(safe-area-inset-bottom, 0px) + 10px);
+                bottom: calc(env(safe-area-inset-bottom, 0px));;
                 width: clamp(48px, 12vw, 68px);
                 height: clamp(48px, 12vw, 68px);
             }
