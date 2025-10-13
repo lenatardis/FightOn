@@ -879,33 +879,50 @@
             user-select: none;
             -webkit-user-drag: none;
         }
-        .env-base { z-index: 1; }
-        .env-flap { z-index: 3; pointer-events: none; }
+        /* ---- ENVELOPE LAYERS / Z-INDEX ---- */
+        .env-base { z-index: 4; }         /* база над усім, має «вікно», крізь яке видно листок */
+        .mail-envelope .letter { z-index: 3; } /* листок над клапаном */
+        .env-flap { z-index: 2; pointer-events: none; }
 
-        /* Листок (всередині — майбутня форма) */
-        .mail-envelope .letter {
+        /* ---- Підняти клапан у «декольте» ---- */
+        /* керована змінна – зручно підкрутити число (10–18%) під свій SVG */
+        :root { --flap-lift: 14%; }
+
+        .env-flap{
             position: absolute;
-            left: 50%;
-            top: 14%;               /* підженеш під макет */
-            transform: translateX(-50%);
-            width: 76%;             /* safe-area листка в конверті */
-            z-index: 2;             /* між base і flap */
-            display: grid;
-            place-items: center;
+            inset: 0;
+            /* піднімаємо клапан угору, щоб його верхній трикутник «зайшов» у V */
+            transform: translateY(calc(-1 * var(--flap-lift)));
         }
 
-        .letter-card {
-            position: relative;
-            width: 100%;
-            background: #fff;
-            color: #1c243a;
-            border-radius: 16px;
-            padding: 20px 18px 22px;
-            /* синій кант і тінь (заміна «галочній тіні») */
-            outline: 6px solid #BFE5FF;
-            outline-offset: -6px;
+        /* ---- Позиція/розмір листка, щоб сідав у вікно ---- */
+        :root{
+            --letter-top: 12%;   /* 10–15% залежно від твого base.svg */
+            --letter-w: 78%;     /* 75–82% */
+        }
+
+        .mail-envelope .letter{
+            position: absolute;        /* ← обов’язково */
+            left: 50%;
+            top: var(--letter-top);    /* 12% за замовчуванням */
+            width: var(--letter-w);    /* 78% */
+            transform: translateX(-50%);
+            z-index: 3;                /* над flap, під base */
+            display: grid;             /* щоб центрнути .letter-card */
+            place-items: center;
+            background: #ffffff;
+        }
+
+
+        /* (опційно) – підрізаємо низ листка м’яким трикутником,
+           аби він «занурювався» в V і не вилізав понад краї */
+        .mail-envelope .letter.clip-v{
+            clip-path: polygon(12% 0, 88% 0, 50% 90%);
+        }
+
+        /* невелика тінь, як у фігмі */
+        .letter-card{
             box-shadow: 0 14px 34px rgba(0,0,0,.28);
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
         }
 
         /* Хрестик закриття */
