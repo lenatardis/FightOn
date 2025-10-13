@@ -900,6 +900,7 @@
 
         .env-base {
             z-index: 3;
+            pointer-events: none;
         }
 
         .mail-envelope .letter {
@@ -917,7 +918,7 @@
         .mail-envelope .letter {
             position: absolute;
             left: 50%;
-            top: 21%;
+            top: 16%;
             width: var(--letter-w);
             transform: translate(-50%, -50%);
             display: grid;
@@ -1004,7 +1005,7 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             column-gap: 10px;
-            padding: 20px 0 30px;
+            padding: 10px 0;
         }
 
         .submitBtn {
@@ -1014,7 +1015,7 @@
             align-items: center;
             justify-content: center;
             width: 170px;
-            padding: 17px 0;
+            padding: 12px 0;
             border-radius: 10px;
             color: #e9f2ff;
             font-family: 'Lucznik', sans-serif;
