@@ -928,8 +928,8 @@
         .letter-card {
             position: relative;
             width: 100%;
-            height: 225%;
-            background: #fff;
+            height: 107%;
+            background: #EDF8FF;
             color: #1c243a;
             padding: 20px 18px 22px;
             outline: 6px solid #BFE5FF;
@@ -939,28 +939,100 @@
         }
 
         /* кнопка закриття */
-        .letter-close {
-            position: absolute;
-            right: 8px;
-            top: 8px;
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            border: 1px solid rgba(0, 0, 0, .08);
-            background: rgba(0, 0, 0, .04);
-            font-size: 22px;
-            line-height: 1;
-            cursor: pointer;
-            transition: transform .15s ease, background .15s ease;
+        .letter-close{
+            position:absolute;
+            top:16px;               /* як у макеті: відступи 16 */
+            right:16px;
+            width:44px;             /* більша, зручна зона кліку */
+            height:44px;
+            border:0;
+            background:transparent; /* без квадрата */
+            cursor:pointer;
         }
 
-        .letter-close:hover {
-            transform: translateY(-1px);
-            background: rgba(0, 0, 0, .06);
+        .letter-close::before,
+        .letter-close::after{
+            content:"";
+            position:absolute;
+            left:50%;
+            top:50%;
+            width:28px;             /* довжина штриха X */
+            height:3px;             /* товщина штриха */
+            background:#8A8E99;     /* сірий як у макеті */
+            transform-origin:center;
+            border-radius:2px;      /* трохи заокруглити кінці */
         }
+
+        .letter-close::before{ transform:translate(-50%,-50%) rotate(45deg); }
+        .letter-close::after { transform:translate(-50%,-50%) rotate(-45deg); }
+
+        .letter-close:hover::before,
+        .letter-close:hover::after{
+            background:#737783;     /* легке затемнення на hover */
+        }
+
+        .letter-close:focus-visible{
+            outline:2px solid #bcd7ff;   /* видимий фокус */
+            outline-offset:3px;
+            border-radius:50%;
+        }
+
 
         html.modal-open, html.modal-open body {
             overflow: hidden;
+        }
+
+        .mailTitle {
+            text-align: center;
+            font-family: 'Lucznik', sans-serif;
+            font-size: 24px;
+            line-height: 100%;
+            color: #351D0B;
+            text-transform: uppercase;
+            margin: 40px 0 20px;
+        }
+
+        .submitForm label {
+            display: block;
+            font-family: 'Gotham', sans-serif;
+            font-size: 16px;
+            line-height: 100%;
+            margin-bottom: 10px;
+        }
+
+        .submitForm__wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 10px;
+            padding: 20px 0 30px;
+        }
+
+        .submitBtn {
+            display: flex;
+            background: #086597;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            width: 170px;
+            padding: 17px 0;
+            border-radius: 10px;
+            color: #e9f2ff;
+            font-family: 'Lucznik', sans-serif;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, .10);
+            transition: transform .15s ease, background .15s ease;
+        }
+
+        .submitBtn span {
+            letter-spacing: 1px;
+        }
+
+        .submitBtn:hover {
+            cursor: pointer;
+            transform: translateY(-1px);
+            background:  #7B8CF1;
         }
 
         /* ==== FLOATING POSTBOX ==== */
@@ -1141,9 +1213,30 @@
             <img class="env-base" src="./assets/base.svg" alt="" aria-hidden="true">
             <div class="letter">
                 <div class="letter-card">
-                    <button class="letter-close" type="button" aria-label="Закрити">&times;</button>
-                    <h3 id="mailTitle">Підписка</h3>
-                    <p>Тут буде форма. Поки — заглушка, щоб підігнати верстку листка.</p>
+                    <button class="letter-close" type="button" aria-label="Закрити"></button>
+                    <h3 class="mailTitle">Зворотній зв'язок</h3>
+                    <form class="submitForm">
+                        <div>
+                            <label for="topic">Тема</label>
+                            <select name="topic" placeholder="Співпраця" id="topic">
+                                <option value="value1">Тема 1</option>
+                                <option value="value2">Тема 2</option>
+                                <option value="value3">Тема 3</option>
+                            </select>
+                        </div>
+                        <div class="submitForm__wrap">
+                            <div>
+                                <label for="name">Ім'я</label>
+                                <input type="text" id="name" placeholder="Ваше ім'я"/>
+                            </div>
+                            <div>
+                                <label for="email">E-mail</label>
+                                <input type="text" id="email" placeholder="Ваш email"/>
+                            </div>
+                        </div>
+                        <a class="submitBtn"><span>Відправити</span></a>
+
+                    </form>
                 </div>
             </div>
             <img class="env-flap" src="./assets/flap.svg" alt="" aria-hidden="true">
