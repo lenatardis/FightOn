@@ -1855,7 +1855,6 @@
     })();
 </script>
 <script>
-    // === MAIL OVERLAY CONTROLLER (єдиний) ===
     (function () {
         const overlay = document.getElementById('mailOverlay');
         if (!overlay) return;
@@ -1871,21 +1870,17 @@
             document.documentElement.classList.remove('modal-open');
         };
 
-        // API для інших скриптів
         window.__mail = { open, close };
 
-        // клік по фону
         overlay.addEventListener('click', (e) => {
             if (e.target === overlay) close();
         });
 
-        // клік по хрестику
         overlay.addEventListener('click', (e) => {
             const btn = e.target.closest('.letter-close');
             if (btn) close();
         });
 
-        // Esc
         addEventListener('keydown', (e) => {
             if (!overlay.hidden && e.key === 'Escape') close();
         });
@@ -1894,14 +1889,13 @@
         const fab = document.getElementById('postboxFab');
         if(!fab) return;
 
-        // відкриття через єдиний контролер
         fab.addEventListener('click', () => window.__mail?.open && window.__mail.open());
 
         const run = () => {
             const st = ScrollTrigger.getById('stageParallax');
             if(!st){ requestAnimationFrame(run); return; }
 
-            const HIDE_AFTER = 0.12; // доки progress <= 0.12 — FAB видимий
+            const HIDE_AFTER = 0.12;
             const sync = () => {
                 const active = (scrollY >= st.start && scrollY <= st.end);
                 const firstScreen = st.progress <= HIDE_AFTER + 0.0001;
@@ -1909,9 +1903,8 @@
                 else fab.classList.remove('on');
             };
 
-            // первинний стан + підписки
             sync();
-            ScrollTrigger.addEventListener('update', sync); // не чіпаємо st.vars.onUpdate
+            ScrollTrigger.addEventListener('update', sync);
             addEventListener('resize', sync);
             addEventListener('scroll', sync, {passive:true});
         };
