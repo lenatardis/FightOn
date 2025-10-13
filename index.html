@@ -844,7 +844,6 @@
             --env-w: 88%; /* 86–92% – синхронний масштаб base+flap */
             --flap-lift: 12.5%; /* 10–16% – підйом клапана вгору */
             --letter-w: calc(var(--env-w) * 0.78); /* 0.75–0.82 – ширина листка */
-            --letter-shift-y: -6%; /* -10%…-2% – зсув листка від центра вгору */
         }
 
         /* ================== OVERLAY + MODAL (СПРАВЖНІЙ ЦЕНТР) ================== */
@@ -899,7 +898,6 @@
             top: 21%;
         }
 
-        /* порядок шарів: base (найвище) > letter > flap */
         .env-base {
             z-index: 3;
         }
@@ -919,9 +917,9 @@
         .mail-envelope .letter {
             position: absolute;
             left: 50%;
-            top: 50%;
+            top: 24%;
             width: var(--letter-w);
-            transform: translate(-50%, calc(-50% + var(--letter-shift-y)));
+            transform: translate(-50%, -50%);
             display: grid;
             place-items: center;
         }
@@ -930,9 +928,9 @@
         .letter-card {
             position: relative;
             width: 100%;
+            height: 225%;
             background: #fff;
             color: #1c243a;
-            border-radius: 16px;
             padding: 20px 18px 22px;
             outline: 6px solid #BFE5FF;
             outline-offset: -6px;
