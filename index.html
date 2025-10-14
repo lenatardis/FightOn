@@ -839,15 +839,13 @@
             transform: scaleX(-1);
         }
 
-        /* ================== КЕРУВАЛЬНІ ЗМІННІ ================== */
-        /* підкручуй ці 4 значення, щоб точно «посадити» графіку */
+      /*envelope*/
         :root {
             --env-w: 88%; /* 86–92% – синхронний масштаб base+flap */
             --flap-lift: 12.5%; /* 10–16% – підйом клапана вгору */
             --letter-w: calc(var(--env-w) * 0.78); /* 0.75–0.82 – ширина листка */
         }
 
-        /* ================== OVERLAY + MODAL (СПРАВЖНІЙ ЦЕНТР) ================== */
         .mail-overlay {
             position: fixed;
             inset: 0;
@@ -870,19 +868,17 @@
             position: fixed;
             left: 50%;
             top: 60%;
-            transform: translate(-50%, -50%); /* центр екрана */
+            transform: translate(-50%, -50%);
             width: min(680px, 92vw);
             max-height: 90dvh;
         }
 
-        /* ================== ENVELOPE ================== */
         .mail-envelope {
             position: relative;
             width: 100%;
             aspect-ratio: 5/4;
         }
 
-        /* ОБИДВА зображення центруємо ОДНАКОВО (ключ до збігу країв) */
         .mail-envelope > img {
             position: absolute;
             left: 50%;
@@ -913,9 +909,6 @@
             pointer-events: none;
         }
 
-        /* піднімаємо лише клапан */
-
-        /* листок: центр по Y + невеликий підйом у «вікно» */
         .mail-envelope .letter {
             position: absolute;
             left: 50%;
@@ -926,7 +919,6 @@
             place-items: center;
         }
 
-        /* картка листка (тут буде форма) */
         .letter-card {
             position: relative;
             width: 100%;
@@ -943,12 +935,12 @@
         /* кнопка закриття */
         .letter-close{
             position:absolute;
-            top:16px;               /* як у макеті: відступи 16 */
+            top:16px;
             right:16px;
-            width:44px;             /* більша, зручна зона кліку */
+            width:44px;
             height:44px;
             border:0;
-            background:transparent; /* без квадрата */
+            background:transparent;
             cursor:pointer;
         }
 
@@ -958,11 +950,11 @@
             position:absolute;
             left:50%;
             top:50%;
-            width:28px;             /* довжина штриха X */
-            height:3px;             /* товщина штриха */
-            background:#8A8E99;     /* сірий як у макеті */
+            width:28px;
+            height:3px;
+            background:#8A8E99;
             transform-origin:center;
-            border-radius:2px;      /* трохи заокруглити кінці */
+            border-radius:2px;
         }
 
         .letter-close::before{ transform:translate(-50%,-50%) rotate(45deg); }
@@ -970,11 +962,11 @@
 
         .letter-close:hover::before,
         .letter-close:hover::after{
-            background:#737783;     /* легке затемнення на hover */
+            background:#737783;
         }
 
         .letter-close:focus-visible{
-            outline:2px solid #bcd7ff;   /* видимий фокус */
+            outline:2px solid #bcd7ff;
             outline-offset:3px;
             border-radius:50%;
         }
@@ -1059,13 +1051,11 @@
             justify-content: center;
         }
 
-        /* під свої стилі */
         .submitForm .invalid{
             border-color:#E74C3C !important;
             box-shadow:0 0 0 2px #E74C3C22;
         }
 
-        /* повідомлення під заголовком */
         .form-error{
             margin:6px 0 0;
             text-align:center;
@@ -1075,7 +1065,6 @@
         }
 
 
-        /* ==== FLOATING POSTBOX ==== */
         .postbox-fab {
             position: fixed;
             right: clamp(12px, 3vw, 28px);
@@ -1123,9 +1112,8 @@
         html.modal-open .postbox-fab{
             opacity: 0 !important;
             pointer-events: none !important;
-            transform: translateY(1px) scale(.98); /* щоб не мигтіла при приховуванні */
+            transform: translateY(1px) scale(.98);
         }
-
 
     </style>
 </head>
