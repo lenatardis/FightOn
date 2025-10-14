@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>FightON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="assets/fonts/fonts.css">
     <style>
         :root {
@@ -995,7 +996,7 @@
 
         .submitForm label {
             display: block;
-            font-family: 'Gotham', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-size: 16px;
             line-height: 100%;
             margin-bottom: 10px;
@@ -1016,7 +1017,7 @@
             border: 1px solid #8C8C8C;
             box-sizing: border-box;
             background: #ffffff;
-            font-family: 'Gotham', sans-serif;
+            font-family: 'Montserrat', sans-serif;
             font-size: 14px;
             line-height: 100%;
             border-radius: 5px;
@@ -1057,6 +1058,22 @@
             display: flex;
             justify-content: center;
         }
+
+        /* під свої стилі */
+        .submitForm .invalid{
+            border-color:#E74C3C !important;
+            box-shadow:0 0 0 2px #E74C3C22;
+        }
+
+        /* повідомлення під заголовком */
+        .form-error{
+            margin:6px 0 0;
+            text-align:center;
+            font-family:'Montserrat', sans-serif;
+            font-size:14px;
+            color:#C0392B;
+        }
+
 
         /* ==== FLOATING POSTBOX ==== */
         .postbox-fab {
@@ -1238,7 +1255,10 @@
                 <div class="letter-card">
                     <button class="letter-close" type="button" aria-label="Закрити"></button>
                     <h3 class="mailTitle">Зворотній зв'язок</h3>
-                    <form class="submitForm">
+                    <p id="formError" class="form-error" hidden>
+                        *Заповніть коректно виділені поля.
+                    </p>
+                    <form class="submitForm" novalidate>
                         <div>
                             <label for="topic">Тема</label>
                             <select name="topic" placeholder="Співпраця" id="topic">
@@ -1254,7 +1274,7 @@
                             </div>
                             <div>
                                 <label for="email">E-mail</label>
-                                <input type="text" id="email" placeholder="Ваш email"/>
+                                <input type="email" id="email" placeholder="Ваш email"/>
                             </div>
                         </div>
                         <div class="submitBtn__wrap">
@@ -2077,5 +2097,63 @@
         run();
     })();
 </script>
+<script>
+    (function formValidation(){
+        const form  = document.querySelector('.submitForm');
+        if(!form) return;
+
+        const name  = document.getElementById('name');
+        const email = document.getElementById('email');
+        const errorBox = document.getElementById('formError');
+        document.querySelector('.submitBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            form.requestSubmit();
+        });
+
+        const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(v.trim());
+
+        function liveClear(el, test){
+            el.addEventListener('input', () => {
+                if(test(el.value)) el.classList.remove('invalid'), el.removeAttribute('aria-invalid');
+                if(test(name.value) && isEmail(email.value)) errorBox.hidden = true;
+            });
+        }
+        liveClear(name, v => v.trim().length > 0);
+        liveClear(email, isEmail);
+
+        form.addEventListener('submit', (e) => {
+            let ok = true;
+
+            if(name.value.trim().length === 0){
+                name.classList.add('invalid');
+                name.setAttribute('aria-invalid','true');
+                ok = false;
+            }else{
+                name.classList.remove('invalid');
+                name.removeAttribute('aria-invalid');
+            }
+
+            if(!isEmail(email.value)){
+                email.classList.add('invalid');
+                email.setAttribute('aria-invalid','true');
+                ok = false;
+            }else{
+                email.classList.remove('invalid');
+                email.removeAttribute('aria-invalid');
+            }
+
+            errorBox.hidden = ok;
+
+            if(!ok){
+                e.preventDefault();
+                return;
+            }
+
+            e.preventDefault();
+            errorBox.hidden = true;
+        });
+    })();
+</script>
+
 </body>
 </html>
