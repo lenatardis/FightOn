@@ -4,6 +4,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width,initial-scale=1"/>
     <title>FightON</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
     <link type="text/css" rel="stylesheet" href="assets/fonts/fonts.css">
     <style>
         :root {
@@ -463,15 +464,6 @@
             pointer-events: auto;
         }
 
-        .housePostbox {
-            height: 18vh;
-            width: auto;
-            margin: 0 24px 0;
-            flex: 0 0 auto;
-            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
-            pointer-events: auto;
-        }
-
         #streetGround .band {
             background-repeat: repeat-x;
             background-position: left bottom;
@@ -847,6 +839,304 @@
             transform: scaleX(-1);
         }
 
+      /*envelope*/
+        :root {
+            --env-w: 88%; /* 86–92% – синхронний масштаб base+flap */
+            --flap-lift: 12.5%; /* 10–16% – підйом клапана вгору */
+            --letter-w: calc(var(--env-w) * 0.78); /* 0.75–0.82 – ширина листка */
+        }
+
+        .mail-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 12000;
+            display: block; /* без grid — усе всередині абсолютне */
+            background: rgba(10, 14, 32, .55);
+            backdrop-filter: blur(6px) saturate(120%);
+            -webkit-backdrop-filter: blur(6px) saturate(120%);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity .22s ease;
+        }
+
+        .mail-overlay.on {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .mail-modal {
+            position: fixed;
+            left: 50%;
+            top: 60%;
+            transform: translate(-50%, -50%);
+            width: min(680px, 92vw);
+            max-height: 90dvh;
+        }
+
+        .mail-envelope {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 5/4;
+        }
+
+        .mail-envelope > img {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: var(--env-w);
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: contain;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .mail-envelope .env-flap {
+            top: 21%;
+        }
+
+        .env-base {
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        .mail-envelope .letter {
+            z-index: 2;
+        }
+
+        .env-flap {
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .mail-envelope .letter {
+            position: absolute;
+            left: 50%;
+            top: 25%;
+            width: var(--letter-w);
+            transform: translate(-50%, -50%);
+            display: grid;
+            place-items: center;
+        }
+
+        .letter-card {
+            position: relative;
+            width: 100%;
+            height: 115%;
+            background: #EDF8FF;
+            color: #1c243a;
+            padding: 20px 18px 22px;
+            outline: 6px solid #BFE5FF;
+            outline-offset: -6px;
+            box-shadow: 0 14px 34px rgba(0, 0, 0, .28);
+            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
+        }
+
+        .letter-close{
+            position:absolute;
+            top:16px;
+            right:16px;
+            width:44px;
+            height:44px;
+            border:0;
+            background:transparent;
+            cursor:pointer;
+        }
+
+        .letter-close::before,
+        .letter-close::after{
+            content:"";
+            position:absolute;
+            left:50%;
+            top:50%;
+            width:28px;
+            height:3px;
+            background:#8A8E99;
+            transform-origin:center;
+            border-radius:2px;
+        }
+
+        .letter-close::before{ transform:translate(-50%,-50%) rotate(45deg); }
+        .letter-close::after { transform:translate(-50%,-50%) rotate(-45deg); }
+
+        .letter-close:hover::before,
+        .letter-close:hover::after{
+            background:#737783;
+        }
+
+        .letter-close:focus-visible{
+            outline:2px solid #bcd7ff;
+            outline-offset:3px;
+            border-radius:50%;
+        }
+
+
+        html.modal-open, html.modal-open body {
+            overflow: hidden;
+        }
+
+        .mailTitle {
+            text-align: center;
+            font-family: 'Lucznik', sans-serif;
+            font-size: 24px;
+            line-height: 100%;
+            color: #351D0B;
+            text-transform: uppercase;
+            margin: 30px 0 10px;
+        }
+
+        .submitForm label {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            line-height: 100%;
+            margin-bottom: 10px;
+            color: #351D0B;
+        }
+
+        .submitForm__wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            column-gap: 10px;
+            padding: 10px 0 20px;
+        }
+
+        .submitForm input, .submitForm select {
+            display: block;
+            width: 100%;
+            height: 40px;
+            border: 1px solid #8C8C8C;
+            box-sizing: border-box;
+            background: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            line-height: 100%;
+            border-radius: 5px;
+            padding: 1px 10px;
+            color: #351D0B;
+        }
+
+        .submitBtn {
+            display: flex;
+            background: #086597;
+            position: relative;
+            align-items: center;
+            justify-content: center;
+            width: 170px;
+            padding: 12px 0;
+            border-radius: 10px;
+            color: #e9f2ff;
+            font-family: 'Lucznik', sans-serif;
+            text-transform: uppercase;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, .10);
+            transition: transform .15s ease, background .15s ease;
+        }
+
+
+        .submitBtn span {
+            letter-spacing: 1px;
+        }
+
+        .submitBtn:hover {
+            cursor: pointer;
+            transform: translateY(-1px);
+            background:  #7B8CF1;
+        }
+
+        .submitBtn__wrap {
+            display: flex;
+            justify-content: center;
+        }
+
+        .submitForm .invalid{
+            border-color:#E74C3C !important;
+            box-shadow:0 0 0 2px #E74C3C22;
+        }
+
+        .form-error{
+            margin:6px 0 0;
+            text-align:center;
+            font-family:'Montserrat', sans-serif;
+            font-size:14px;
+            color:#C0392B;
+        }
+
+        @media (max-width: 780px) {
+            .submitForm__wrap {
+                grid-template-columns: 1fr;
+                row-gap: 10px;
+            }
+
+            .mail-modal {
+                top: 80%;
+            }
+
+            .letter-card {
+                height: 90%;
+            }
+
+            .mail-envelope .letter {
+                top: -30%;
+            }
+
+            .letter-close {
+                right: 8px;
+                top: 8px;
+            }
+        }
+
+
+        .postbox-fab {
+            position: fixed;
+            right: clamp(12px, 3vw, 28px);
+            bottom: 0;
+            z-index: 12010;
+            display: grid;
+            place-items: end center;
+            width: clamp(54px, 9vmin, 84px);
+            height: clamp(72px, 18vh, 136px);
+            border-radius: 16px;
+            background: transparent;
+            border: 0;
+            padding: 0;
+            cursor: pointer;
+            transition: transform .15s ease, opacity .18s ease, filter .18s ease;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .postbox-fab img {
+            display: block;
+            width: auto;
+            height: clamp(72px, 18vh, 136px);
+            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .35));
+            -webkit-user-drag: none;
+            user-select: none;
+        }
+
+        .postbox-fab.on {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .postbox-fab:active {
+            transform: translateY(1px) scale(.98);
+        }
+
+        @media (max-width: 780px) {
+            .postbox-fab {
+                right: 30px;
+                height: 120px;
+            }
+        }
+
+        html.modal-open .postbox-fab{
+            opacity: 0 !important;
+            pointer-events: none !important;
+            transform: translateY(1px) scale(.98);
+        }
 
     </style>
 </head>
@@ -895,8 +1185,6 @@
         <div class="band" id="housesBand">
             <img class="houseImg" src="./assets/house1.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <img class="houseImg" src="./assets/house2.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="housePostbox" src="./assets/postbox.svg" alt="Postbox" loading="lazy" fetchpriority="low"
-                 decoding="async">
             <img class="houseImg" src="./assets/house3.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <img class="houseImg" src="./assets/house4.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
             <!-- ▼ білборд -->
@@ -968,6 +1256,52 @@
 </div>
 
 <section class="tail" id="tail"><h2>Далі контент</h2></section>
+
+<!-- ===== MAIL OVERLAY ===== -->
+<div class="mail-overlay" id="mailOverlay" hidden>
+    <div class="mail-modal" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
+        <div class="mail-envelope">
+            <img class="env-base" src="./assets/base.svg" alt="" aria-hidden="true">
+            <div class="letter">
+                <div class="letter-card">
+                    <button class="letter-close" type="button" aria-label="Закрити"></button>
+                    <h3 class="mailTitle">Зворотній зв'язок</h3>
+                    <p id="formError" class="form-error" hidden>
+                        *Заповніть коректно виділені поля.
+                    </p>
+                    <form class="submitForm" novalidate>
+                        <div>
+                            <label for="topic">Тема</label>
+                            <select name="topic" placeholder="Співпраця" id="topic">
+                                <option value="value1">Тема 1</option>
+                                <option value="value2">Тема 2</option>
+                                <option value="value3">Тема 3</option>
+                            </select>
+                        </div>
+                        <div class="submitForm__wrap">
+                            <div>
+                                <label for="name">Ім'я</label>
+                                <input type="text" id="name" placeholder="Ваше ім'я"/>
+                            </div>
+                            <div>
+                                <label for="email">E-mail</label>
+                                <input type="email" id="email" placeholder="Ваш email"/>
+                            </div>
+                        </div>
+                        <div class="submitBtn__wrap">
+                            <a class="submitBtn"><span>Відправити</span></a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <img class="env-flap" src="./assets/flap.svg" alt="" aria-hidden="true">
+        </div>
+    </div>
+</div>
+<!-- опційна кнопка для відкриття -->
+<button class="postbox-fab" id="postboxFab" aria-label="Відкрити скриньку">
+    <img src="./assets/postbox.svg" alt="" width="64" height="64">
+</button>
 
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
@@ -1701,7 +2035,136 @@
         addEventListener('load', () => scheduleNext());
     })();
 </script>
+<script>
+    (function () {
+        const overlay = document.getElementById('mailOverlay');
+        if (!overlay) return;
 
+        const open = () => {
+            overlay.hidden = false;
+            requestAnimationFrame(() => {
+                overlay.classList.add('on');
+                document.documentElement.classList.add('modal-open');
+
+                const letter = overlay.querySelector('.mail-envelope .letter');
+                if (letter && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                    gsap.killTweensOf(letter);
+                    gsap.set(letter, {y: 18}); // старт трохи нижче
+                    gsap.timeline()
+                        .to(letter, {y: -10, duration: 0.28, ease: 'power2.out'}) // підскок
+                        .to(letter, {y: 0,   duration: 0.36, ease: 'power1.out'}); // назад вниз
+                }
+            });
+        };
+        const close = () => {
+            overlay.classList.remove('on');
+            setTimeout(() => {
+                document.documentElement.classList.remove('modal-open');
+                overlay.hidden = true;
+            }, 220);
+        };
+
+        window.__mail = {open, close};
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) close();
+        });
+
+        overlay.addEventListener('click', (e) => {
+            const btn = e.target.closest('.letter-close');
+            if (btn) close();
+        });
+
+        addEventListener('keydown', (e) => {
+            if (!overlay.hidden && e.key === 'Escape') close();
+        });
+    })();
+    (function floatingPostbox() {
+        const fab = document.getElementById('postboxFab');
+        if (!fab) return;
+
+        fab.addEventListener('click', () => window.__mail?.open && window.__mail.open());
+
+        const run = () => {
+            const st = ScrollTrigger.getById('stageParallax');
+            if (!st) {
+                requestAnimationFrame(run);
+                return;
+            }
+
+            const HIDE_AFTER = 0.12;
+            const sync = () => {
+                const active = (scrollY >= st.start && scrollY <= st.end);
+                const firstScreen = st.progress <= HIDE_AFTER + 0.0001;
+                if (active && firstScreen) fab.classList.add('on');
+                else fab.classList.remove('on');
+            };
+
+            sync();
+            ScrollTrigger.addEventListener('update', sync);
+            addEventListener('resize', sync);
+            addEventListener('scroll', sync, {passive: true});
+        };
+        run();
+    })();
+</script>
+<script>
+    (function formValidation(){
+        const form  = document.querySelector('.submitForm');
+        if(!form) return;
+
+        const name  = document.getElementById('name');
+        const email = document.getElementById('email');
+        const errorBox = document.getElementById('formError');
+        document.querySelector('.submitBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            form.requestSubmit();
+        });
+
+        const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(v.trim());
+
+        function liveClear(el, test){
+            el.addEventListener('input', () => {
+                if(test(el.value)) el.classList.remove('invalid'), el.removeAttribute('aria-invalid');
+                if(test(name.value) && isEmail(email.value)) errorBox.hidden = true;
+            });
+        }
+        liveClear(name, v => v.trim().length > 0);
+        liveClear(email, isEmail);
+
+        form.addEventListener('submit', (e) => {
+            let ok = true;
+
+            if(name.value.trim().length === 0){
+                name.classList.add('invalid');
+                name.setAttribute('aria-invalid','true');
+                ok = false;
+            }else{
+                name.classList.remove('invalid');
+                name.removeAttribute('aria-invalid');
+            }
+
+            if(!isEmail(email.value)){
+                email.classList.add('invalid');
+                email.setAttribute('aria-invalid','true');
+                ok = false;
+            }else{
+                email.classList.remove('invalid');
+                email.removeAttribute('aria-invalid');
+            }
+
+            errorBox.hidden = ok;
+
+            if(!ok){
+                e.preventDefault();
+                return;
+            }
+
+            e.preventDefault();
+            errorBox.hidden = true;
+        });
+    })();
+</script>
 
 </body>
 </html>
