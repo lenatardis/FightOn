@@ -932,7 +932,6 @@
             font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
         }
 
-        /* кнопка закриття */
         .letter-close{
             position:absolute;
             top:16px;
@@ -1062,6 +1061,30 @@
             font-family:'Montserrat', sans-serif;
             font-size:14px;
             color:#C0392B;
+        }
+
+        @media (max-width: 780px) {
+            .submitForm__wrap {
+                grid-template-columns: 1fr;
+                row-gap: 10px;
+            }
+
+            .mail-modal {
+                top: 80%;
+            }
+
+            .letter-card {
+                height: 90%;
+            }
+
+            .mail-envelope .letter {
+                top: -30%;
+            }
+
+            .letter-close {
+                right: 8px;
+                top: 8px;
+            }
         }
 
 
