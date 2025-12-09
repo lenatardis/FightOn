@@ -8,7 +8,8 @@
     <link type="text/css" rel="stylesheet" href="assets/fonts/fonts.css">
     <style>
         :root {
-            --header-h: 64px;
+         /*   --header-h: 64px;*/
+            --header-h: 0;
             --intro-h: 120vh;
             --stage-h: 108vh;
             --ground-h: 40vh;
@@ -135,7 +136,7 @@
             }
 
             body {
-                padding-top: 58px;
+                /*padding-top: 58px;*/
             }
 
             .nav-link {
@@ -1142,11 +1143,41 @@
             transform: translateY(1px) scale(.98);
         }
 
+        .parallax-gallery {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            background: #7B8CF1; /* або твій фон */
+        }
+
+        /* Кожна сторінка */
+        .pg-item {
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Обгортка під картинку, обрізає краї при паралаксі */
+        .pg-item__media {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Власне картинка */
+        .pg-item__media img {
+            display: block;
+            width: 100%;
+            height: auto;              /* важливо: не фіксуємо висоту */
+            will-change: transform;    /* GSAP крутить translate/scale */
+            transform-origin: center center;
+        }
+
+
     </style>
 </head>
 <body>
-<header class="site-header" id="siteHeader">
-    <a class="brand brand--mobile" href="#intro" aria-label="FightON">
+<!--<header class="site-header" id="siteHeader">
+    <a class="brand brand&#45;&#45;mobile" href="#intro" aria-label="FightON">
         <img src="./assets/fighton.png" alt="FightON" width="36" height="36" loading="eager" decoding="async">
     </a>
     <button class="nav-toggle" id="navToggle" aria-label="Відкрити меню" aria-controls="primaryNav"
@@ -1160,7 +1191,7 @@
         <a class="nav-link" href="#templates" data-target="#templates">Шаблони</a>
         <a class="nav-link" href="#faq" data-target="#faq">FAQ</a>
     </nav>
-</header>
+</header>-->
 
 <section class="intro sky-gradient1" id="intro">
     <div class="intro-logo"><img src="./assets/fighton.png" alt="FightTON"></div>
@@ -1258,6 +1289,79 @@
         </div>
     </div>
 </div>
+
+<section class="parallax-gallery" id="gallery">
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page1.webp" alt="Сторінка 1" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page2.webp" alt="Сторінка 2" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page3.webp" alt="Сторінка 3" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page4.webp" alt="Сторінка 4" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page5.webp" alt="Сторінка 5" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page6.webp" alt="Сторінка 6" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page7.webp" alt="Сторінка 7" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page8.webp" alt="Сторінка 8" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page9.webp" alt="Сторінка 9" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page10.webp" alt="Сторінка 10" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page11.webp" alt="Сторінка 11" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page12.webp" alt="Сторінка 12" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page13.webp" alt="Сторінка 13" loading="lazy" decoding="async">
+        </div>
+    </article>
+    <article class="pg-item">
+        <div class="pg-item__media">
+            <img src="./assets/PDF100/page14.webp" alt="Сторінка 14" loading="lazy" decoding="async">
+        </div>
+    </article>
+</section>
 
 <section class="tail" id="tail"><h2>Далі контент</h2></section>
 
@@ -1732,7 +1836,13 @@
 <script>
     (function () {
         const header = document.getElementById('siteHeader');
-        const headerH = () => header ? Math.round(header.getBoundingClientRect().height) : 64;
+
+        if (!header) {
+            // хедера немає – обнуляємо змінну і не вішаємо слухачі
+            document.documentElement.style.setProperty('--header-h', '0px');
+            return;
+        }
+        const headerH = () => header ? Math.round(header.getBoundingClientRect().height) : 0;
 
         function syncHeaderVar() {
             document.documentElement.style.setProperty('--header-h', headerH() + 'px');
@@ -2169,6 +2279,50 @@
         });
     })();
 </script>
+<script>
+    (function () {
+
+        function initGalleryParallax() {
+            // тільки десктоп
+            if (!matchMedia('(min-width: 781px)').matches) return;
+
+            const imgs = gsap.utils.toArray('.pg-item__media img');
+            if (!imgs.length) return;
+
+            const SHIFT = 25;   // сила паралаксу у % (можна 6–12)
+            const SCALE = 1; // легкий zoom, щоб не було полос по краях
+
+            imgs.forEach((img) => {
+                // початковий стан
+                gsap.set(img, {
+                    scale: SCALE,
+                    yPercent: -SHIFT,             // старт трохи вище
+                    transformOrigin: "center center"
+                });
+
+                // анімація для кожної сторінки окремо
+                gsap.to(img, {
+                    yPercent: SHIFT,              // до +SHIFT
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: img.parentElement,   // .pg-item__media
+                        start: "top bottom",          // коли блок заходить в екран
+                        end: "bottom top",            // коли виходить
+                        scrub: true,
+                        invalidateOnRefresh: true
+                    }
+                });
+            });
+
+            ScrollTrigger.refresh();
+        }
+
+        // після повного завантаження (щоб не сваритися зі stage/pin)
+        window.addEventListener("load", initGalleryParallax);
+
+    })();
+</script>
+
 
 </body>
 </html>
