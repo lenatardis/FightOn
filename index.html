@@ -722,14 +722,6 @@
             z-index: 3;
         }
 
-        .tail {
-            min-height: 70vh;
-            display: grid;
-            place-items: center;
-            background: radial-gradient(1100px 520px at 70% 15%, #1d2a66 0%, #0b1020 62%);
-            color: #cfd6ff;
-        }
-
         #stageGate[hidden] {
             display: none
         }
@@ -1187,7 +1179,6 @@
     </button>
     <nav class="main-nav" id="primaryNav" aria-label="Main">
         <a class="nav-link" href="#intro" data-target="#intro">Особливості</a>
-        <a class="nav-link" href="#tail" data-target="#tail">Досліджуй</a>
         <a class="nav-link" href="#gallery" data-target="#gallery">Галерея</a>
         <a class="nav-link" href="#templates" data-target="#templates">Шаблони</a>
         <a class="nav-link" href="#faq" data-target="#faq">FAQ</a>
@@ -1364,7 +1355,6 @@
     </article>
 </section>
 
-<section class="tail" id="tail"><h2>Далі контент</h2></section>
 
 <!-- ===== MAIL OVERLAY ===== -->
 <div class="mail-overlay" id="mailOverlay" hidden>
@@ -1873,7 +1863,7 @@
             });
         });
 
-        const SECTIONS = ['#intro', '#tail', '#gallery', '#templates', '#faq'];
+        const SECTIONS = ['#intro', '#gallery', '#templates', '#faq'];
         let currentActive = null, rafRunning = false;
 
         function updateActive() {
@@ -1982,14 +1972,10 @@
                 const step = Math.max(innerHeight * 0.45, Math.min(innerHeight * 0.9, Math.abs(dx) * 8));
                 const delta = dx < 0 ? step : -step;
                 let target = curr + delta;
-                if (dx < 0 && ST && curr >= (ST.end - 4)) {
-                    document.querySelector('.tail')?.scrollIntoView({behavior: 'smooth'});
-                } else {
-                    if (ST) {
-                        target = Math.max(ST.start, Math.min(ST.end, target));
-                    }
-                    window.scrollTo({top: target, behavior: 'smooth'});
+                if (ST) {
+                    target = Math.max(ST.start, Math.min(ST.end, target));
                 }
+                window.scrollTo({top: target, behavior: 'smooth'});
             }
             x0 = y0 = null;
         }
@@ -2290,7 +2276,7 @@
             const imgs = gsap.utils.toArray('.pg-item__media img');
             if (!imgs.length) return;
 
-            const SHIFT = 15;    // було 25 – зробили делікатнішим
+            const SHIFT = 18;    // було 25 – зробили делікатнішим
             const SCALE = 1.05;  // легкий zoom, щоб не зʼявлялись полоски
 
             imgs.forEach((img) => {
