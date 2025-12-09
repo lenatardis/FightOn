@@ -1143,9 +1143,35 @@
             transform: translateY(1px) scale(.98);
         }
 
-        .pg-item__media img {
-            width: 100%;
+        .parallax-gallery {
+            position: relative;
+            margin: 0;
+            padding: 0;
+            background: #7B8CF1; /* або твій фон */
         }
+
+        /* Кожна сторінка */
+        .pg-item {
+            position: relative;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Обгортка під картинку, обрізає краї при паралаксі */
+        .pg-item__media {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Власне картинка */
+        .pg-item__media img {
+            display: block;
+            width: 100%;
+            height: auto;              /* важливо: не фіксуємо висоту */
+            will-change: transform;    /* GSAP крутить translate/scale */
+            transform-origin: center center;
+        }
+
 
     </style>
 </head>
@@ -2253,6 +2279,50 @@
         });
     })();
 </script>
+<script>
+    (function () {
+
+        function initGalleryParallax() {
+            // тільки десктоп
+            if (!matchMedia('(min-width: 781px)').matches) return;
+
+            const imgs = gsap.utils.toArray('.pg-item__media img');
+            if (!imgs.length) return;
+
+            const SHIFT = 25;   // сила паралаксу у % (можна 6–12)
+            const SCALE = 1; // легкий zoom, щоб не було полос по краях
+
+            imgs.forEach((img) => {
+                // початковий стан
+                gsap.set(img, {
+                    scale: SCALE,
+                    yPercent: -SHIFT,             // старт трохи вище
+                    transformOrigin: "center center"
+                });
+
+                // анімація для кожної сторінки окремо
+                gsap.to(img, {
+                    yPercent: SHIFT,              // до +SHIFT
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: img.parentElement,   // .pg-item__media
+                        start: "top bottom",          // коли блок заходить в екран
+                        end: "bottom top",            // коли виходить
+                        scrub: true,
+                        invalidateOnRefresh: true
+                    }
+                });
+            });
+
+            ScrollTrigger.refresh();
+        }
+
+        // після повного завантаження (щоб не сваритися зі stage/pin)
+        window.addEventListener("load", initGalleryParallax);
+
+    })();
+</script>
+
 
 </body>
 </html>
