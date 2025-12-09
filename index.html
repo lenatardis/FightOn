@@ -2289,25 +2289,23 @@
             const imgs = gsap.utils.toArray('.pg-item__media img');
             if (!imgs.length) return;
 
-            const SHIFT = 25;   // сила паралаксу у % (можна 6–12)
-            const SCALE = 1; // легкий zoom, щоб не було полос по краях
+            const SHIFT = 15;    // було 25 – зробили делікатнішим
+            const SCALE = 1.05;  // легкий zoom, щоб не зʼявлялись полоски
 
             imgs.forEach((img) => {
-                // початковий стан
                 gsap.set(img, {
                     scale: SCALE,
-                    yPercent: -SHIFT,             // старт трохи вище
+                    yPercent: -SHIFT,
                     transformOrigin: "center center"
                 });
 
-                // анімація для кожної сторінки окремо
                 gsap.to(img, {
-                    yPercent: SHIFT,              // до +SHIFT
+                    yPercent: SHIFT,
                     ease: "none",
                     scrollTrigger: {
-                        trigger: img.parentElement,   // .pg-item__media
-                        start: "top bottom",          // коли блок заходить в екран
-                        end: "bottom top",            // коли виходить
+                        trigger: img.parentElement,
+                        start: "top bottom",
+                        end: "bottom top",
                         scrub: true,
                         invalidateOnRefresh: true
                     }
@@ -2317,10 +2315,10 @@
             ScrollTrigger.refresh();
         }
 
-        // після повного завантаження (щоб не сваритися зі stage/pin)
         window.addEventListener("load", initGalleryParallax);
 
     })();
+
 </script>
 
 
