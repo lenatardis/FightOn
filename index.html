@@ -2054,21 +2054,48 @@
                 x0 = y0 = null;
                 return;
             }
+
             const dx = t.clientX - x0;
             const dy = Math.abs(t.clientY - y0 || 0);
+
+            // горизонтальний свайп
             if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2) {
                 const ST = ScrollTrigger.getById('stageParallax');
                 const curr = window.scrollY;
-                const step = Math.max(innerHeight * 0.45, Math.min(innerHeight * 0.9, Math.abs(dx) * 8));
+                const step = Math.max(
+                    innerHeight * 0.45,
+                    Math.min(innerHeight * 0.9, Math.abs(dx) * 8)
+                );
                 const delta = dx < 0 ? step : -step;
                 let target = curr + delta;
+
                 if (ST) {
-                    target = Math.max(ST.start, Math.min(ST.end, target));
+                    const start = ST.start;
+                    const end   = ST.end;
+                    const EPS   = 2; // невеликий допуск у пікселях
+
+                    const atTop    = curr <= start + EPS;
+                    const atBottom = curr >= end   - EPS;
+
+                    // якщо ми вже в самому кінці сцени і свайпимо "вперед" (вліво),
+                    // дозволяємо вийти нижче end → скролимо вниз до галереї
+                    // якщо на самому початку і свайп назад — дозволяємо вийти вище сцени
+                    const exitingStage =
+                        (dx < 0 && atBottom) ||  // кінець сцени, рух вперед
+                        (dx > 0 && atTop);       // початок сцени, рух назад
+
+                    if (!exitingStage) {
+                        // звичайна поведінка: тримаємося всередині pinned-ділянки
+                        target = Math.max(start, Math.min(end, target));
+                    }
                 }
-                window.scrollTo({top: target, behavior: 'smooth'});
+
+                window.scrollTo({ top: target, behavior: 'smooth' });
             }
+
             x0 = y0 = null;
         }
+
 
         stage.addEventListener('touchstart', onStart, {passive: true});
         stage.addEventListener('touchend', onEnd, {passive: true});
