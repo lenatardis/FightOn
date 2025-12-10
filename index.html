@@ -1446,8 +1446,12 @@
     function initStage() {
         const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
         const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
-        document.querySelector('.streetGroundSpacer')?.style && (document.querySelector('.streetGroundSpacer').style.width = baseWidth + 'px');
-        document.querySelector('.streetSnowSpacer')?.style && (document.querySelector('.streetSnowSpacer').style.width = baseWidth + 'px');
+
+        const groundSpacer = document.querySelector('.streetGroundSpacer');
+        if (groundSpacer?.style) groundSpacer.style.width = baseWidth + 'px';
+
+        const snowSpacer = document.querySelector('.streetSnowSpacer');
+        if (snowSpacer?.style) snowSpacer.style.width = baseWidth + 'px';
 
         document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
         document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
@@ -1458,40 +1462,127 @@
                 trigger: "#stage",
                 start: "top top",
                 end: () => {
+                    // як і раніше – довжина скролу рахується від ширини смуги персонажів
                     const w = bandFull('#charsBand');
                     return "+=" + Math.max(1600, Math.round(w * 1.15));
                 },
-                pin: true, scrub: 1, anticipatePin: 1, invalidateOnRefresh: true
+                pin: true,
+                scrub: 1,
+                anticipatePin: 1,
+                invalidateOnRefresh: true
             }
         });
 
-        tl.to('.sunImg', {yPercent: -6, scale: 0.98, ease: 'none', duration: 18}, 0);
+        // Сонце: нормалізуємо тривалість до 1 (все одно раніше воно встигало завершитись до кінця)
+        tl.to('.sunImg', {
+            yPercent: -6,
+            scale: 0.98,
+            ease: 'none',
+            duration: 1
+        }, 0);
 
-        const durChars = 75, durGround = 75, durHouses = 110, durMountains = 130;
-        const cssVarPx = (name) => parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
+        // Старі "тривалості" – нам тепер потрібні тільки як коефіцієнти для парлаксу
+        const durChars = 75,
+            durGround = 75,
+            durHouses = 110,
+            durMountains = 130;
+
+        const cssVarPx = (name) =>
+            parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
+
+        // скільки частки шляху повинні проїхати шари, щоб у момент,
+        // коли персонажі були «на фініші» в старій версії, вони були в тих самих точках
+        const scaleToChars = (layerDur) => {
+            // персонажі закінчували свій рух раніше, ніж гори.
+            // старе співвідношення = durChars / durMountains
+            // але для кожного шару рахуємо його власний коефіцієнт
+            return Math.min(1, durChars / layerDur);
+        };
+
+        const scaledEnd = (sel, fromXFn, layerDur) => {
+            const from = fromXFn();
+            const fullEnd = endOffset(sel);      // «повний» кінець як було раніше
+            const dist = fullEnd - from;
+            const k = scaleToChars(layerDur);    // скільки цієї дистанції проїхати до моменту фінішу персонажів
+            return from + dist * k;
+        };
+
+        // ===== MOUNTAINS =====
+        const fromMountains = () => -cssVarPx('--mountains-lead');
+        const toMountains   = () => scaledEnd('#mountainsBand', fromMountains, durMountains);
 
         tl.fromTo('#mountainsBand',
-            {x: () => -cssVarPx('--mountains-lead')},
-            {x: () => endOffset('#mountainsBand'), ease: 'none', duration: durMountains}, 0);
+            { x: fromMountains },
+            {
+                x: toMountains,
+                ease: 'none',
+                duration: 1
+            },
+            0
+        );
+
+        // ===== HOUSES =====
+        const fromHouses = () => -cssVarPx('--houses-lead');
+        const toHouses   = () => scaledEnd('#housesBand', fromHouses, durHouses);
 
         tl.fromTo('#housesBand',
-            {x: () => -cssVarPx('--houses-lead')},
-            {x: () => endOffset('#housesBand'), ease: 'none', duration: durHouses}, 0);
+            { x: fromHouses },
+            {
+                x: toHouses,
+                ease: 'none',
+                duration: 1
+            },
+            0
+        );
+
+        // ===== GROUND =====
+        const fromGround = () => startOffset('#streetGroundBand', 0.90);
+        const toGround   = () => scaledEnd('#streetGroundBand', fromGround, durGround);
 
         tl.fromTo('#streetGroundBand',
-            {x: () => startOffset('#streetGroundBand', 0.90)},
-            {x: () => endOffset('#streetGroundBand'), ease: 'none', duration: durGround}, 0);
+            { x: fromGround },
+            {
+                x: toGround,
+                ease: 'none',
+                duration: 1
+            },
+            0
+        );
+
+        // ===== SNOW =====
+        const fromSnow = () => startOffset('#streetSnowBand', 0.90);
+        const toSnow   = () => scaledEnd('#streetSnowBand', fromSnow, durGround);
 
         tl.fromTo('#streetSnowBand',
-            {x: () => startOffset('#streetSnowBand', 0.90)},
-            {x: () => endOffset('#streetSnowBand'), ease: 'none', duration: durGround}, 0);
+            { x: fromSnow },
+            {
+                x: toSnow,
+                ease: 'none',
+                duration: 1
+            },
+            0
+        );
+
+        // ===== CHARS (ГОЛОВНИЙ ШАР) =====
+        // Тут персонажі проходять ВСЮ свою дистанцію від старту до фінішу
+        // і саме момент, коли вони доїжджають до endOffset('#charsBand'),
+        // тепер є кінцем таймлайну і ScrollTrigger.
+        const fromChars = () => startOffset('#charsBand', 1.00);
+        const toChars   = () => endOffset('#charsBand');
 
         tl.fromTo('#charsBand',
-            {x: () => startOffset('#charsBand', 1.00)},
-            {x: () => endOffset('#charsBand'), ease: 'none', duration: durChars}, 0);
+            { x: fromChars },
+            {
+                x: toChars,
+                ease: 'none',
+                duration: 1
+            },
+            0
+        );
 
         addEventListener('resize', () => ScrollTrigger.refresh());
     }
+
 
     const charData = [
         {
