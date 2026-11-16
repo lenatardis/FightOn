@@ -7,6 +7,8 @@ import { initStage } from './stage.js';
 import { initStageSwipe } from './swipe.js';
 import { initTraffic } from './traffic.js';
 import { initBillboard } from './billboard.js';
+import { initHeroIdle } from './idle.js';
+import { initSnow } from './snow.js';
 
 /**
  * Boots the sky intro and the pinned street scene.
@@ -30,6 +32,8 @@ export async function initScene() {
     const stage = initStage();
     initStageSwipe(stage);
     initTraffic();
+    initHeroIdle(stage);
+    initSnow(stage);
     ScrollTrigger.refresh();
     return stage;
 }

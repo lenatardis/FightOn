@@ -81,8 +81,15 @@ export function enhanceHeroes() {
         hoverImg.loading = 'lazy';
         hoverImg.src = baseImg.dataset.hover || baseImg.getAttribute('src').replace(/(\.[a-z]+)$/i, '_hover$1');
 
+        // The figure (both poses) is its own element so idle motion never moves the plate or the bubble.
+        const figure = document.createElement('span');
+        figure.className = 'charFigure';
+        figure.style.setProperty('--breath-time', (2.6 + Math.random() * 1.4).toFixed(2) + 's');
+        figure.style.setProperty('--breath-offset', (-Math.random() * 4).toFixed(2) + 's');
+
         baseImg.replaceWith(wrap);
-        wrap.append(baseImg, hoverImg);
+        figure.append(baseImg, hoverImg);
+        wrap.append(figure);
         if (stats) wrap.append(buildPlate(stats));
         wrap.append(buildNameBubble(name));
 
@@ -122,5 +129,5 @@ export function syncFirstHeroGap() {
 /** The first heroes on screen – the stage waits for these on slow connections. */
 export function criticalHeroImages() {
     const count = isSceneMobile() ? 2 : 4;
-    return Array.from(band()?.querySelectorAll('.charImg > img.base') ?? []).slice(0, count);
+    return Array.from(band()?.querySelectorAll('.charFigure > img.base') ?? []).slice(0, count);
 }

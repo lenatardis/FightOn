@@ -310,6 +310,20 @@
 .vehicle.bus img { height: 21vh; }
 .vehicle.flip img { transform: scaleX(-1); }
 
+/* ---------- snowfall (canvas created by js/scene/snow.js) ---------- */
+
+.snowfall {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 7;                       /* above the houses, below the heroes */
+    width: 100%;
+    height: calc(100% - var(--ground-h));
+    pointer-events: none;
+    -webkit-mask-image: linear-gradient(#000 80%, transparent);
+    mask-image: linear-gradient(#000 80%, transparent);
+}
+
 /* ---------- heroes ---------- */
 
 .charImg {
@@ -334,7 +348,14 @@ img.charImg {
     margin-left: calc(5vw + var(--first-char-extra-gap));
 }
 
-.charImg > img.base {
+.charFigure {
+    display: block;
+    position: relative;
+    z-index: 2;
+    transform-origin: 50% 100%;      /* everything pivots on the feet */
+}
+
+.charFigure > img.base {
     display: block;
     width: 100%;
     height: auto;
@@ -342,7 +363,7 @@ img.charImg {
     z-index: 2;
 }
 
-.charImg > img.hover {
+.charFigure > img.hover {
     position: absolute;
     left: 50%;
     bottom: 0;
@@ -358,10 +379,27 @@ img.charImg {
     z-index: 2;
 }
 
-.charImg:hover > img.hover,
-.charImg:focus-visible > img.hover,
-.charImg.is-touch > img.hover {
+.charImg:hover .charFigure > img.hover,
+.charImg:focus-visible .charFigure > img.hover,
+.charImg.is-touch .charFigure > img.hover,
+.charImg.is-posing .charFigure > img.hover {      /* is-posing: random idle pose, see js/scene/idle.js */
     opacity: 1;
+}
+
+/* idle "breathing": a slight squash and stretch, each hero on its own rhythm */
+@media (prefers-reduced-motion: no-preference) {
+    .charFigure {
+        animation: hero-breathe var(--breath-time, 3s) ease-in-out var(--breath-offset, 0s) infinite alternate;
+    }
+
+    .stage.is-offscreen .charFigure {
+        animation-play-state: paused;
+    }
+}
+
+@keyframes hero-breathe {
+    from { scale: 1 1; }
+    to { scale: .985 1.03; }
 }
 
 .charImg:hover,

@@ -1,5 +1,6 @@
 import { gsap } from '../lib/gsap.js';
 import { prefersReducedMotion } from '../config.js';
+import { onStageVisibility } from './visibility.js';
 
 /** Vehicles and how often each one shows up. */
 const FLEET = [
@@ -11,7 +12,7 @@ const FLEET = [
 ];
 
 const SPEED_PX_S = [1500, 1800];
-const PAUSE_S = [5, 10];
+const PAUSE_S = [1.5, 4];          // gap between one vehicle leaving and the next appearing
 
 const rand = (a, b) => a + Math.random() * (b - a);
 
@@ -29,7 +30,7 @@ export function initTraffic() {
 
     // Don't animate cars nobody can see.
     let stageVisible = false;
-    new IntersectionObserver(([entry]) => { stageVisible = entry.isIntersecting; }).observe(stage);
+    onStageVisibility((visible) => { stageVisible = visible; });
 
     const scheduleNext = () => setTimeout(spawn, rand(...PAUSE_S) * 1000);
 
