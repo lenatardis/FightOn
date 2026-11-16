@@ -1,0 +1,298 @@
+/* ==========================================================================
+   Deck: shared building blocks of the content sections ("slides")
+
+   The slides were designed as 2000 × 1125 artboards. On desktop every size is
+   expressed in --u (one artboard pixel), so a slide scales with the viewport
+   exactly like the original design. Below 901px the slides switch to a normal
+   single-column flow (see the end of deck-slides.css).
+   ========================================================================== */
+
+.deck {
+    container-type: inline-size;
+    background: #000;
+}
+
+.deck *,
+.deck *::before,
+.deck *::after {
+    box-sizing: border-box;
+}
+
+.deck img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* zero-specificity reset, so any class can override it */
+:where(.deck) :where(h2, h3, p, ul, ol, dl, dd) {
+    margin: 0;
+}
+
+:where(.deck) :where(ul, ol) {
+    padding: 0;
+    list-style: none;
+}
+
+/* ---------- slide shell ---------- */
+
+.slide {
+    --u: calc(100cqw / 2000);
+    --pad-x: calc(112 * var(--u));
+    --fs-title: calc(118 * var(--u));
+    --fs-body: calc(34 * var(--u));
+    --fs-small: calc(24 * var(--u));
+    --fs-type: calc(31.5 * var(--u));
+    --type-tracking: -.04em;
+
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    min-height: calc(1125 * var(--u));
+    overflow: hidden;
+    overflow: clip;
+    background: #000;
+    color: #fff;
+    font: 300 var(--fs-body)/1.3 var(--font-ui);
+    letter-spacing: -.02em;
+}
+
+/* Desktop slides have a known height, so the browser can skip laying out and painting the ones
+   that are off screen without the page height (and ScrollTrigger's measurements) changing. */
+@media (min-width: 901px) {
+    .slide {
+        content-visibility: auto;
+        contain-intrinsic-block-size: auto var(--slide-h, calc(1125 * var(--u)));
+    }
+}
+
+.slide__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.slide__inner {
+    position: relative;
+    min-width: 0;
+    padding: calc(100 * var(--u)) var(--pad-x);
+}
+
+/* artwork cut out of the original design, positioned in artboard coordinates */
+.slide__art {
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+}
+
+.slide__art img {
+    display: block;
+    width: 100%;
+}
+
+.slide strong,
+.slide b {
+    font-weight: 700;
+}
+
+/* ---------- neon typewriter heading ---------- */
+
+.neon-title {
+    --glow: 79, 170, 255;
+    font: 400 var(--fs-title)/1.08 var(--font-type);
+    letter-spacing: var(--type-tracking);
+    text-transform: uppercase;
+    color: #f3fbff;
+    text-shadow:
+        0 0 .10em rgba(var(--glow), .95),
+        0 0 .28em rgba(var(--glow), .7),
+        0 0 .65em rgba(var(--glow), .45);
+}
+
+.neon-title--teal { --glow: 40, 215, 235; }
+.neon-title--soft { --glow: 60, 150, 255; color: #cfe6fb; }
+.neon-title--plain { text-shadow: none; color: #fff; }
+
+.neon-ring {
+    display: block;
+    border: calc(9 * var(--u)) solid #eef8ff;
+    border-radius: 50%;
+    box-shadow:
+        0 0 calc(18 * var(--u)) rgba(79, 170, 255, .95),
+        0 0 calc(60 * var(--u)) rgba(40, 120, 255, .6),
+        inset 0 0 calc(18 * var(--u)) rgba(79, 170, 255, .95),
+        inset 0 0 calc(60 * var(--u)) rgba(40, 120, 255, .45);
+}
+
+/* ---------- icons & lists ---------- */
+
+.icon {
+    flex: none;
+    width: 1.25em;
+    height: 1.25em;
+    fill: none;
+    stroke: var(--c-neon-soft);
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 .12em rgba(79, 170, 255, .9));
+}
+
+.icon--wide {
+    width: 1.75em;
+}
+
+.icon-list li,
+.rule-list li {
+    display: flex;
+    align-items: center;
+    gap: .55em;
+}
+
+.dot-list li {
+    position: relative;
+    padding-left: 1.1em;
+}
+
+.dot-list li::before {
+    content: "";
+    position: absolute;
+    left: .15em;
+    top: .52em;
+    width: .26em;
+    height: .26em;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+mark {
+    padding: .05em .28em;
+    background: #1d5278;
+    color: inherit;
+}
+
+/* ---------- data tables ---------- */
+
+.data-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: calc(3 * var(--u));
+    table-layout: fixed;
+    font: 600 calc(22 * var(--u))/1.2 var(--font-ui);
+    letter-spacing: 0;
+    text-align: center;
+    background: linear-gradient(100deg, #06121f 0%, #153f63 45%, #0a1c2e 100%);
+}
+
+.data-table :is(th, td) {
+    padding: calc(17 * var(--u)) calc(8 * var(--u));
+    font-weight: 600;
+    background: rgba(4, 12, 22, .28);
+    box-shadow: 0 0 0 calc(1.5 * var(--u)) #030a13;
+}
+
+.data-table--head {
+    background: linear-gradient(100deg, #4f7396 0%, #1c4a70 30%, #0c2a45 65%, #060d16 100%);
+}
+
+/* ---------- backdrops ---------- */
+
+/* perspective grid floor: a flat grid tilted back until it meets the horizon */
+.fx-floor {
+    --horizon: calc(350 * var(--u));        /* height of the floor = distance from the horizon to the bottom edge */
+    --line: rgba(205, 212, 225, .7);
+    --cell: calc(150 * var(--u));
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--horizon);
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to top, #000 40%, transparent 98%);
+    mask-image: linear-gradient(to top, #000 40%, transparent 98%);
+}
+
+.fx-floor::before {
+    content: "";
+    position: absolute;
+    left: -100%;
+    right: -100%;
+    bottom: 0;
+    height: calc(var(--horizon) * 6);
+    background:
+        repeating-linear-gradient(90deg, var(--line) 0 calc(2.5 * var(--u)), transparent 0 var(--cell)) 50% 0,
+        repeating-linear-gradient(0deg, var(--line) 0 calc(2.5 * var(--u)), transparent 0 var(--cell));
+    /* The plane hinges on the bottom edge and vanishes at the horizon (the top of .fx-floor).
+       perspective() lives in the transform itself: Safari ignores the `perspective` property
+       on an element that is also masked. */
+    transform-origin: 50% calc(100% - var(--horizon));
+    transform:
+        perspective(calc(260 * var(--u)))
+        translateY(var(--horizon)) rotateX(76deg) translateY(calc(var(--horizon) * -1));
+}
+
+.fx-floor--blue {
+    --line: rgba(60, 195, 240, .95);
+}
+
+/* the same grid as a ceiling */
+.fx-floor--ceiling {
+    top: 0;
+    bottom: auto;
+    scale: 1 -1;
+}
+
+/* a sky of small stars */
+.fx-stars {
+    position: absolute;
+    inset: -8% 0;
+    background-image:
+        radial-gradient(circle, rgba(170, 200, 255, .8) 0 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(150, 180, 255, .55) 0 1px, transparent 1.6px),
+        radial-gradient(circle, rgba(200, 220, 255, .5) 0 1.6px, transparent 2.4px),
+        radial-gradient(circle, rgba(120, 160, 255, .45) 0 1px, transparent 1.6px);
+    background-size: 331px 277px, 223px 311px, 457px 389px, 173px 199px;
+    background-position: 40px 60px, 130px 20px, 210px 170px, 90px 120px;
+    opacity: .7;
+}
+
+/* film dust / grain: generated noise, no image request */
+.fx-dust::before,
+.fx-grain::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.55' numOctaves='3' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .75  0 0 0 0 .85  0 0 0 0 1  3.2 0 0 0 -1.95'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: .55;
+}
+
+.fx-grain::before {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n' x='0' y='0' width='100%25' height='100%25'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .7  0 0 0 0 .85  0 0 0 0 1  1.4 0 0 0 -.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    opacity: .5;
+}
+
+/* halftone dots */
+.fx-dots::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: radial-gradient(circle, rgba(90, 150, 170, .22) 0 calc(3 * var(--u)), transparent calc(4 * var(--u))) 0 0 / calc(17 * var(--u)) calc(17 * var(--u));
+    -webkit-mask-image: linear-gradient(115deg, transparent 20%, #000 100%);
+    mask-image: linear-gradient(115deg, transparent 20%, #000 100%);
+}
+
+/* CRT scanlines */
+.fx-scanlines::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: repeating-linear-gradient(0deg, rgba(40, 130, 190, .34) 0 calc(2 * var(--u)), transparent 0 calc(9 * var(--u)));
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 30%, #000 70%, rgba(0, 0, 0, .25) 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 30%, #000 70%, rgba(0, 0, 0, .25) 100%);
+}

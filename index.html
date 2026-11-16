@@ -1,1377 +1,593 @@
 <!doctype html>
-<html lang="uk">
+<html lang="en">
 <head>
-    <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width,initial-scale=1"/>
-    <title>FightON</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
-    <link type="text/css" rel="stylesheet" href="assets/fonts/fonts.css">
-    <style>
-        :root {
-         /*   --header-h: 64px;*/
-            --header-h: 0;
-            --intro-h: 120vh;
-            --stage-h: 108vh;
-            --ground-h: 40vh;
-            --snow-h: 50px;
-            --mountains-k: 0.85;
-            --sun-k: 0.90;
-            --char-drop: -33.25vh;
-            --char-scale: 1.3;
-            --mountains-lead: 0px;
-            --houses-lead: 0px;
-            --first-char-extra-gap: 0px;
-            --top-h: clamp(110px, 11vmin, 160px);
-            --top-gap: 0px;
-            --top-font: clamp(16px, 2.2vmin, 24px);
-            --top-pad-x: 12px;
-        }
-
-        html, body {
-            margin: 0;
-          /*  background: #7B8CF1;*/
-            background: #000000;
-            color: #fff;
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-        }
-
-        body {
-            padding-top: var(--header-h);
-        }
-
-        /* header */
-        .site-header {
-            position: fixed;
-            inset: 0 0 auto 0;
-            height: var(--header-h);
-            z-index: 10000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            padding: 0 18px;
-            backdrop-filter: saturate(140%) blur(10px);
-            -webkit-backdrop-filter: saturate(140%) blur(10px);
-            background: linear-gradient(180deg, rgba(11, 16, 32, 0.14) 0%, rgba(11, 16, 32, 0.06) 60%, rgba(11, 16, 32, 0.02) 100%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .main-nav {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-
-        .nav-link {
-            position: relative;
-            display: inline-flex;
-            align-items: center;
-            height: 36px;
-            padding: 0 12px;
-            border-radius: 10px;
-            color: #e9f2ff;
-            font-family: 'Lucznik', sans-serif;
-            text-transform: uppercase;
-            text-decoration: none;
-            font-weight: 700;
-            letter-spacing: .2px;
-            background: rgba(255, 255, 255, .06);
-            border: 1px solid rgba(255, 255, 255, .10);
-            transition: transform .15s ease, background .15s ease, border-color .15s ease;
-        }
-
-        .nav-link:hover {
-            transform: translateY(-1px);
-            background: rgba(255, 255, 255, .10);
-        }
-
-        .intro, .stage, section {
-            scroll-margin-top: var(--header-h);
-        }
-
-        .nav-toggle {
-            display: none;
-            margin-left: 0;
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(255, 255, 255, .12);
-            background: rgba(255, 255, 255, .06);
-            border-radius: 10px;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .nav-toggle-bar {
-            display: block;
-            width: 22px;
-            height: 2px;
-            background: #fff;
-            border-radius: 2px;
-            position: relative;
-        }
-
-        .nav-toggle-bar::before, .nav-toggle-bar::after {
-            content: "";
-            position: absolute;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #fff;
-            border-radius: 2px;
-        }
-
-        .nav-toggle-bar::before {
-            top: -7px;
-        }
-
-        .nav-toggle-bar::after {
-            top: 7px;
-        }
-
-        @media (max-width: 780px) {
-            .site-header {
-                height: 58px;
-                padding: 0 12px;
-            }
-
-            body {
-                /*padding-top: 58px;*/
-            }
-
-            .nav-link {
-                height: 44px;
-                padding: 0 12px;
-                font-size: 15px;
-            }
-
-            .nav-toggle {
-                display: inline-grid;
-                position: absolute;
-                right: 12px;
-            }
-
-            .main-nav {
-                position: fixed;
-                top: var(--header-h);
-                left: 0;
-                right: 0;
-                display: grid;
-                gap: 8px;
-                padding: 10px;
-                background: linear-gradient(180deg, rgba(11, 16, 32, 0.14) 0%, rgba(11, 16, 32, 0.06) 60%, rgba(11, 16, 32, 0.02) 100%);
-                border: 1px solid rgba(255, 255, 255, .10);
-                border-radius: 12px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
-                transform-origin: top center;
-                transform: translateY(-8px) scale(.98);
-                opacity: 0;
-                pointer-events: none;
-                transition: transform .18s ease, opacity .18s ease;
-                z-index: 10001;
-            }
-
-            .nav-open .main-nav {
-                opacity: 1;
-                pointer-events: auto;
-                transform: translateY(0) scale(1);
-            }
-
-            .nav-open #navToggle .nav-toggle-bar {
-                background: transparent;
-            }
-
-            .nav-open #navToggle .nav-toggle-bar::before {
-                top: 0;
-                transform: rotate(45deg);
-            }
-
-            .nav-open #navToggle .nav-toggle-bar::after {
-                top: 0;
-                transform: rotate(-45deg);
-            }
-        }
-
-        /* intro */
-        .sky-gradient1 {
-            background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0, rgba(255, 255, 255, 0) 60%),
-            linear-gradient(180deg, #7B8CF1 0%, #6FA2FA 28%, #699BD8 100%);
-        }
-
-        .sky-gradient2 {
-            background: linear-gradient(180deg, #699BD8 0%, #82ABDD 28%, #ACBEB4 100%);
-        }
-
-        .intro {
-            position: relative;
-            height: var(--intro-h);
-            overflow: hidden;
-        }
-
-        .intro-logo {
-            position: absolute;
-            left: 50%;
-            top: 16vh;
-            transform: translateX(-50%);
-            z-index: 3;
-            pointer-events: none;
-        }
-
-        .intro-logo img {
-            width: min(48vmax, 760px);
-            height: auto;
-            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
-        }
-
-        .intro .cloud {
-            position: absolute;
-            z-index: 2;
-            filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .12));
-        }
-
-        .intro .cloud img {
-            height: 22vh;
-            width: auto;
-        }
-
-        .cloud--lt {
-            left: 6vw;
-            top: 22vh;
-        }
-
-        .cloud--rt {
-            right: 6vw;
-            top: 22vh;
-        }
-
-        .cloud--lb {
-            left: 12vw;
-            bottom: 40vh;
-        }
-
-        .cloud--rb {
-            right: 12vw;
-            bottom: 40vh;
-        }
-
-        /* stage */
-        .stage {
-            position: relative;
-            height: var(--stage-h);
-            overflow: hidden;
-        }
-
-        .layer {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
-
-        .band {
-            position: absolute;
-            left: 0;
-            bottom: 0;
-            height: 100%;
-            min-width: 100%;
-            display: flex;
-            align-items: flex-end;
-            white-space: nowrap;
-            will-change: transform;
-            transform: translateZ(0);
-        }
-
-        .band::after {
-            content: "";
-            flex: 0 0 0;
-        }
-
-        #sky {
-            z-index: 1
-        }
-
-        #sun {
-            z-index: 2
-        }
-
-        #mountains {
-            z-index: 4
-        }
-
-        #streetGround {
-            z-index: 5
-        }
-
-        #streetSnow {
-            z-index: 6
-        }
-
-        #houses {
-            z-index: 7
-        }
-
-        #chars {
-            z-index: 8;
-            pointer-events: auto;
-        }
-
-        #sky::before {
-            content: "";
-            position: absolute;
-            left: 50%;
-            top: 6vh;
-            transform: translateX(-50%);
-            width: 64vmin;
-            height: 64vmin;
-            border-radius: 50%;
-            background: radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
-            filter: blur(16px);
-            opacity: .22;
-        }
-
-        #sun {
-            display: grid;
-            place-items: center;
-        }
-
-        .sunImg {
-            width: min(22vmax, 420px);
-            height: auto;
-            position: absolute;
-            left: 50%;
-            transform: translateX(-50%);
-            bottom: calc(var(--ground-h) * var(--sun-k) + 8vh);
-            opacity: .93;
-            filter: blur(.2px);
-        }
-
-        @media (max-width: 780px) {
-            .sunImg {
-                bottom: calc(var(--ground-h) * var(--sun-k) + 19vh);
-            }
-        }
-
-        .mountainsImg {
-            height: 32vh;
-            width: auto;
-            margin: 0 0 10vh;
-        }
-
-        #mountains .mountainsImg:first-child {
-            margin-left: var(--mountains-lead);
-        }
-
-        #mountainsBand {
-            bottom: calc(var(--ground-h) * var(--mountains-k));
-        }
-
-        #mountains .mountainsImg:nth-of-type(2) {
-            margin-left: -2px;
-        }
-
-        .houseImg {
-            height: 44vh;
-            width: auto;
-            margin: 0 36px 0;
-            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
-        }
-
-        #houses .houseImg:first-child {
-            margin-left: var(--houses-lead);
-        }
-
-        #housesBand {
-            bottom: var(--ground-h);
-        }
-
-        /* billboard */
-        .houseBillboard {
-            position: relative;
-            height: 44vh;
-            aspect-ratio: 16/9;
-            margin: 0 36px 0;
-            flex: 0 0 auto;
-            background: url("./assets/bigboard.svg") center/contain no-repeat;
-            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
-            pointer-events: auto;
-        }
-
-        .houseBillboard .billboard-screen {
-            position: absolute;
-            left: 12.5%;
-            top: 15%;
-            width: 75%;
-            height: 70%;
-            border-radius: 14px;
-            overflow: hidden;
-            background: #000;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, .35) inset;
-        }
-
-        #houses {
-            pointer-events: auto;
-        }
-
-        .houseBillboard iframe {
-            width: 100%;
-            height: 100%;
-            border: 0;
-            display: block;
-        }
-
-        @media (max-width: 780px) {
-            .houseBillboard {
-                height: auto;
-                margin: 0 12px;
-                max-width: calc(100vw - 24px);
-                width: 100%;
-                max-height: 44vh;
-            }
-        }
-
-        .bb-loader {
-            position: absolute;
-            inset: 0;
-            display: grid;
-            place-items: center;
-            background: #0b0f1a;
-            z-index: 2;
-            transition: opacity .25s ease;
-        }
-
-        .bb-loader__spinner {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, .25);
-            border-top-color: #fff;
-            animation: bbspin .9s linear infinite;
-        }
-
-        @keyframes bbspin {
-            to {
-                transform: rotate(360deg)
-            }
-        }
-
-        .bb-loader.has-poster {
-            background: #000 center/cover no-repeat;
-        }
-
-        .houseBillboard {
-            z-index: 50;
-        }
-
-        .houseBillboard, .houseBillboard * {
-            pointer-events: auto;
-        }
-
-        #streetGround .band {
-            background-repeat: repeat-x;
-            background-position: left bottom;
-            background-size: auto var(--ground-h);
-        }
-
-        .streetGroundSpacer {
-            width: 600vw;
-            height: var(--ground-h);
-        }
-
-        #streetSnow .band {
-            position: relative;
-        }
-
-        #streetSnow .snowLine {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: var(--ground-h);
-            height: var(--snow-h);
-            background: #fff;
-            pointer-events: none;
-        }
-
-        .streetSnowSpacer {
-            width: 600vw;
-            height: 0;
-        }
-
-        .charImg {
-            position: relative;
-            display: inline-block;
-            width: 240px;
-            margin: 0 90px 0;
-            transform: translateY(var(--char-drop)) translateZ(0);
-            transform-origin: center bottom;
-            transition: transform .2s ease, filter .2s ease;
-            filter: drop-shadow(0 12px 34px rgba(0, 0, 0, .35));
-            vertical-align: bottom;
-            will-change: transform;
-        }
-
-        .charImg.sm {
-            width: 200px;
-        }
-
-        .charImg.lg {
-            width: 280px;
-        }
-
-        .charImg > img.base {
-            display: block;
-            width: 100%;
-            height: auto;
-            position: relative;
-            z-index: 2;
-        }
-
-        .charImg > img.hover {
-            position: absolute;
-            left: 50%;
-            bottom: 0;
-            transform: translateX(-50%);
-            height: 100%;
-            width: auto;
-            margin: 0;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .18s ease;
-            object-fit: contain;
-            object-position: center bottom;
-            z-index: 2;
-        }
-
-        .charImg:hover > img.hover, .charImg:focus-visible > img.hover, .charImg.is-touch > img.hover {
-            opacity: 1;
-        }
-
-        #charsBand > .charImg:first-child {
-            margin-left: calc(5vw + var(--first-char-extra-gap));
-        }
-
-        .charImg:hover,
-        .charImg:focus-visible,
-        .charImg.is-touch {
-            transform: translateY(var(--char-drop)) scale(var(--char-scale));
-            z-index: 20;
-        }
-
-        .charPlate {
-            position: absolute;
-            left: 50%;
-            top: calc(100% + 15px);
-            transform: translateX(-50%) scale(var(--plate-scale, 1));
-            transform-origin: center top;
-            z-index: 1;
-            pointer-events: none;
-            background: #111;
-            color: #fff;
-            padding: 20px;
-            border-radius: 14px;
-            box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0, 0, 0, .35);
-            display: none;
-        }
-
-        .charPlate__inner {
-            display: flex;
-            column-gap: 15px;
-        }
-
-        .charPlate__inner p {
-            margin: 0;
-        }
-
-        .charPlate::before, .charPlate::after {
-            content: "";
-            position: absolute;
-            left: var(--plate-tip-x, 50%);
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            pointer-events: none;
-        }
-
-        .charPlate::before {
-            top: -13px;
-            border-bottom: 13px solid #fff;
-        }
-
-        .charPlate::after {
-            top: -11px;
-            border-bottom: 11px solid #ffffff;
-        }
-
-        .charPlate .column_1, .charPlate .column_2 {
-            display: flex;
-            flex-direction: column;
-            row-gap: 12px;
-            width: 100%;
-        }
-
-        .charPlate .column_1 > div, .charPlate .column_2 > div {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px dashed #ffffff;
-        }
-
-        .charPlate p {
-            font-size: 14px;
-            line-height: 1em;
-            font-family: 'Lucznik', sans-serif;
-        }
-
-        .charPlate span {
-            display: block;
-            margin-left: 10px;
-            font-size: 12px;
-            line-height: 12px;
-            font-family: 'Gotham', sans-serif;
-        }
-
-        .charImg:hover .charPlate, .charImg:focus-visible .charPlate, .charImg.is-touch .charPlate {
-            display: block;
-            --plate-scale: calc(1 / var(--char-scale));
-        }
-
-        #charsBand > .charImg:first-child .charPlate {
-            left: 20px;
-            right: auto;
-            transform: translateX(0) scale(var(--plate-scale, 1));
-            transform-origin: center top;
-            --plate-tip-x: 28px;
-        }
-
-        #charsBand > .charImg:last-child .charPlate {
-            left: auto;
-            right: 20px;
-            transform: translateX(0) scale(var(--plate-scale, 1));
-            transform-origin: center top;
-            --plate-tip-x: calc(100% - 28px);
-        }
-
-        .charTop {
-            position: absolute;
-            left: 50%;
-            bottom: calc(100% + var(--top-gap));
-            transform: translateX(-50%) translateY(6px) scale(var(--top-scale, 1));
-            transform-origin: center bottom;
-            z-index: 30;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity .18s ease, transform .18s ease;
-        }
-
-        .charTop__img {
-            display: block;
-            height: var(--top-h);
-            width: auto;
-        }
-
-        .charTop__label {
-            position: absolute;
-            left: 50%;
-            font-size: var(--top-font);
-            top: 50%;
-            padding: 0 var(--top-pad-x);
-            transform: translate(-50%, -50%);
-            font-family: 'Lucznik', sans-serif;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .6px;
-            line-height: 1;
-            color: #2b1e1e;
-            white-space: nowrap;
-        }
-
-        .charImg:hover .charTop,
-        .charImg:focus-visible .charTop,
-        .charImg.is-touch .charTop {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0) scale(var(--top-scale, 1));
-            --top-scale: calc(1 / var(--char-scale));
-        }
-
-        @media (max-width: 780px) {
-            .charPlate {
-                padding: 10px 5px;
-                top: 100%;
-            }
-
-            .charPlate__inner {
-                flex-direction: column;
-                row-gap: 5px;
-            }
-
-            .charPlate .column_1, .charPlate .column_2 {
-                row-gap: 5px;
-            }
-        }
-
-        .stage::after {
-            content: "";
-            position: absolute;
-            left: -5vw;
-            right: -5vw;
-            bottom: -6vh;
-            height: 18vh;
-            background: radial-gradient(120% 150% at 50% 115%, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, .18) 38%, rgba(0, 0, 0, 0) 72%);
-            pointer-events: none;
-            z-index: 3;
-        }
-
-        #stageGate[hidden] {
-            display: none
-        }
-
-        #stageGate {
-            position: absolute;
-            inset: 0;
-            display: grid;
-            place-items: center;
-            background: radial-gradient(900px 520px at 60% 15%, rgba(11, 16, 32, .65), rgba(11, 16, 32, .35));
-            z-index: 9000;
-            opacity: 0;
-            transition: opacity .22s ease;
-            backdrop-filter: blur(6px) saturate(120%);
-            -webkit-backdrop-filter: blur(6px) saturate(120%);
-        }
-
-        #stageGate.on {
-            opacity: 1;
-        }
-
-        #stageGate .gate-card {
-            padding: 16px 18px;
-            border-radius: 14px;
-            background: rgba(255, 255, 255, .08);
-            border: 1px solid rgba(255, 255, 255, .18);
-            box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: 'Lucznik', system-ui;
-            letter-spacing: .2px;
-        }
-
-        #stage {
-            overscroll-behavior: contain;
-        }
-
-        .gate-spinner {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            border: 3px solid rgba(255, 255, 255, .25);
-            border-top-color: #fff;
-            animation: spin .8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg)
-            }
-        }
-
-
-        .brand--mobile {
-            display: none;
-        }
-
-        @media (max-width: 780px) {
-            .brand--mobile {
-                display: inline-flex;
-                align-items: center;
-                position: absolute;
-                left: 12px;
-                height: 58px;
-                z-index: 10002;
-            }
-
-            .brand--mobile img {
-                height: 40px;
-                width: auto;
-                filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .25));
-            }
-        }
-
-        .trafficLayer {
-            position: absolute;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            height: var(--ground-h);
-            pointer-events: none;
-        }
-
-        .vehicle {
-            position: absolute;
-            bottom: calc(var(--ground-h) * 0.25);
-            will-change: transform;
-            transform: translateX(-200px);
-            filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .35));
-            pointer-events: none;
-        }
-
-        .vehicle.lane2 {
-            bottom: calc(var(--ground-h) * 0.3);
-        }
-
-        .vehicle img {
-            height: 20vh;
-            width: auto;
-            display: block;
-        }
-
-        .vehicle.longcar img {
-            height: 18vh;
-        }
-
-        .vehicle.bus img {
-            height: 21vh;
-        }
-
-        .vehicle.flip img {
-            transform: scaleX(-1);
-        }
-
-      /*envelope*/
-        :root {
-            --env-w: 88%; /* 86–92% – синхронний масштаб base+flap */
-            --flap-lift: 12.5%; /* 10–16% – підйом клапана вгору */
-            --letter-w: calc(var(--env-w) * 0.78); /* 0.75–0.82 – ширина листка */
-        }
-
-        .mail-overlay {
-            position: fixed;
-            inset: 0;
-            z-index: 12000;
-            display: block; /* без grid — усе всередині абсолютне */
-            background: rgba(10, 14, 32, .55);
-            backdrop-filter: blur(6px) saturate(120%);
-            -webkit-backdrop-filter: blur(6px) saturate(120%);
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity .22s ease;
-        }
-
-        .mail-overlay.on {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .mail-modal {
-            position: fixed;
-            left: 50%;
-            top: 60%;
-            transform: translate(-50%, -50%);
-            width: min(680px, 92vw);
-            max-height: 90dvh;
-        }
-
-        .mail-envelope {
-            position: relative;
-            width: 100%;
-            aspect-ratio: 5/4;
-        }
-
-        .mail-envelope > img {
-            position: absolute;
-            left: 50%;
-            top: 50%;
-            width: var(--env-w);
-            height: auto;
-            transform: translate(-50%, -50%);
-            object-fit: contain;
-            user-select: none;
-            -webkit-user-drag: none;
-        }
-
-        .mail-envelope .env-flap {
-            top: 21%;
-        }
-
-        .env-base {
-            z-index: 3;
-            pointer-events: none;
-        }
-
-        .mail-envelope .letter {
-            z-index: 2;
-        }
-
-        .env-flap {
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .mail-envelope .letter {
-            position: absolute;
-            left: 50%;
-            top: 25%;
-            width: var(--letter-w);
-            transform: translate(-50%, -50%);
-            display: grid;
-            place-items: center;
-        }
-
-        .letter-card {
-            position: relative;
-            width: 100%;
-            height: 115%;
-            background: #EDF8FF;
-            color: #1c243a;
-            padding: 20px 18px 22px;
-            outline: 6px solid #BFE5FF;
-            outline-offset: -6px;
-            box-shadow: 0 14px 34px rgba(0, 0, 0, .28);
-            font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
-        }
-
-        .letter-close{
-            position:absolute;
-            top:16px;
-            right:16px;
-            width:44px;
-            height:44px;
-            border:0;
-            background:transparent;
-            cursor:pointer;
-        }
-
-        .letter-close::before,
-        .letter-close::after{
-            content:"";
-            position:absolute;
-            left:50%;
-            top:50%;
-            width:28px;
-            height:3px;
-            background:#8A8E99;
-            transform-origin:center;
-            border-radius:2px;
-        }
-
-        .letter-close::before{ transform:translate(-50%,-50%) rotate(45deg); }
-        .letter-close::after { transform:translate(-50%,-50%) rotate(-45deg); }
-
-        .letter-close:hover::before,
-        .letter-close:hover::after{
-            background:#737783;
-        }
-
-        .letter-close:focus-visible{
-            outline:2px solid #bcd7ff;
-            outline-offset:3px;
-            border-radius:50%;
-        }
-
-
-        html.modal-open, html.modal-open body {
-            overflow: hidden;
-        }
-
-        .mailTitle {
-            text-align: center;
-            font-family: 'Lucznik', sans-serif;
-            font-size: 24px;
-            line-height: 100%;
-            color: #351D0B;
-            text-transform: uppercase;
-            margin: 30px 0 10px;
-        }
-
-        .submitForm label {
-            display: block;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 16px;
-            line-height: 100%;
-            margin-bottom: 10px;
-            color: #351D0B;
-        }
-
-        .submitForm__wrap {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            column-gap: 10px;
-            padding: 10px 0 20px;
-        }
-
-        .submitForm input, .submitForm select {
-            display: block;
-            width: 100%;
-            height: 40px;
-            border: 1px solid #8C8C8C;
-            box-sizing: border-box;
-            background: #ffffff;
-            font-family: 'Montserrat', sans-serif;
-            font-size: 14px;
-            line-height: 100%;
-            border-radius: 5px;
-            padding: 1px 10px;
-            color: #351D0B;
-        }
-
-        .submitBtn {
-            display: flex;
-            background: #086597;
-            position: relative;
-            align-items: center;
-            justify-content: center;
-            width: 170px;
-            padding: 12px 0;
-            border-radius: 10px;
-            color: #e9f2ff;
-            font-family: 'Lucznik', sans-serif;
-            text-transform: uppercase;
-            text-decoration: none;
-            font-weight: 700;
-            border: 1px solid rgba(255, 255, 255, .10);
-            transition: transform .15s ease, background .15s ease;
-        }
-
-
-        .submitBtn span {
-            letter-spacing: 1px;
-        }
-
-        .submitBtn:hover {
-            cursor: pointer;
-            transform: translateY(-1px);
-            background:  #7B8CF1;
-        }
-
-        .submitBtn__wrap {
-            display: flex;
-            justify-content: center;
-        }
-
-        .submitForm .invalid{
-            border-color:#E74C3C !important;
-            box-shadow:0 0 0 2px #E74C3C22;
-        }
-
-        .form-error{
-            margin:6px 0 0;
-            text-align:center;
-            font-family:'Montserrat', sans-serif;
-            font-size:14px;
-            color:#C0392B;
-        }
-
-        @media (max-width: 780px) {
-            .submitForm__wrap {
-                grid-template-columns: 1fr;
-                row-gap: 10px;
-            }
-
-            .mail-modal {
-                top: 80%;
-            }
-
-            .letter-card {
-                height: 90%;
-            }
-
-            .mail-envelope .letter {
-                top: -30%;
-            }
-
-            .letter-close {
-                right: 8px;
-                top: 8px;
-            }
-        }
-
-
-        .postbox-fab {
-            position: fixed;
-            right: clamp(12px, 3vw, 28px);
-            bottom: 0;
-            z-index: 12010;
-            display: grid;
-            place-items: end center;
-            width: clamp(54px, 9vmin, 84px);
-            height: clamp(72px, 18vh, 136px);
-            border-radius: 16px;
-            background: transparent;
-            border: 0;
-            padding: 0;
-            cursor: pointer;
-            transition: transform .15s ease, opacity .18s ease, filter .18s ease;
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        .postbox-fab img {
-            display: block;
-            width: auto;
-            height: clamp(72px, 18vh, 136px);
-            filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .35));
-            -webkit-user-drag: none;
-            user-select: none;
-        }
-
-        .postbox-fab.on {
-            opacity: 1;
-            pointer-events: auto;
-        }
-
-        .postbox-fab:active {
-            transform: translateY(1px) scale(.98);
-        }
-
-        @media (max-width: 780px) {
-            .postbox-fab {
-                right: 30px;
-                height: 120px;
-            }
-        }
-
-        html.modal-open .postbox-fab{
-            opacity: 0 !important;
-            pointer-events: none !important;
-            transform: translateY(1px) scale(.98);
-        }
-
-        .parallax-gallery {
-            position: relative;
-            margin: 0;
-            padding: 0;
-            background: #020815;
-        }
-
-        /* Кожна сторінка */
-        .pg-item {
-            position: relative;
-            margin: 0;
-            padding: 0;
-        }
-
-        /* Обгортка під картинку, обрізає краї при паралаксі */
-        .pg-item__media {
-            position: relative;
-            overflow: hidden;
-        }
-
-        /* Власне картинка */
-        .pg-item__media img {
-            display: block;
-            width: 100%;
-            height: auto;              /* важливо: не фіксуємо висоту */
-            will-change: transform;    /* GSAP крутить translate/scale */
-            transform-origin: center center;
-        }
-
-
-    </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>FightON — Your discipline = Your income</title>
+    <meta name="description" content="FightON is a Telegram game with a transparent economy: feed your hero, collect TON every hour and earn up to +275% ROI in 60 days.">
+    <meta name="theme-color" content="#000000">
+    <link rel="icon" href="./assets/fighton.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&family=Outfit:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="./assets/fonts/fonts.css">
+    <link rel="stylesheet" href="./css/base.css">
+    <link rel="stylesheet" href="./css/scene.css">
+    <link rel="stylesheet" href="./css/mail.css">
+    <link rel="stylesheet" href="./css/deck.css">
+    <link rel="stylesheet" href="./css/deck-slides.css">
 </head>
 <body>
-<!--<header class="site-header" id="siteHeader">
-    <a class="brand brand&#45;&#45;mobile" href="#intro" aria-label="FightON">
-        <img src="./assets/fighton.png" alt="FightON" width="36" height="36" loading="eager" decoding="async">
-    </a>
-    <button class="nav-toggle" id="navToggle" aria-label="Відкрити меню" aria-controls="primaryNav"
-            aria-expanded="false">
-        <span class="nav-toggle-bar" aria-hidden="true"></span>
-    </button>
-    <nav class="main-nav" id="primaryNav" aria-label="Main">
-        <a class="nav-link" href="#intro" data-target="#intro">Особливості</a>
-        <a class="nav-link" href="#gallery" data-target="#gallery">Галерея</a>
-        <a class="nav-link" href="#templates" data-target="#templates">Шаблони</a>
-        <a class="nav-link" href="#faq" data-target="#faq">FAQ</a>
-    </nav>
-</header>-->
 
-<section class="intro sky-gradient1" id="intro">
-    <div class="intro-logo"><img src="./assets/fighton.png" alt="FightTON"></div>
-    <div class="cloud cloud--lt"><img src="./assets/cloud_left_top.svg" alt=""></div>
-    <div class="cloud cloud--rt"><img src="./assets/cloud_right_top.svg" alt=""></div>
-    <div class="cloud cloud--lb"><img src="./assets/cloud_left_bottom.svg" alt=""></div>
-    <div class="cloud cloud--rb"><img src="./assets/cloud_right_bottom.svg" alt=""></div>
-</section>
+<main>
+    <!-- ===================== SKY INTRO ===================== -->
+    <section class="intro sky-gradient1" id="intro">
+        <h1 class="intro-logo"><img src="./assets/fighton.png" alt="FightON" width="512" height="273" fetchpriority="high"></h1>
+        <div class="cloud cloud--lt"><img src="./assets/cloud_left_top.svg" alt="" width="250" height="151"></div>
+        <div class="cloud cloud--rt"><img src="./assets/cloud_right_top.svg" alt="" width="216" height="108"></div>
+        <div class="cloud cloud--lb"><img src="./assets/cloud_left_bottom.svg" alt="" width="582" height="185"></div>
+        <div class="cloud cloud--rb"><img src="./assets/cloud_right_bottom.svg" alt="" width="652" height="250"></div>
+    </section>
 
-<div class="stage" id="stage">
-    <div class="layer sky-gradient2" id="sky">
-        <div class="band"></div>
-    </div>
-    <div class="layer" id="sun"><img class="sunImg" src="./assets/sun.svg" alt="Sun"></div>
+    <!-- ===================== STREET SCENE (pinned, scrolls sideways) ===================== -->
+    <section class="stage" id="stage" aria-label="Meet the heroes">
+        <div class="layer sky-gradient2" id="sky"></div>
 
-    <div class="layer" id="mountains">
-        <div class="band" id="mountainsBand">
-            <img class="mountainsImg" src="./assets/mountain.webp" alt="" loading="lazy" fetchpriority="low"
-                 decoding="async">
-            <img class="mountainsImg" src="./assets/mountain.webp" alt="" loading="lazy" fetchpriority="low"
-                 decoding="async">
+        <div class="layer" id="sun">
+            <img class="sunImg" src="./assets/sun.svg" alt="" width="580" height="500">
         </div>
-    </div>
 
-    <div class="layer" id="houses">
-        <div class="band" id="housesBand">
-            <img class="houseImg" src="./assets/house1.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house2.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house3.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house4.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <!-- ▼ білборд -->
-            <div class="houseBillboard" aria-label="Відео-білборд">
-                <div class="billboard-screen">
-                    <div class="bb-loader" id="bbLoader" aria-live="polite">
-                        <div class="bb-loader__spinner" aria-hidden="true"></div>
+        <div class="layer" id="mountains">
+            <div class="band" id="mountainsBand">
+                <img class="mountainsImg" src="./assets/mountain.webp" alt="" width="3837" height="503" decoding="async">
+                <img class="mountainsImg" src="./assets/mountain.webp" alt="" width="3837" height="503" decoding="async">
+            </div>
+        </div>
+
+        <div class="layer" id="houses">
+            <div class="band" id="housesBand">
+                <img class="houseImg" src="./assets/house1.webp" alt="" width="1108" height="706" decoding="async">
+                <img class="houseImg" src="./assets/house2.webp" alt="" width="1095" height="692" decoding="async">
+                <img class="houseImg" src="./assets/house3.webp" alt="" width="1140" height="734" loading="lazy" decoding="async">
+                <img class="houseImg" src="./assets/house4.webp" alt="" width="1091" height="708" loading="lazy" decoding="async">
+
+                <div class="houseBillboard">
+                    <div class="billboard-screen">
+                        <a class="bb-poster"
+                           href="https://www.youtube.com/watch?v=xWf9Ha7vdqw"
+                           target="_blank" rel="noopener"
+                           data-video-id="xWf9Ha7vdqw"
+                           data-video-title="Comics — a short video"
+                           aria-label="Play video">
+                            <svg class="bb-poster__play" viewBox="0 0 68 48" aria-hidden="true">
+                                <path fill="#f00" d="M66.5 7.7a8.5 8.5 0 0 0-6-6C55.2.3 34 .3 34 .3S12.8.3 7.5 1.7a8.5 8.5 0 0 0-6 6C.1 13 .1 24 .1 24s0 11 1.4 16.3a8.5 8.5 0 0 0 6 6C12.8 47.7 34 47.7 34 47.7s21.2 0 26.5-1.4a8.5 8.5 0 0 0 6-6C67.9 35 67.9 24 67.9 24s0-11-1.4-16.3z"/>
+                                <path fill="#fff" d="M27 34V14l18 10z"/>
+                            </svg>
+                        </a>
                     </div>
-                    <iframe
-                            id="bbFrame"
-                            src="https://www.youtube-nocookie.com/embed/xWf9Ha7vdqw?rel=0&modestbranding=1&playsinline=1&controls=1"
-                            title="Комікси — коротке відео"
-                            loading="lazy"
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allow="encrypted-media; picture-in-picture; web-share"
-                            allowfullscreen>
-                    </iframe>
+                </div>
+
+                <img class="houseImg" src="./assets/house5.webp" alt="" width="1135" height="700" loading="lazy" decoding="async">
+                <img class="houseImg" src="./assets/house6.webp" alt="" width="1108" height="706" loading="lazy" decoding="async">
+                <img class="houseImg" src="./assets/house4.webp" alt="" width="1091" height="708" loading="lazy" decoding="async">
+            </div>
+        </div>
+
+        <div class="layer" id="streetGround">
+            <div class="band" id="streetGroundBand">
+                <div id="trafficLayer" class="trafficLayer" aria-hidden="true"></div>
+                <div class="streetGroundSpacer"></div>
+            </div>
+        </div>
+
+        <div class="layer" id="streetSnow">
+            <div class="snowLine"></div>
+        </div>
+
+        <!-- Heroes: js/scene/heroes.js adds the hover pose, name bubble and stats plate to each image -->
+        <div class="layer" id="chars">
+            <div class="band" id="charsBand">
+                <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" width="404" height="403" fetchpriority="high">
+                <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla" width="370" height="370" fetchpriority="high">
+                <img class="charImg" src="./assets/Mobster.svg" alt="Mobster" width="342" height="343">
+                <img class="charImg" src="./assets/Snap.svg" alt="Snap" width="399" height="399">
+                <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" width="327" height="328" loading="lazy">
+                <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" width="373" height="373" loading="lazy">
+                <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" width="387" height="387" loading="lazy">
+                <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" width="401" height="401" loading="lazy">
+                <img class="charImg" src="./assets/Golfer.svg" alt="Golfer" width="416" height="416" loading="lazy">
+            </div>
+        </div>
+
+        <div id="stageGate" aria-live="polite" hidden>
+            <div class="gate-card">
+                <div class="gate-spinner" aria-hidden="true"></div>
+                <p>Setting the scene…</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===================== DECK ===================== -->
+    <div class="deck" id="deck">
+
+        <!-- 01 · Hero -->
+        <section class="slide slide--hero" id="about" aria-labelledby="about-title">
+            <div class="slide__bg" aria-hidden="true">
+                <div class="fx-stars" data-parallax="6"></div>
+                <div class="fx-floor"></div>
+            </div>
+            <div class="slide__inner">
+                <h2 class="neon-title" id="about-title" data-reveal="neon">FIGHTON</h2>
+                <div class="hero__copy">
+                    <p class="hero__lead" data-reveal>Your discipline = Your income.</p>
+                    <p data-reveal>A game with a transparent economy,<br>
+                        where you know exactly what you get up to <strong>+275% ROI for.</strong></p>
+                    <p data-reveal>Everything depends only on you.</p>
+                </div>
+                <div class="slide__art hero__art" data-reveal="fade">
+                    <img src="./assets/sections/hero-art.webp" alt="" width="880" height="1125" loading="lazy" decoding="async">
                 </div>
             </div>
-            <!-- ▲ кінець білборда -->
-            <img class="houseImg" src="./assets/house5.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house6.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-            <img class="houseImg" src="./assets/house4.webp" alt="" loading="lazy" fetchpriority="low" decoding="async">
-        </div>
+        </section>
+
+        <!-- 02 · Enough puzzles in Web3 -->
+        <section class="slide slide--puzzles fx-dust" id="why" aria-labelledby="why-title">
+            <div class="slide__inner">
+                <h2 class="neon-title" id="why-title" data-reveal="neon">Enough puzzles in Web3.</h2>
+                <div class="puzzles__lists">
+                    <ul class="icon-list">
+                        <li data-reveal="left"><svg class="icon" aria-hidden="true"><use href="#i-cross"/></svg>Shady tokenomics.</li>
+                        <li data-reveal="left"><svg class="icon" aria-hidden="true"><use href="#i-cross"/></svg>Income "maybe someday".</li>
+                        <li data-reveal="left"><svg class="icon" aria-hidden="true"><use href="#i-cross"/></svg>Hidden fees, locks and penalties.</li>
+                    </ul>
+                    <ul class="icon-list">
+                        <li data-reveal="right"><svg class="icon icon--wide" aria-hidden="true"><use href="#i-chevrons"/></svg>Transparent mechanics: Feed your hero = Get income.</li>
+                        <li data-reveal="right"><svg class="icon icon--wide" aria-hidden="true"><use href="#i-chevrons"/></svg>Cashflow: TON drops every hour.</li>
+                        <li data-reveal="right"><svg class="icon icon--wide" aria-hidden="true"><use href="#i-chevrons"/></svg>Control: Your discipline decides everything.</li>
+                    </ul>
+                </div>
+                <div class="puzzles__art" aria-hidden="true">
+                    <div class="slide__art puzzles__tangle" data-reveal="fade">
+                        <img src="./assets/sections/tangle.webp" alt="" width="740" height="435" loading="lazy" decoding="async" data-parallax="8 0">
+                    </div>
+                    <div class="slide__art puzzles__gate" data-reveal="fade">
+                        <img src="./assets/sections/gate.webp" alt="" width="780" height="495" loading="lazy" decoding="async" data-parallax="5 0">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 03 · Transparency №1 -->
+        <section class="slide slide--transparency" id="transparency" aria-labelledby="transparency-title">
+            <div class="slide__bg" aria-hidden="true">
+                <img class="transparency__waves transparency__waves--a" src="./assets/sections/waves-a.webp" alt="" width="300" height="680" loading="lazy" decoding="async" data-parallax="10">
+                <img class="transparency__waves transparency__waves--b" src="./assets/sections/waves-a.webp" alt="" width="300" height="680" loading="lazy" decoding="async" data-parallax="10 0">
+            </div>
+            <div class="slide__inner">
+                <h2 class="neon-title" id="transparency-title" data-reveal="neon">Transparency №1</h2>
+                <ul class="dot-list transparency__list">
+                    <li data-reveal>24/7: Your Hero generates profit even while you sleep.</li>
+                    <li data-reveal>24 hours: Your feeding deadline. Miss it — you lose the fighter.</li>
+                    <li data-reveal>60 days: Full cycle for maximum returns.</li>
+                    <li data-reveal>No limits on Heroes: Scale your squad to infinity.</li>
+                    <li data-reveal>100% Withdrawal: All earned TON is instantly available to withdraw to your wallet.</li>
+                </ul>
+                <p class="equation" role="img" aria-label="Hero plus food equals TON">
+                    <img class="equation__hero" src="./assets/Mobster.svg" alt="" width="342" height="343" loading="lazy" data-reveal="zoom">
+                    <span class="equation__sign equation__sign--plus" data-reveal="fade">+</span>
+                    <img class="equation__item" src="./assets/sections/burger.webp" alt="" width="330" height="335" loading="lazy" data-reveal="zoom">
+                    <span class="equation__sign equation__sign--equals" data-reveal="fade">=</span>
+                    <img class="equation__item" src="./assets/sections/ton-coin.webp" alt="" width="360" height="320" loading="lazy" data-reveal="zoom">
+                </p>
+            </div>
+        </section>
+
+        <!-- 04 · Cycle of success -->
+        <section class="slide slide--cycle fx-dots" id="cycle" aria-labelledby="cycle-title">
+            <div class="slide__inner">
+                <div class="slide__art cycle__art" aria-hidden="true" data-reveal="zoom">
+                    <img src="./assets/sections/cycle.webp" alt="" width="712" height="710" loading="lazy" decoding="async" data-parallax="-4">
+                </div>
+                <div class="cycle__copy">
+                    <h2 class="neon-title neon-title--teal" id="cycle-title" data-reveal="neon">Cycle of success</h2>
+                    <ul class="tag-list">
+                        <li data-reveal="right"><b>Act:</b> Feed your heroes and earn up to +275% ROI from each one.</li>
+                        <li data-reveal="right"><b>Win:</b> Play PvP and take +100% of the reward for every victory.</li>
+                        <li data-reveal="right"><b>Invite:</b> Bring friends and earn up to +35% from their purchases.</li>
+                        <li data-reveal="right"><b>Collect:</b> All earned TON is available for withdrawal.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 05 · Your benefit -->
+        <section class="slide slide--benefit" id="benefit" aria-labelledby="benefit-title">
+            <div class="slide__bg" aria-hidden="true">
+                <div class="fx-floor fx-floor--blue"></div>
+            </div>
+            <div class="slide__inner">
+                <header class="benefit__head">
+                    <h2 class="neon-title" id="benefit-title" data-reveal="neon">Your benefit</h2>
+                    <p class="benefit__tagline" data-reveal="fade">An average of 185% to 275% on the deposit over <strong>60 days</strong>
+                        <small>*All heroes have different ROI</small></p>
+                </header>
+
+                <ul class="benefit__cards">
+                    <li data-reveal="left">Buy a fighter — and he starts working instantly. For example, SNIPER brings <strong>~255%</strong> profit in <strong>60 days.</strong></li>
+                    <li data-reveal="left">Income drips every hour, not as a one-time payout. That’s <strong>+2.55%</strong> of the hero’s cost SNIPER — daily.</li>
+                    <li data-reveal="left">Profit is credited hourly and available immediately.</li>
+                    <li data-reveal="left">Referral bonuses are instant.</li>
+                    <li data-reveal="left">You must feed your hero — <strong>0.53 TON</strong>, no later than every <strong>24 hours.</strong></li>
+                    <li data-reveal="left">First 3 days of feeding are free.</li>
+                    <li data-reveal="left">After that, you can use the TON earned from income.</li>
+                </ul>
+
+                <div class="benefit__hero" aria-hidden="true">
+                    <span class="neon-ring" data-reveal="fade"></span>
+                    <img src="./assets/Sniper.svg" alt="" width="404" height="403" loading="lazy" data-reveal="zoom">
+                </div>
+
+                <p class="benefit__note" data-reveal>Every time your friend buys a hero, you instantly receive your share — every day, every hour.</p>
+
+                <div class="benefit__chart" role="img" aria-label="Deposit compared with the result in 60 days: up to +275%">
+                    <div class="bar bar--deposit" data-reveal="grow"><span>Deposit</span></div>
+                    <div class="bar bar--result" data-reveal="grow"><span>Result in <b>60 days</b></span></div>
+                    <div class="benefit__total" data-reveal="zoom">+275%</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 06 · Build your squad -->
+        <section class="slide slide--squad" id="squad" aria-labelledby="squad-title">
+            <div class="slide__bg" aria-hidden="true">
+                <div class="fx-floor fx-floor--blue fx-floor--ceiling"></div>
+            </div>
+            <div class="slide__inner">
+                <h2 class="neon-title" id="squad-title" data-reveal="neon">Build your squad</h2>
+                <p class="squad__intro" data-reveal="fade">After buying a hero you don’t need to keep TON in balance — he mines TON hourly.<br>
+                    Tap <strong>“Collect all”</strong> to withdraw <strong>profit</strong> and feed him using <strong>earned coins.</strong></p>
+
+                <div class="squad__grid">
+                    <article class="hero-card" data-reveal>
+                        <img class="hero-card__img" src="./assets/Cuadrilla.svg" alt="" width="327" height="328" loading="lazy">
+                        <div class="hero-card__body">
+                            <h3>Cuadrilla</h3>
+                            <dl class="stats">
+                                <div><dt>Price</dt><dd>3.33 TON</dd></div>
+                                <div><dt>Max Profit</dt><dd>up to 6.17 TON</dd></div>
+                                <div><dt>Max ROI</dt><dd>up to 185%</dd></div>
+                                <div><dt>Daily Profit</dt><dd>0.075 TON</dd></div>
+                                <div><dt>Daily ROI</dt><dd>2.25%</dd></div>
+                                <div><dt>Feeding</dt><dd>0.0013 TON</dd></div>
+                            </dl>
+                        </div>
+                    </article>
+
+                    <article class="hero-card" data-reveal>
+                        <img class="hero-card__img" src="./assets/Gorilla.svg" alt="" width="370" height="370" loading="lazy">
+                        <div class="hero-card__body">
+                            <h3>Enforcer</h3>
+                            <dl class="stats">
+                                <div><dt>Price</dt><dd>33.33 TON</dd></div>
+                                <div><dt>Max Profit</dt><dd>up to 76.67 TON</dd></div>
+                                <div><dt>Max ROI</dt><dd>up to 230%</dd></div>
+                                <div><dt>Daily Profit</dt><dd>0.817 TON</dd></div>
+                                <div><dt>Daily ROI</dt><dd>2.45%</dd></div>
+                                <div><dt>Feeding</dt><dd>0.19 TON</dd></div>
+                            </dl>
+                        </div>
+                    </article>
+
+                    <article class="hero-card hero-card--top" data-reveal="right">
+                        <div class="hero-card__body">
+                            <h3>Trumpoline</h3>
+                            <dl class="stats">
+                                <div><dt>Price</dt><dd>333.33 TON</dd></div>
+                                <div><dt>Max Profit</dt><dd>up to 916.67 TON</dd></div>
+                                <div><dt>Max ROI</dt><dd>up to 275%</dd></div>
+                                <div><dt>Daily Profit</dt><dd>9.02 TON</dd></div>
+                                <div><dt>Daily ROI</dt><dd>2.7%</dd></div>
+                                <div><dt>Feeding</dt><dd>2.34 TON</dd></div>
+                            </dl>
+                        </div>
+                        <img class="hero-card__img" src="./assets/sections/trumpoline.webp" alt="" width="518" height="443" loading="lazy">
+                    </article>
+
+                    <article class="hero-card" data-reveal>
+                        <img class="hero-card__img" src="./assets/Snap.svg" alt="" width="399" height="399" loading="lazy">
+                        <div class="hero-card__body">
+                            <h3>Snap</h3>
+                            <dl class="stats">
+                                <div><dt>Price</dt><dd>8.33 TON</dd></div>
+                                <div><dt>Max Profit</dt><dd>up to 16.67 TON</dd></div>
+                                <div><dt>Max ROI</dt><dd>up to 200%</dd></div>
+                                <div><dt>Daily Profit</dt><dd>0.192 TON</dd></div>
+                                <div><dt>Daily ROI</dt><dd>2.3%</dd></div>
+                                <div><dt>Feeding</dt><dd>0.033 TON</dd></div>
+                            </dl>
+                        </div>
+                    </article>
+
+                    <article class="hero-card" data-reveal>
+                        <img class="hero-card__img" src="./assets/Sniper.svg" alt="" width="404" height="403" loading="lazy">
+                        <div class="hero-card__body">
+                            <h3>Sniper</h3>
+                            <dl class="stats">
+                                <div><dt>Price</dt><dd>83.33 TON</dd></div>
+                                <div><dt>Max Profit</dt><dd>up to 204.17 TON</dd></div>
+                                <div><dt>Max ROI</dt><dd>up to 245%</dd></div>
+                                <div><dt>Daily Profit</dt><dd>2.125 TON</dd></div>
+                                <div><dt>Daily ROI</dt><dd>2.55%</dd></div>
+                                <div><dt>Feeding</dt><dd>0.523 TON</dd></div>
+                            </dl>
+                        </div>
+                    </article>
+
+                    <article class="hero-card" data-reveal>
+                        <img class="hero-card__img" src="./assets/Mobster.svg" alt="" width="342" height="343" loading="lazy">
+                        <div class="hero-card__body">
+                            <h3>Mobster</h3>
+                            <dl class="stats">
+                                <div><dt>Price</dt><dd>16.67 TON</dd></div>
+                                <div><dt>Max Profit</dt><dd>up to 35.83 TON</dd></div>
+                                <div><dt>Max ROI</dt><dd>up to 215%</dd></div>
+                                <div><dt>Daily Profit</dt><dd>0.392 TON</dd></div>
+                                <div><dt>Daily ROI</dt><dd>2.35%</dd></div>
+                                <div><dt>Feeding</dt><dd>0.083 TON</dd></div>
+                            </dl>
+                        </div>
+                    </article>
+
+                    <article class="hero-card" data-reveal>
+                        <img class="hero-card__img" src="./assets/sections/mavrodiy.webp" alt="" width="204" height="226" loading="lazy">
+                        <div class="hero-card__body">
+                            <h3>Mavrodiy</h3>
+                            <dl class="stats">
+                                <div><dt>Price</dt><dd>166.67 TON</dd></div>
+                                <div><dt>Max Profit</dt><dd>up to 433.33 TON</dd></div>
+                                <div><dt>Max ROI</dt><dd>up to 260%</dd></div>
+                                <div><dt>Daily Profit</dt><dd>4.41 TON</dd></div>
+                                <div><dt>Daily ROI</dt><dd>2.65%</dd></div>
+                                <div><dt>Feeding</dt><dd>1.13 TON</dd></div>
+                            </dl>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- 07 · Discipline (feeding) -->
+        <section class="slide slide--discipline" id="discipline" aria-labelledby="discipline-title">
+            <div class="slide__inner">
+                <div class="slide__art discipline__art" aria-hidden="true" data-reveal="fade">
+                    <img src="./assets/sections/battery.webp" alt="" width="650" height="805" loading="lazy" decoding="async" data-parallax="5 0">
+                </div>
+                <h2 class="neon-title" id="discipline-title" data-reveal="neon">Discipline (feeding)</h2>
+                <p class="discipline__lead" data-reveal="fade">Feed every 24 hours.<br>Forgot? The hero dies.<br>Revival costs 50% of the price.</p>
+                <ul class="rule-list">
+                    <li data-reveal="right"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>You can buy as many fighters as you want.</li>
+                    <li data-reveal="right"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg>The challenge lasts 60 days — during this period the fighter earns the full ROI.</li>
+                    <li data-reveal="right"><svg class="icon" aria-hidden="true"><use href="#i-meal"/></svg>You must feed your hero at least once every 24 hours.</li>
+                    <li data-reveal="right"><svg class="icon" aria-hidden="true"><use href="#i-alert"/></svg>Miss it — the fighter dies.</li>
+                    <li data-reveal="right"><svg class="icon" aria-hidden="true"><use href="#i-coins"/></svg>Revival costs 50% and is available only once.</li>
+                    <li data-reveal="right"><svg class="icon" aria-hidden="true"><use href="#i-bulb"/></svg>Keep TON in balance or earn it in PvP battles (rock/paper/scissors).</li>
+                    <li data-reveal="right"><svg class="icon" aria-hidden="true"><use href="#i-growth"/></svg>The more expensive the fighter — the higher the ROI.</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- 08 · Rock paper scissors -->
+        <section class="slide slide--rps fx-grain" id="pvp" aria-labelledby="pvp-title">
+            <div class="slide__inner">
+                <h2 class="neon-title neon-title--soft" id="pvp-title" data-reveal="neon">Rock<br>Paper<br>Scissors</h2>
+                <div class="rps__ring" data-reveal="zoom">
+                    <svg viewBox="0 0 1000 1000" data-parallax="-4" role="img" aria-label="Settle arguments. Take TON from friends. Victory in 3 seconds.">
+                        <defs>
+                            <path id="rps-arc-left" d="M83.3 571A425 425 0 0 1 266.5 144"/>
+                            <path id="rps-arc-top" d="M418 82.5A425 425 0 0 1 924.5 478"/>
+                            <path id="rps-arc-bottom" d="M241 878A458 458 0 0 0 942 620"/>
+                        </defs>
+                        <image href="./assets/sections/rps-hands.webp" x="95" y="125" width="800" height="800"/>
+                        <g class="rps__words" aria-hidden="true">
+                            <text><textPath href="#rps-arc-left" startOffset="50%">Settle arguments</textPath></text>
+                            <text><textPath href="#rps-arc-top" startOffset="50%">Take TON from friends</textPath></text>
+                            <text><textPath href="#rps-arc-bottom" startOffset="50%">Victory in 3 seconds</textPath></text>
+                        </g>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- 09 · Become the best -->
+        <section class="slide slide--best fx-scanlines" id="ranking" aria-labelledby="ranking-title">
+            <div class="slide__inner">
+                <div class="slide__art best__art" aria-hidden="true" data-reveal="fade">
+                    <img src="./assets/sections/podium.webp" alt="" width="1335" height="655" loading="lazy" decoding="async" data-parallax="5 0">
+                </div>
+                <div class="best__copy">
+                    <h2 class="neon-title neon-title--teal" id="ranking-title" data-reveal="neon">Become the best</h2>
+                    <ul class="ring-list">
+                        <li data-reveal="right"><h3>Advanced ranking:</h3><p>Real-time stats. No fake boosts.</p></li>
+                        <li data-reveal="right"><h3>Rewards for activity:</h3><p>Fat bonuses, drops and TON for holding the top.</p></li>
+                        <li data-reveal="right"><h3>The whole world sees your success:</h3><p>Your nickname in the leaderboard is a magnet for new referrals.</p></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10 · Power of the community -->
+        <section class="slide slide--community fx-dust" id="community" aria-labelledby="community-title">
+            <div class="slide__inner">
+                <div class="community__left">
+                    <h2 class="neon-title" id="community-title" data-reveal="neon">Power of the community</h2>
+                    <div class="community__art" aria-hidden="true" data-reveal="zoom">
+                        <img src="./assets/sections/referral-tree.webp" alt="" width="825" height="651" loading="lazy" decoding="async" data-parallax="-3">
+                    </div>
+                </div>
+                <div class="community__right">
+                    <div class="type-note" data-reveal="fade">
+                        <p>Invite friends using your link <span aria-hidden="true">→</span> earn TON when they buy heroes.</p>
+                        <p>Total referral reward — 35%, distributed across levels:</p>
+                    </div>
+                    <table class="data-table" data-reveal>
+                        <caption class="visually-hidden">Referral reward by line and the personal deposit that unlocks it</caption>
+                        <thead class="visually-hidden">
+                        <tr><th scope="col">Line</th><th scope="col">Reward</th><th scope="col">Personal deposit</th></tr>
+                        </thead>
+                        <tbody>
+                        <tr><th scope="row">1st line</th><td>15%</td><td>up to 20 TON</td></tr>
+                        <tr><th scope="row">2nd line</th><td>7%</td><td>up to 20 TON</td></tr>
+                        <tr><th scope="row">3rd line</th><td>5%</td><td>up to 20 TON</td></tr>
+                        <tr><th scope="row">4th line</th><td>2%</td><td>20–60 TON</td></tr>
+                        <tr><th scope="row">5th line</th><td>1%</td><td>20–60 TON</td></tr>
+                        <tr><th scope="row">6th line</th><td>1%</td><td>60–150 TON</td></tr>
+                        <tr><th scope="row">7th line</th><td>1%</td><td>60–150 TON</td></tr>
+                        <tr><th scope="row">8th line</th><td>1%</td><td>150+ TON</td></tr>
+                        <tr><th scope="row">9th line</th><td>1%</td><td>150+ TON</td></tr>
+                        <tr><th scope="row">10th line</th><td>1%</td><td>150+ TON</td></tr>
+                        </tbody>
+                    </table>
+                    <p class="footnote" data-reveal="fade">*Full statistics — in the "Invites" tab.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11 · Scale of your network -->
+        <section class="slide slide--network fx-dust" id="network" aria-labelledby="network-title">
+            <div class="slide__bg" aria-hidden="true">
+                <img class="network__waves" src="./assets/sections/waves-b.webp" alt="" width="840" height="311" loading="lazy" decoding="async" data-parallax="12 0">
+            </div>
+            <div class="slide__inner">
+                <h2 class="neon-title" id="network-title" data-reveal="neon">Scale of your network</h2>
+                <p class="network__lead" data-reveal="fade">The higher your in-game deposit, the more income levels you unlock:</p>
+                <ul class="glow-list">
+                    <li data-reveal="left">Personal deposit 0–20 TON: access to lines 1–3 (Start)</li>
+                    <li data-reveal="left">Personal deposit 20–60 TON: access to lines 4–5 (Medium)</li>
+                    <li data-reveal="left">Personal deposit 60–150 TON: access to lines 6–7 (Pro)</li>
+                    <li data-reveal="left">Personal deposit 150+ TON: access to lines 8–10 (Max)</li>
+                </ul>
+                <p class="network__note" data-reveal="fade">In-game deposit = total value of all your alive heroes.</p>
+
+                <div class="network__art" aria-hidden="true">
+                    <svg class="network__stairs" viewBox="0 0 720 585">
+                        <path pathLength="1" d="M28 585V500H192V345H350V182H508V25H700" data-reveal="draw"/>
+                        <text x="60" y="552" data-reveal="fade">I START</text>
+                        <text x="210" y="398" data-reveal="fade">II MEDIUM</text>
+                        <text x="365" y="239" data-reveal="fade">III PRO</text>
+                        <text x="527" y="84" data-reveal="fade">IV MAX</text>
+                    </svg>
+                    <img class="network__coins" src="./assets/sections/coin-stack.webp" alt="" width="350" height="725" loading="lazy" decoding="async" data-reveal="fade">
+                </div>
+            </div>
+        </section>
+
+        <!-- 12 · Numbers for leaders -->
+        <section class="slide slide--leaders fx-dust" id="leaders" aria-labelledby="leaders-title">
+            <div class="slide__inner">
+                <h2 class="neon-title neon-title--plain" id="leaders-title" data-reveal="neon">Numbers for leaders</h2>
+
+                <div class="leaders__numbers">
+                    <div class="leaders__potential" data-reveal="left">
+                        <p>Monthly earning potential:</p>
+                        <ul>
+                            <li>500 players ≈ <mark>$2,100</mark></li>
+                            <li>2,000 players ≈ <mark>$8,500</mark></li>
+                        </ul>
+                    </div>
+
+                    <div class="table-scroll" data-reveal>
+                        <table class="data-table data-table--head">
+                            <caption class="visually-hidden">Monthly referral income by number of players</caption>
+                            <thead>
+                            <tr><th scope="col">Players</th><th scope="col">line 1-3</th><th scope="col">line 4-6</th><th scope="col">line 7-10</th><th scope="col">Total per month</th></tr>
+                            </thead>
+                            <tbody>
+                            <tr><th scope="row">500</th><td>1 125 TON</td><td>262.5 TON</td><td>112.5 TON</td><td>1 500 TON</td></tr>
+                            <tr><th scope="row">2000</th><td>4 500 TON</td><td>1 050 TON</td><td>450 TON</td><td>6 000 TON</td></tr>
+                            <tr><th scope="row">10000</th><td>22 500 TON</td><td>5 250 TON</td><td>2 250 TON</td><td>30 000 TON</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="leaders__basis" data-reveal="fade">
+                        <h3>Based on:</h3>
+                        <ul class="dot-list">
+                            <li>Average player check — 15 TON (hero purchase)</li>
+                            <li>Referral levels: 15% / 7% / 5% / 2% / 1% / 1% / 1% / 1% / 1% / 1%</li>
+                            <li>Calculations based on players who bought heroes</li>
+                            <li>Rewards come from purchases, not deposits</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <aside class="leaders__panel" data-reveal="right">
+                    <p class="leaders__pitch">Are you a streamer or TikTok warrior?<br><strong>We want you on the team.</strong></p>
+                    <ul class="dot-list">
+                        <li>10-level referral program: <mark class="leaders__range">15% → 1%</mark></li>
+                        <li>A unique hero in your style
+                            <span class="leaders__avatars" aria-hidden="true">
+                                <img src="./assets/sections/streamer-1.webp" alt="" width="165" height="170" loading="lazy">
+                                <img src="./assets/sections/streamer-2.webp" alt="" width="170" height="170" loading="lazy">
+                                <img src="./assets/sections/streamer-3.webp" alt="" width="170" height="174" loading="lazy">
+                            </span>
+                        </li>
+                        <li>Promo codes, boosts, skins</li>
+                        <li>Algorithm boosts + platform traffic</li>
+                        <li>Personal events + support from our team</li>
+                    </ul>
+                    <p class="leaders__outro">Bring active players and earn daily income.</p>
+                </aside>
+            </div>
+        </section>
+
+        <!-- 13 · Future of FightON -->
+        <section class="slide slide--future fx-dust" id="roadmap" aria-labelledby="roadmap-title">
+            <div class="slide__inner">
+                <div class="slide__art future__art" aria-hidden="true" data-reveal="fade">
+                    <img src="./assets/sections/roadmap.webp" alt="" width="1280" height="835" loading="lazy" decoding="async" data-parallax="4 0">
+                </div>
+                <h2 class="neon-title" id="roadmap-title" data-reveal="neon">Future of FightON</h2>
+                <ol class="roadmap">
+                    <li data-reveal="left"><svg class="icon icon--wide" aria-hidden="true"><use href="#i-done"/></svg><time>Q1 2026</time><span>— First hero collections, PvP arena</span></li>
+                    <li data-reveal="left"><svg class="icon icon--wide" aria-hidden="true"><use href="#i-done"/></svg><time>Q3 2026</time><span>— Alliances, collabs &amp; partner heroes</span></li>
+                    <li data-reveal="left"><svg class="icon icon--wide" aria-hidden="true"><use href="#i-done"/></svg><time>Q4 2026</time><span>— FIGHTON Metaverse</span></li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- 14 · Start game -->
+        <section class="slide slide--start" id="start" aria-labelledby="start-title">
+            <div class="slide__bg" aria-hidden="true">
+                <div class="fx-floor"></div>
+            </div>
+            <div class="slide__inner">
+                <div class="slide__art start__art" aria-hidden="true" data-reveal="fade">
+                    <img src="./assets/sections/start-art.webp" alt="" width="1015" height="945" loading="lazy" decoding="async" data-parallax="4 0">
+                </div>
+                <div class="start__copy">
+                    <h2 class="neon-title" id="start-title" data-reveal="neon">Start game</h2>
+                    <p data-reveal="fade">Your hero is waiting.<br>Start for free right now.</p>
+                </div>
+            </div>
+        </section>
     </div>
+</main>
 
-    <div class="layer" id="streetGround">
-        <div class="band" id="streetGroundBand">
-            <div id="trafficLayer" class="trafficLayer" aria-hidden="true"></div>
-            <div class="streetGroundSpacer"></div>
-        </div>
-    </div>
-    <div class="layer" id="streetSnow">
-        <div class="band" id="streetSnowBand">
-            <div class="snowLine"></div>
-            <div class="streetSnowSpacer"></div>
-        </div>
-    </div>
-
-    <div class="layer" id="chars">
-        <div class="band" id="charsBand">
-            <img class="charImg" src="./assets/Sniper.svg" alt="Sniper" data-plate-title="SNIPER"
-                 data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Gorilla.svg" alt="Gorilla" data-plate-title="GORILLA"
-                 data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Mobster.svg" alt="Mobster" data-plate-title="MOBSTER"
-                 data-plate-text="Я можу все і навіть трохи більше!">
-            <img class="charImg" src="./assets/Snap.svg" alt="Snap" data-plate-title="SNAP" data-plate-text="...">
-            <img class="charImg" src="./assets/Cuadrilla.svg" alt="Cuadrilla" data-plate-title="CUADRILLA"
-                 data-plate-text="...">
-            <img class="charImg" src="./assets/Shelldren.svg" alt="Shelldren" data-plate-title="SHELLDREN"
-                 data-plate-text="...">
-            <img class="charImg" src="./assets/Pistolero.svg" alt="Pistolero" data-plate-title="PISTOLERO"
-                 data-plate-text="...">
-            <img class="charImg" src="./assets/Machetero.svg" alt="Machetero" data-plate-title="MACHETERO"
-                 data-plate-text="...">
-            <img class="charImg" src="./assets/Golfer.svg" alt="Golfer" data-plate-title="GOLFER" data-plate-text="..."
-                 style="margin-right:6vw">
-        </div>
-    </div>
-
-    <!-- gate всередині #stage -->
-    <div id="stageGate" aria-live="polite" hidden>
-        <div class="gate-card">
-            <div class="gate-spinner" aria-hidden="true"></div>
-            <p>Готуємо сцену…</p>
-        </div>
-    </div>
-</div>
-
-<section class="parallax-gallery" id="gallery">
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF100/page1.webp" alt="Сторінка 1" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page2.webp" alt="Сторінка 2" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page3.webp" alt="Сторінка 3" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF100/page4.webp" alt="Сторінка 4" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page5.webp" alt="Сторінка 5" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page6.webp" alt="Сторінка 6" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page7.webp" alt="Сторінка 7" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page8.webp" alt="Сторінка 8" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page9.webp" alt="Сторінка 9" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page10.webp" alt="Сторінка 10" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page11.webp" alt="Сторінка 11" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page12.webp" alt="Сторінка 12" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page13.webp" alt="Сторінка 13" loading="lazy" decoding="async">
-        </div>
-    </article>
-    <article class="pg-item">
-        <div class="pg-item__media">
-            <img src="./assets/PDF75/page14.webp" alt="Сторінка 14" loading="lazy" decoding="async">
-        </div>
-    </article>
-</section>
-
-
-<!-- ===== MAIL OVERLAY ===== -->
-<div class="mail-overlay" id="mailOverlay" hidden>
+<!-- ===================== FEEDBACK MODAL ===================== -->
+<div class="mail-overlay" id="mailOverlay" lang="uk" hidden>
     <div class="mail-modal" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
         <div class="mail-envelope">
-            <img class="env-base" src="./assets/base.svg" alt="" aria-hidden="true">
+            <img class="env-base" src="./assets/base.svg" alt="" width="690" height="368">
             <div class="letter">
                 <div class="letter-card">
                     <button class="letter-close" type="button" aria-label="Закрити"></button>
-                    <h3 class="mailTitle">Зворотній зв'язок</h3>
-                    <p id="formError" class="form-error" hidden>
-                        *Заповніть коректно виділені поля.
-                    </p>
+                    <h2 class="mailTitle" id="mailTitle">Зворотній зв'язок</h2>
+                    <p id="formError" class="form-error" role="status" data-success="Дякуємо! Повідомлення надіслано." hidden>*Заповніть коректно виділені поля.</p>
                     <form class="submitForm" novalidate>
                         <div>
                             <label for="topic">Тема</label>
-                            <select name="topic" placeholder="Співпраця" id="topic">
+                            <select name="topic" id="topic">
                                 <option value="value1">Тема 1</option>
                                 <option value="value2">Тема 2</option>
                                 <option value="value3">Тема 3</option>
@@ -1380,1051 +596,54 @@
                         <div class="submitForm__wrap">
                             <div>
                                 <label for="name">Ім'я</label>
-                                <input type="text" id="name" placeholder="Ваше ім'я"/>
+                                <input type="text" id="name" name="name" autocomplete="name" placeholder="Ваше ім'я">
                             </div>
                             <div>
                                 <label for="email">E-mail</label>
-                                <input type="email" id="email" placeholder="Ваш email"/>
+                                <input type="email" id="email" name="email" autocomplete="email" placeholder="Ваш email">
                             </div>
                         </div>
                         <div class="submitBtn__wrap">
-                            <a class="submitBtn"><span>Відправити</span></a>
+                            <button class="submitBtn" type="submit">Відправити</button>
                         </div>
                     </form>
                 </div>
             </div>
-            <img class="env-flap" src="./assets/flap.svg" alt="" aria-hidden="true">
+            <img class="env-flap" src="./assets/flap.svg" alt="" width="690" height="465">
         </div>
     </div>
 </div>
-<!-- опційна кнопка для відкриття -->
-<button class="postbox-fab" id="postboxFab" aria-label="Відкрити скриньку">
-    <img src="./assets/postbox.svg" alt="" width="64" height="64">
+
+<button class="postbox-fab" id="postboxFab" type="button" aria-label="Open the feedback form" aria-haspopup="dialog">
+    <img src="./assets/postbox.svg" alt="" width="248" height="365">
 </button>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollToPlugin.min.js"></script>
-<script>
-    gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
-    gsap.config({nullTargetWarn: false});
-</script>
+
+<!-- ===================== ICON SPRITE ===================== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+        <symbol id="i-cross" viewBox="0 0 24 24"><path d="M3 3l18 18M21 3L3 21"/></symbol>
+        <symbol id="i-chevrons" viewBox="0 0 34 24"><path d="M2 3h4l7 9-7 9H2zM13 3l7 9-7 9M22 3l7 9-7 9"/></symbol>
+        <symbol id="i-done" viewBox="0 0 34 24"><path d="M2 13l7 7L24 4M12 18l2 2L30 4"/></symbol>
+        <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/><path stroke-width="2.4" d="M7 12.5l3.3 3.3L17 9"/></symbol>
+        <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="12" r="5.5"/><path d="M12 9v3.2l2 1.3"/></symbol>
+        <symbol id="i-meal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/><circle cx="12" cy="12" r="3.6"/><path d="M6.5 7v10M17.5 7v10M6.5 9.5h11M6.5 16.5h11"/></symbol>
+        <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/><path stroke-width="2.2" d="M12 6.5v7M12 16.5v.800"/></symbol>
+        <symbol id="i-coins" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/><ellipse cx="10.5" cy="9" rx="4" ry="1.7"/><path d="M6.5 9v6.5c0 .900 1.8 1.7 4 1.7s4-.800 4-1.7V9M6.5 12.2c0 .900 1.8 1.7 4 1.7s4-.800 4-1.7M15 13.5l2.5 3"/></symbol>
+        <symbol id="i-bulb" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/><path d="M10 15.5h4M10.5 17.5h3M9.8 15.5c0-1.5-1.6-2.2-1.6-4.2a3.8 3.8 0 0 1 7.6 0c0 2-1.6 2.7-1.6 4.2M12 4.5v1M6.5 7l.800.8M17.5 7l-.800.8"/></symbol>
+        <symbol id="i-growth" viewBox="0 0 24 24"><circle cx="12" cy="12" r="11"/><path d="M7 17.5v-5h3v5zM13 17.5V10h3v7.5zM7 10l4-3 2 1.5L17 6M14.8 6H17v2.2"/></symbol>
+    </defs>
+</svg>
 
 <script>
-    (function introClouds() {
-        const tl = gsap.timeline({scrollTrigger: {trigger: "#intro", start: "top top", end: "bottom top", scrub: 1}});
-        const push = () => Math.max(innerWidth * 0.28, 280);
-        tl.to(".intro .cloud.cloud--lt", {x: -push(), ease: "none"}, 0);
-        tl.to(".intro .cloud.cloud--rt", {x: push(), ease: "none"}, 0);
-        tl.to(".intro .cloud.cloud--lb", {x: -push() * 0.8, ease: "none"}, 0);
-        tl.to(".intro .cloud.cloud--rb", {x: push() * 0.8, ease: "none"}, 0);
-        tl.to(".intro-logo", {y: -40, opacity: 0.92, ease: "none"}, 0);
-    })();
-
-    const bandFull = (sel) => {
-        const el = document.querySelector(sel);
-        if (!el) return 0;
-        const w = Math.max(el.scrollWidth, el.getBoundingClientRect().width);
-        return Math.max(0, w - innerWidth);
-    };
-    const startOffset = (sel, k) => -(bandFull(sel) * (1 - k));
-    const endOffset = (sel) => -(bandFull(sel));
-    const leadPx = (sel, k) => Math.round(bandFull(sel) * (1 - k));
-
-    function recalcStageDims() {
-        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
-        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
-        const g = document.querySelector('.streetGroundSpacer');
-        if (g) g.style.width = baseWidth + 'px';
-        const s = document.querySelector('.streetSnowSpacer');
-        if (s) s.style.width = baseWidth + 'px';
-        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
-        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
+    // ES modules can't be loaded from file:// – point the developer to the local server instead of failing silently.
+    if (location.protocol === 'file:') {
+        document.body.insertAdjacentHTML('beforeend',
+            '<p class="dev-notice">This page uses ES modules, which browsers only load over http. ' +
+            'Run <code>npm start</code> in the project folder and open <code>http://localhost:5173</code>.</p>');
     }
-
-    ScrollTrigger.addEventListener('refreshInit', recalcStageDims);
-
-    function initStage() {
-        const charsW = document.getElementById('charsBand')?.scrollWidth || innerWidth * 3;
-        const baseWidth = Math.round(Math.max(charsW * 1.05, innerWidth * 3.5));
-
-        const groundSpacer = document.querySelector('.streetGroundSpacer');
-        if (groundSpacer?.style) groundSpacer.style.width = baseWidth + 'px';
-
-        const snowSpacer = document.querySelector('.streetSnowSpacer');
-        if (snowSpacer?.style) snowSpacer.style.width = baseWidth + 'px';
-
-        document.documentElement.style.setProperty('--mountains-lead', leadPx('#mountainsBand', 0.28) + 'px');
-        document.documentElement.style.setProperty('--houses-lead', leadPx('#housesBand', 0.72) + 'px');
-
-        const tl = gsap.timeline({
-            scrollTrigger: {
-                id: "stageParallax",
-                trigger: "#stage",
-                start: "top top",
-                end: () => {
-                    // як і раніше – довжина скролу рахується від ширини смуги персонажів
-                    const w = bandFull('#charsBand');
-                    return "+=" + Math.max(1600, Math.round(w * 1.15));
-                },
-                pin: true,
-                scrub: 1,
-                anticipatePin: 1,
-                invalidateOnRefresh: true
-            }
-        });
-
-        // Сонце: нормалізуємо тривалість до 1 (все одно раніше воно встигало завершитись до кінця)
-        tl.to('.sunImg', {
-            yPercent: -6,
-            scale: 0.98,
-            ease: 'none',
-            duration: 1
-        }, 0);
-
-        // Старі "тривалості" – нам тепер потрібні тільки як коефіцієнти для парлаксу
-        const durChars = 75,
-            durGround = 75,
-            durHouses = 110,
-            durMountains = 130;
-
-        const cssVarPx = (name) =>
-            parseFloat(getComputedStyle(document.documentElement).getPropertyValue(name)) || 0;
-
-        // скільки частки шляху повинні проїхати шари, щоб у момент,
-        // коли персонажі були «на фініші» в старій версії, вони були в тих самих точках
-        const scaleToChars = (layerDur) => {
-            // персонажі закінчували свій рух раніше, ніж гори.
-            // старе співвідношення = durChars / durMountains
-            // але для кожного шару рахуємо його власний коефіцієнт
-            return Math.min(1, durChars / layerDur);
-        };
-
-        const scaledEnd = (sel, fromXFn, layerDur) => {
-            const from = fromXFn();
-            const fullEnd = endOffset(sel);      // «повний» кінець як було раніше
-            const dist = fullEnd - from;
-            const k = scaleToChars(layerDur);    // скільки цієї дистанції проїхати до моменту фінішу персонажів
-            return from + dist * k;
-        };
-
-        // ===== MOUNTAINS =====
-        const fromMountains = () => -cssVarPx('--mountains-lead');
-        const toMountains   = () => scaledEnd('#mountainsBand', fromMountains, durMountains);
-
-        tl.fromTo('#mountainsBand',
-            { x: fromMountains },
-            {
-                x: toMountains,
-                ease: 'none',
-                duration: 1
-            },
-            0
-        );
-
-        // ===== HOUSES =====
-        const fromHouses = () => -cssVarPx('--houses-lead');
-        const toHouses   = () => scaledEnd('#housesBand', fromHouses, durHouses);
-
-        tl.fromTo('#housesBand',
-            { x: fromHouses },
-            {
-                x: toHouses,
-                ease: 'none',
-                duration: 1
-            },
-            0
-        );
-
-        // ===== GROUND =====
-        const fromGround = () => startOffset('#streetGroundBand', 0.90);
-        const toGround   = () => scaledEnd('#streetGroundBand', fromGround, durGround);
-
-        tl.fromTo('#streetGroundBand',
-            { x: fromGround },
-            {
-                x: toGround,
-                ease: 'none',
-                duration: 1
-            },
-            0
-        );
-
-        // ===== SNOW =====
-        const fromSnow = () => startOffset('#streetSnowBand', 0.90);
-        const toSnow   = () => scaledEnd('#streetSnowBand', fromSnow, durGround);
-
-        tl.fromTo('#streetSnowBand',
-            { x: fromSnow },
-            {
-                x: toSnow,
-                ease: 'none',
-                duration: 1
-            },
-            0
-        );
-
-        // ===== CHARS (ГОЛОВНИЙ ШАР) =====
-        // Тут персонажі проходять ВСЮ свою дистанцію від старту до фінішу
-        // і саме момент, коли вони доїжджають до endOffset('#charsBand'),
-        // тепер є кінцем таймлайну і ScrollTrigger.
-        const fromChars = () => startOffset('#charsBand', 1.00);
-        const toChars   = () => endOffset('#charsBand');
-
-        tl.fromTo('#charsBand',
-            { x: fromChars },
-            {
-                x: toChars,
-                ease: 'none',
-                duration: 1
-            },
-            0
-        );
-
-        addEventListener('resize', () => ScrollTrigger.refresh());
-    }
-
-
-    const charData = [
-        {
-            'price': '83,33 TON',
-            'max profit': 'up to 204,17 TON',
-            'max roi': 'up to 245%',
-            'daily profit': '2,1250 TON',
-            'daily roi': '2,55%',
-            'feeding': '1.57 TON'
-        },
-        {
-            'price': '33,33 TON',
-            'max profit': 'up to 76,67 TON',
-            'max roi': 'up to 230%',
-            'daily profit': '0,8167 TON',
-            'daily roi': '2,45%',
-            'feeding': '0.57 TON'
-        },
-        {
-            'price': '16,67 TON',
-            'max profit': 'up to 35,83 TON',
-            'max roi': 'up to 215%',
-            'daily profit': '0,3917 TON',
-            'daily roi': '2,35%',
-            'feeding': '0.25 TON'
-        },
-        {
-            'price': '16,67 TON',
-            'max profit': 'up to 35,83 TON',
-            'max roi': 'up to 215%',
-            'daily profit': '0,3917 TON',
-            'daily roi': '2,35%',
-            'feeding': '0.25 TON'
-        },
-        {
-            'price': '8,33 TON',
-            'max profit': 'up to 16,67 TON',
-            'max roi': 'up to 200%',
-            'daily profit': '0,1917 TON',
-            'daily roi': '2,3%',
-            'feeding': '0.1 TON'
-        },
-        {
-            'price': '3,33 TON',
-            'max profit': 'up to 6,17 TON',
-            'max roi': 'up to 185%',
-            'daily profit': '0,0750 TON',
-            'daily roi': '2,25%',
-            'feeding': '0.004 TON'
-        },
-        {
-            'price': '1,67 TON',
-            'max profit': 'up to 2,92 TON',
-            'max roi': 'up to 175%',
-            'daily profit': '0,0750 TON',
-            'daily roi': '2,25%',
-            'feeding': '0.004 TON'
-        },
-        {
-            'price': '1 TON',
-            'max profit': 'up to 1,60 TON',
-            'max roi': 'up to 160%',
-            'daily profit': '0,0210 TON',
-            'daily roi': '2,1%',
-            'feeding': '0.008 TON'
-        },
-        {
-            'price': '0.33 TON',
-            'max profit': 'up to 0,50 TON',
-            'max roi': 'up to 150%',
-            'daily profit': '0,0067 TON',
-            'daily roi': '2%',
-            'feeding': '0.002 TON'
-        },
-        {
-            'price': 'free',
-            'max profit': 'up to 0,17 TON',
-            'max roi': 'up to 100%',
-            'daily profit': '0,0020 TON',
-            'daily roi': '1.2%',
-            'feeding': '0.004 TON'
-        }
-    ];
-
-    (function attachPlates() {
-        const band = document.getElementById('charsBand');
-        if (!band) return;
-        const cards = Array.from(band.querySelectorAll('img.charImg, img.charImg.sm, img.charImg.lg'));
-        cards.forEach((baseImg, idx) => {
-            const data = charData[idx] || null;
-
-            const wrap = document.createElement('span');
-            wrap.className = baseImg.className;
-            wrap.tabIndex = 0;
-            if (baseImg.style.margin) {
-                wrap.style.margin = baseImg.style.margin;
-                baseImg.style.margin = '';
-            }
-            baseImg.className = 'base';
-
-            const hoverSrc = baseImg.dataset.hover || baseImg.src.replace(/(\.[a-z]+)$/i, '_hover$1');
-            const hoverImg = new Image();
-            hoverImg.className = 'hover';
-            hoverImg.alt = baseImg.alt ? baseImg.alt + ' (hover)' : '';
-            hoverImg.decoding = 'async';
-            hoverImg.src = hoverSrc;
-
-            const poor = isPoorNet();
-            if (!poor && 'requestIdleCallback' in window) {
-                requestIdleCallback(() => {
-                    const pre = new Image();
-                    pre.decoding = 'async';
-                    pre.src = hoverSrc;
-                });
-            }
-
-            const plate = document.createElement('div');
-            plate.className = 'charPlate';
-            if (data) {
-                const inner = document.createElement('div');
-                inner.className = 'charPlate__inner';
-                const col1 = document.createElement('div');
-                col1.className = 'column_1';
-                const col2 = document.createElement('div');
-                col2.className = 'column_2';
-                const entries = Object.entries(data);
-                const buildItems = (pairs) => pairs.map(([k, v]) => {
-                    const item = document.createElement('div');
-                    const p = document.createElement('p');
-                    p.textContent = String(k).toUpperCase();
-                    const span = document.createElement('span');
-                    span.textContent = v;
-                    item.appendChild(p);
-                    item.appendChild(span);
-                    return item;
-                });
-                buildItems(entries.slice(0, 3)).forEach(el => col1.appendChild(el));
-                buildItems(entries.slice(3, 6)).forEach(el => col2.appendChild(el));
-                inner.appendChild(col1);
-                inner.appendChild(col2);
-                plate.appendChild(inner);
-            }
-
-            baseImg.parentNode.insertBefore(wrap, baseImg);
-            wrap.appendChild(baseImg);
-            wrap.appendChild(hoverImg);
-            if (data) wrap.appendChild(plate);
-
-            // === верхня хмаринка (title bubble) ===
-            const top = document.createElement('div');
-            top.className = 'charTop';
-
-            const topImg = new Image();
-            topImg.className = 'charTop__img';
-            topImg.alt = '';
-            topImg.decoding = 'async';
-            topImg.src = './assets/top_bubble.svg';
-
-            const topLabel = document.createElement('span');
-            topLabel.className = 'charTop__label';
-            topLabel.textContent = (baseImg.dataset.plateTitle || baseImg.alt || '').toUpperCase();
-
-            top.appendChild(topImg);
-            top.appendChild(topLabel);
-            wrap.appendChild(top);
-
-
-            if (!poor && 'requestIdleCallback' in window) {
-                requestIdleCallback(() => {
-                    const preTop = new Image();
-                    preTop.decoding = 'async';
-                    preTop.src = topImg.src;
-                });
-            }
-
-            wrap.addEventListener('touchstart', () => {
-                wrap.classList.add('is-touch');
-                clearTimeout(wrap._t);
-                wrap._t = setTimeout(() => wrap.classList.remove('is-touch'), 900);
-            }, {passive: true});
-        });
-    })();
-
-    function setFirstCharExtraGap(mult = 1) {
-        const band = document.getElementById('charsBand');
-        const first = band?.querySelector('.charImg');
-        const second = first?.nextElementSibling;
-        if (!band || !first || !second) return;
-        const cs1 = getComputedStyle(first), cs2 = getComputedStyle(second);
-        const w1 = first.getBoundingClientRect().width;
-        const mr1 = parseFloat(cs1.marginRight) || 0;
-        const ml2 = parseFloat(cs2.marginLeft) || 0;
-        const baseSlot = Math.round((w1 + mr1 + ml2) * mult);
-        const fiveVwPx = innerWidth * 0.05;
-        let extra = baseSlot;
-        if (matchMedia('(max-width:780px)').matches) {
-            const SAFE_PAD = 12;
-            const maxWithoutOverflow = innerWidth - fiveVwPx - w1 - SAFE_PAD;
-            const tuned = Math.max(0, Math.min(baseSlot, maxWithoutOverflow));
-            extra = Math.round(tuned * 0.98);
-        }
-        document.documentElement.style.setProperty('--first-char-extra-gap', extra + 'px');
-    }
-
-    setFirstCharExtraGap(1);
-    addEventListener('resize', () => setFirstCharExtraGap(1));
-    ScrollTrigger.addEventListener('refreshInit', () => setFirstCharExtraGap(1));
-
-    let STAGE_INITTED = false;
-
-    function initStageOnce() {
-        if (STAGE_INITTED) return;
-        STAGE_INITTED = true;
-        initStage();
-        ScrollTrigger.refresh();
-    }
-
-    function isPoorNet() {
-        const q = new URLSearchParams(location.search);
-        if (q.get('gate') === '1') return true;
-        if (q.get('gate') === '0') return false;
-        const c = navigator.connection;
-        const et = c?.effectiveType;
-        const save = c?.saveData === true;
-        const down = typeof c?.downlink === 'number' ? c.downlink : Infinity;
-        const rtt = typeof c?.rtt === 'number' ? c.rtt : 0;
-        if (save || et === 'slow-2g' || et === '2g' || et === '3g') return true;
-        if (down < 1.2 || rtt > 300) return true;
-        return false;
-    }
-
-    function criticalCharNodes() {
-        const all = Array.from(document.querySelectorAll('#charsBand .charImg'));
-        const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
-        return all.slice(0, N);
-    }
-
-    function collectCriticalImgs() {
-        return criticalCharNodes();
-    }
-
-    function waitCritical({minShow = 220, maxWait = 5000, readyRatio = 0.5} = {}) {
-        const imgs = collectCriticalImgs();
-        const need = imgs.length;
-        const start = performance.now();
-        const allSettled = new Promise(resolve => {
-            if (!need) return resolve();
-            let loaded = 0;
-            const mark = () => {
-                loaded++;
-                if (loaded / need >= readyRatio) resolve();
-            };
-            imgs.forEach(img => {
-                if (img.complete) mark();
-                else img.addEventListener('load', mark, {once: true});
-                img.addEventListener('error', mark, {once: true});
-            });
-        });
-        const minDelay = new Promise(r => setTimeout(r, minShow));
-        const maxDelay = new Promise(r => setTimeout(r, maxWait));
-        return Promise.race([Promise.all([allSettled, minDelay]), maxDelay]).then(() => {
-            const spent = performance.now() - start;
-            if (spent < minShow) return new Promise(r => setTimeout(r, minShow - spent));
-        });
-    }
-
-    function ensureGroundBg() {
-        const g = document.getElementById('streetGroundBand');
-        if (g && !g.style.backgroundImage) {
-            g.style.backgroundImage = 'image-set(' +
-                'url("./assets/street_ground.webp") type("image/webp") 1x, ' +
-                'url("./assets/street_ground.png") type("image/jpeg") 1x' +
-                ')';
-        }
-    }
-
-    function enableGate() {
-        const gate = document.getElementById('stageGate');
-        if (!gate) return;
-        gate.hidden = false;
-        requestAnimationFrame(() => gate.classList.add('on'));
-    }
-
-    function disableGate() {
-        const gate = document.getElementById('stageGate');
-        if (!gate) return;
-        gate.classList.remove('on');
-        setTimeout(() => {
-            gate.hidden = true;
-        }, 220);
-        ensureGroundBg(); // підставляємо фон землі одразу після гейта
-    }
-
-    (function bumpHeroPriority() {
-        const chars = Array.from(document.querySelectorAll('#charsBand .charImg'));
-        const N = Math.min(4, Math.max(2, matchMedia('(max-width:780px)').matches ? 2 : 4));
-        chars.forEach((img, i) => {
-            img.setAttribute('decoding', 'async');
-            // орієнтовні числа, щоб браузер міг зарезервувати місце
-            const w = Math.round(img.getBoundingClientRect().width || 240);
-            const h = matchMedia('(max-width:780px)').matches ? 220 : 280;
-            img.setAttribute('width', w);
-            img.setAttribute('height', h);
-            if (i < N) {
-                img.setAttribute('loading', 'eager');
-                img.setAttribute('fetchpriority', 'high');
-            } else {
-                img.setAttribute('loading', 'lazy');
-                img.setAttribute('fetchpriority', 'low');
-            }
-        });
-    })();
-
-    (async function bootStageSmart() {
-        const poor = isPoorNet();
-        const critImgs = collectCriticalImgs();
-        const ready = critImgs.length && critImgs.filter(i => i.complete).length / critImgs.length >= 0.8;
-
-        if (poor && !ready) {
-            enableGate();
-            await waitCritical({minShow: 220, maxWait: 5000, readyRatio: 0.5});
-            disableGate();
-        } else {
-            await new Promise(r => setTimeout(r, ready ? 140 : 200));
-            ensureGroundBg();
-        }
-
-        initStageOnce();
-    })();
 </script>
-
-<script>
-    (function () {
-        const header = document.getElementById('siteHeader');
-
-        if (!header) {
-            // хедера немає – обнуляємо змінну і не вішаємо слухачі
-            document.documentElement.style.setProperty('--header-h', '0px');
-            return;
-        }
-        const headerH = () => header ? Math.round(header.getBoundingClientRect().height) : 0;
-
-        function syncHeaderVar() {
-            document.documentElement.style.setProperty('--header-h', headerH() + 'px');
-        }
-
-        syncHeaderVar();
-        addEventListener('resize', () => {
-            syncHeaderVar();
-            ScrollTrigger.refresh();
-        });
-
-        function setActiveById(id) {
-            document.querySelectorAll('.nav-link').forEach(a => {
-                const target = a.dataset.target || a.getAttribute('href');
-                a.classList.toggle('active', target === id);
-            });
-        }
-
-        document.querySelectorAll('.nav-link').forEach(a => {
-            a.addEventListener('click', (e) => {
-                e.preventDefault();
-                const sel = a.dataset.target || a.getAttribute('href');
-                setActiveById(sel);
-                gsap.to(window, {duration: 0.8, ease: 'power2.out', scrollTo: {y: sel, offsetY: headerH()}});
-                document.documentElement.classList.remove('nav-open');
-                document.getElementById('navToggle')?.setAttribute('aria-expanded', 'false');
-            });
-        });
-
-        const SECTIONS = ['#intro', '#gallery', '#templates', '#faq'];
-        let currentActive = null, rafRunning = false;
-
-        function updateActive() {
-            rafRunning = false;
-            const y = headerH(), hysteresis = 10;
-            let winner = null;
-            for (const id of SECTIONS) {
-                const el = document.querySelector(id);
-                if (!el) continue;
-                const r = el.getBoundingClientRect();
-                if (r.top <= y + hysteresis && r.bottom > y + hysteresis) {
-                    winner = id;
-                    break;
-                }
-            }
-            if (!winner) {
-                let best = Infinity;
-                for (const id of SECTIONS) {
-                    const el = document.querySelector(id);
-                    if (!el) continue;
-                    const dist = Math.abs(el.getBoundingClientRect().top - y);
-                    if (dist < best) {
-                        best = dist;
-                        winner = id;
-                    }
-                }
-            }
-            if (winner && winner !== currentActive) {
-                currentActive = winner;
-                setActiveById(winner);
-            }
-        }
-
-        function onScroll() {
-            if (!rafRunning) {
-                rafRunning = true;
-                requestAnimationFrame(updateActive);
-            }
-        }
-
-        addEventListener('scroll', onScroll, {passive: true});
-        addEventListener('resize', updateActive);
-        addEventListener('load', () => {
-            const hash = window.location.hash;
-            if (hash && document.querySelector(hash)) {
-                gsap.set(window, {scrollTo: {y: hash, offsetY: headerH(), autoKill: false}});
-            }
-            updateActive();
-            ScrollTrigger.refresh();
-        });
-
-        const navToggle = document.getElementById('navToggle');
-
-        function closeNav() {
-            document.documentElement.classList.remove('nav-open');
-            navToggle?.setAttribute('aria-expanded', 'false');
-        }
-
-        function openNav() {
-            document.documentElement.classList.add('nav-open');
-            navToggle?.setAttribute('aria-expanded', 'true');
-        }
-
-        function toggleNav() {
-            document.documentElement.classList.contains('nav-open') ? closeNav() : openNav();
-        }
-
-        navToggle?.addEventListener('click', toggleNav);
-        addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeNav();
-        });
-        addEventListener('resize', () => {
-            if (matchMedia('(min-width:781px)').matches) closeNav();
-        });
-    })();
-</script>
-
-<script>
-    (function () {
-        if (!matchMedia('(max-width:780px)').matches) return;
-        const stage = document.getElementById('stage');
-        if (!stage) return;
-        let x0 = null, y0 = null;
-
-        function onStart(e) {
-            const t = e.touches && e.touches[0];
-            if (!t) return;
-            x0 = t.clientX;
-            y0 = t.clientY;
-        }
-
-        function onEnd(e) {
-            if (x0 == null) return;
-            const t = (e.changedTouches && e.changedTouches[0]) || e.touches?.[0];
-            x0 = x0 ?? 0;
-            y0 = y0 ?? 0;
-            if (!t) {
-                x0 = y0 = null;
-                return;
-            }
-
-            const dx = t.clientX - x0;
-            const dy = Math.abs(t.clientY - y0 || 0);
-
-            // горизонтальний свайп
-            if (Math.abs(dx) > 40 && Math.abs(dx) > dy * 1.2) {
-                const ST = ScrollTrigger.getById('stageParallax');
-                const curr = window.scrollY;
-                const step = Math.max(
-                    innerHeight * 0.45,
-                    Math.min(innerHeight * 0.9, Math.abs(dx) * 8)
-                );
-                const delta = dx < 0 ? step : -step;
-                let target = curr + delta;
-
-                if (ST) {
-                    const start = ST.start;
-                    const end   = ST.end;
-                    const EPS   = 2; // невеликий допуск у пікселях
-
-                    const atTop    = curr <= start + EPS;
-                    const atBottom = curr >= end   - EPS;
-
-                    // якщо ми вже в самому кінці сцени і свайпимо "вперед" (вліво),
-                    // дозволяємо вийти нижче end → скролимо вниз до галереї
-                    // якщо на самому початку і свайп назад — дозволяємо вийти вище сцени
-                    const exitingStage =
-                        (dx < 0 && atBottom) ||  // кінець сцени, рух вперед
-                        (dx > 0 && atTop);       // початок сцени, рух назад
-
-                    if (!exitingStage) {
-                        // звичайна поведінка: тримаємося всередині pinned-ділянки
-                        target = Math.max(start, Math.min(end, target));
-                    }
-                }
-
-                window.scrollTo({ top: target, behavior: 'smooth' });
-            }
-
-            x0 = y0 = null;
-        }
-
-
-        stage.addEventListener('touchstart', onStart, {passive: true});
-        stage.addEventListener('touchend', onEnd, {passive: true});
-    })();
-</script>
-
-<script>
-    (function () {
-        const loader = document.getElementById('bbLoader');
-        const iframe = document.getElementById('bbFrame');
-        if (!loader || !iframe) return;
-
-        function hideLoader() {
-            if (!loader || loader._hidden) return;
-            loader._hidden = true;
-            loader.style.opacity = '0';
-            setTimeout(() => loader.remove(), 180);
-        }
-
-        // якщо користувач тицяє — прибираємо оверлей одразу
-        loader.addEventListener('pointerdown', hideLoader, {once: true});
-        loader.addEventListener('touchstart', hideLoader, {once: true, passive: true});
-
-        // коли iframe готовий — теж прибираємо
-        iframe.addEventListener('load', hideLoader, {once: true});
-
-        // запасний таймаут
-        setTimeout(hideLoader, 8000);
-    })();
-</script>
-<script>
-    (function billboardHitTest() {
-        const charsLayer = document.getElementById('chars');
-        const billboard = document.querySelector('.houseBillboard');
-        const screen = document.querySelector('.houseBillboard .billboard-screen');
-
-        if (!charsLayer || !billboard || !screen) return;
-
-        const overBillboard = (x, y) => {
-            const stack = document.elementsFromPoint(x, y);
-            return stack.some(el => el === billboard || el === screen || el.closest?.('.houseBillboard'));
-        };
-
-        const setCharsPE = (enabled) => {
-            charsLayer.style.pointerEvents = enabled ? 'auto' : 'none';
-        };
-
-        document.addEventListener('pointermove', (e) => {
-            setCharsPE(!overBillboard(e.clientX, e.clientY));
-        }, {passive: true});
-
-        let touched = false;
-        document.addEventListener('touchstart', (e) => {
-            const t = e.touches && e.touches[0];
-            if (!t) return;
-            touched = true;
-            setCharsPE(!overBillboard(t.clientX, t.clientY));
-        }, {passive: true});
-
-        document.addEventListener('touchend', () => {
-            if (!touched) return;
-            touched = false;
-            // невелика затримка — щоб YouTube встиг з’їсти тап
-            setTimeout(() => setCharsPE(true), 450);
-        }, {passive: true});
-
-        screen.addEventListener('pointerenter', () => setCharsPE(false));
-        screen.addEventListener('pointerleave', () => setCharsPE(true));
-    })();
-</script>
-<script>
-    (function traffic() {
-        const trafficLayer = () => document.getElementById('trafficLayer');
-        if (!trafficLayer()) return;
-
-        // Список машин з «вагою» появи
-        const FLEET = [
-            {src: './assets/car1.webp', cls: 'car', weight: 2},
-            {src: './assets/car2.webp', cls: 'car', weight: 3},
-            {src: './assets/car3.webp', cls: 'car', weight: 3},
-            {src: './assets/car4.webp', cls: 'longcar', weight: 3},
-            {src: './assets/bus.webp', cls: 'bus', weight: 1.2}
-        ];
-
-
-        // утиліти
-        const pickWeighted = (arr) => {
-            const sum = arr.reduce((s, a) => s + a.weight, 0);
-            let r = Math.random() * sum;
-            for (const a of arr) {
-                if ((r -= a.weight) <= 0) return a;
-            }
-            return arr[0];
-        };
-        const rand = (a, b) => a + Math.random() * (b - a);
-        const bandWidth = () => {
-            const band = document.getElementById('streetGroundBand');
-            return band ? Math.max(band.scrollWidth, innerWidth * 3) : innerWidth * 3;
-        };
-
-        let busy = false;
-
-        function spawnVehicle() {
-            if (busy) return scheduleNext();
-            busy = true;
-
-            const fleetItem = pickWeighted(FLEET);
-            const dirLTR = Math.random() < 0.5;
-            const lane = Math.random() < 0.55 ? 1 : 2;
-            const speed = rand(1500, 1800);
-            const pad = Math.max(innerWidth * 0.22, 240);
-            const W = bandWidth();
-
-            // вузол
-            const box = document.createElement('div');
-            box.className = 'vehicle' + (lane === 2 ? ' lane2' : '') + ' ' + fleetItem.cls;
-            const img = new Image();
-            img.src = fleetItem.src;
-            img.alt = fleetItem.cls;
-            box.appendChild(img);
-            trafficLayer().appendChild(box);
-
-
-            const startX = dirLTR ? -pad : (W + pad);
-            const endX = dirLTR ? (W + pad) : -pad;
-
-            if (!dirLTR) box.classList.add('flip');
-
-
-            gsap.set(box, {x: startX});
-
-
-            const duration = Math.abs(endX - startX) / speed;
-
-            gsap.to(box, {
-                x: endX,
-                ease: "none",
-                duration,
-                onComplete() {
-                    box.remove();
-                    busy = false;
-                    scheduleNext();
-                }
-            });
-        }
-
-        function scheduleNext() {
-            const delay = rand(5, 10);
-            setTimeout(() => {
-                if (document.hidden) return scheduleNext();
-                spawnVehicle();
-            }, delay * 1000);
-        }
-
-        addEventListener('load', () => scheduleNext());
-    })();
-</script>
-<script>
-    (function () {
-        const overlay = document.getElementById('mailOverlay');
-        if (!overlay) return;
-
-        const open = () => {
-            overlay.hidden = false;
-            requestAnimationFrame(() => {
-                overlay.classList.add('on');
-                document.documentElement.classList.add('modal-open');
-
-                const letter = overlay.querySelector('.mail-envelope .letter');
-                if (letter && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-                    gsap.killTweensOf(letter);
-                    gsap.set(letter, {y: 18}); // старт трохи нижче
-                    gsap.timeline()
-                        .to(letter, {y: -10, duration: 0.28, ease: 'power2.out'}) // підскок
-                        .to(letter, {y: 0,   duration: 0.36, ease: 'power1.out'}); // назад вниз
-                }
-            });
-        };
-        const close = () => {
-            overlay.classList.remove('on');
-            setTimeout(() => {
-                document.documentElement.classList.remove('modal-open');
-                overlay.hidden = true;
-            }, 220);
-        };
-
-        window.__mail = {open, close};
-
-        overlay.addEventListener('click', (e) => {
-            if (e.target === overlay) close();
-        });
-
-        overlay.addEventListener('click', (e) => {
-            const btn = e.target.closest('.letter-close');
-            if (btn) close();
-        });
-
-        addEventListener('keydown', (e) => {
-            if (!overlay.hidden && e.key === 'Escape') close();
-        });
-    })();
-    (function floatingPostbox() {
-        const fab = document.getElementById('postboxFab');
-        if (!fab) return;
-
-        fab.addEventListener('click', () => window.__mail?.open && window.__mail.open());
-
-        const run = () => {
-            const st = ScrollTrigger.getById('stageParallax');
-            if (!st) {
-                requestAnimationFrame(run);
-                return;
-            }
-
-            const HIDE_AFTER = 0.12;
-            const sync = () => {
-                const active = (scrollY >= st.start && scrollY <= st.end);
-                const firstScreen = st.progress <= HIDE_AFTER + 0.0001;
-                if (active && firstScreen) fab.classList.add('on');
-                else fab.classList.remove('on');
-            };
-
-            sync();
-            ScrollTrigger.addEventListener('update', sync);
-            addEventListener('resize', sync);
-            addEventListener('scroll', sync, {passive: true});
-        };
-        run();
-    })();
-</script>
-<script>
-    (function formValidation(){
-        const form  = document.querySelector('.submitForm');
-        if(!form) return;
-
-        const name  = document.getElementById('name');
-        const email = document.getElementById('email');
-        const errorBox = document.getElementById('formError');
-        document.querySelector('.submitBtn')?.addEventListener('click', (e) => {
-            e.preventDefault();
-            form.requestSubmit();
-        });
-
-        const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/i.test(v.trim());
-
-        function liveClear(el, test){
-            el.addEventListener('input', () => {
-                if(test(el.value)) el.classList.remove('invalid'), el.removeAttribute('aria-invalid');
-                if(test(name.value) && isEmail(email.value)) errorBox.hidden = true;
-            });
-        }
-        liveClear(name, v => v.trim().length > 0);
-        liveClear(email, isEmail);
-
-        form.addEventListener('submit', (e) => {
-            let ok = true;
-
-            if(name.value.trim().length === 0){
-                name.classList.add('invalid');
-                name.setAttribute('aria-invalid','true');
-                ok = false;
-            }else{
-                name.classList.remove('invalid');
-                name.removeAttribute('aria-invalid');
-            }
-
-            if(!isEmail(email.value)){
-                email.classList.add('invalid');
-                email.setAttribute('aria-invalid','true');
-                ok = false;
-            }else{
-                email.classList.remove('invalid');
-                email.removeAttribute('aria-invalid');
-            }
-
-            errorBox.hidden = ok;
-
-            if(!ok){
-                e.preventDefault();
-                return;
-            }
-
-            e.preventDefault();
-            errorBox.hidden = true;
-        });
-    })();
-</script>
-<script>
-    (function () {
-
-        function initGalleryParallax() {
-            // тільки десктоп
-            if (!matchMedia('(min-width: 781px)').matches) return;
-
-            const imgs = gsap.utils.toArray('.pg-item__media img');
-            if (!imgs.length) return;
-
-            const SHIFT = 18;    // було 25 – зробили делікатнішим
-            const SCALE = 1.05;  // легкий zoom, щоб не зʼявлялись полоски
-
-            imgs.forEach((img) => {
-                gsap.set(img, {
-                    scale: SCALE,
-                    yPercent: -SHIFT,
-                    transformOrigin: "center center"
-                });
-
-                gsap.to(img, {
-                    yPercent: SHIFT,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: img.parentElement,
-                        start: "top bottom",
-                        end: "bottom top",
-                        scrub: true,
-                        invalidateOnRefresh: true
-                    }
-                });
-            });
-
-            ScrollTrigger.refresh();
-        }
-
-        window.addEventListener("load", initGalleryParallax);
-
-    })();
-
-</script>
-
-
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
+<script type="module" src="./js/main.js"></script>
 </body>
 </html>

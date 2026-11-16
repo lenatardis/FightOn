@@ -1,0 +1,274 @@
+/* ==========================================================================
+   Feedback: floating postbox button + envelope modal
+   ========================================================================== */
+
+:root {
+    --env-w: 88%;                            /* envelope scale (base + flap together) */
+    --letter-w: calc(var(--env-w) * 0.78);   /* letter width relative to the envelope */
+}
+
+.mail-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    background: rgba(10, 14, 32, .55);
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .22s ease;
+}
+
+.mail-overlay.on {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.mail-modal {
+    position: fixed;
+    left: 50%;
+    top: 60%;
+    transform: translate(-50%, -50%);
+    width: min(680px, 92vw);
+    max-height: 90dvh;
+}
+
+.mail-envelope {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 5/4;
+}
+
+.mail-envelope > img {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: var(--env-w);
+    height: auto;
+    transform: translate(-50%, -50%);
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+    pointer-events: none;
+}
+
+.env-base { z-index: 3; }
+.mail-envelope .env-flap { z-index: 1; top: 21%; }
+
+.mail-envelope .letter {
+    position: absolute;
+    left: 50%;
+    top: 25%;
+    z-index: 2;
+    width: var(--letter-w);
+    transform: translate(-50%, -50%);
+    display: grid;
+    place-items: center;
+}
+
+.letter-card {
+    position: relative;
+    width: 100%;
+    height: 115%;
+    background: #EDF8FF;
+    color: #1c243a;
+    padding: 20px 18px 22px;
+    outline: 6px solid #BFE5FF;
+    outline-offset: -6px;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .28);
+    font-family: var(--font-system);
+}
+
+.letter-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+.letter-close::before,
+.letter-close::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 28px;
+    height: 3px;
+    background: #8A8E99;
+    border-radius: 2px;
+}
+
+.letter-close::before { transform: translate(-50%, -50%) rotate(45deg); }
+.letter-close::after { transform: translate(-50%, -50%) rotate(-45deg); }
+
+.letter-close:hover::before,
+.letter-close:hover::after {
+    background: #737783;
+}
+
+.letter-close:focus-visible {
+    outline: 2px solid #bcd7ff;
+    outline-offset: 3px;
+    border-radius: 50%;
+}
+
+.mailTitle {
+    text-align: center;
+    font-family: var(--font-type);
+    font-size: 24px;
+    font-weight: 700;
+    line-height: 100%;
+    color: #351D0B;
+    text-transform: uppercase;
+    margin: 30px 0 10px;
+}
+
+.submitForm label {
+    display: block;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 16px;
+    line-height: 100%;
+    margin-bottom: 10px;
+    color: #351D0B;
+}
+
+.submitForm__wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 10px;
+    padding: 10px 0 20px;
+}
+
+.submitForm input,
+.submitForm select {
+    display: block;
+    width: 100%;
+    height: 40px;
+    border: 1px solid #8C8C8C;
+    box-sizing: border-box;
+    background: #fff;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    line-height: 100%;
+    border-radius: 5px;
+    padding: 1px 10px;
+    color: #351D0B;
+}
+
+.submitForm .invalid {
+    border-color: #E74C3C;
+    box-shadow: 0 0 0 2px #E74C3C22;
+}
+
+.submitBtn__wrap {
+    display: flex;
+    justify-content: center;
+}
+
+.submitBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 170px;
+    padding: 12px 0;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .10);
+    background: #086597;
+    color: #e9f2ff;
+    font: 700 16px/normal var(--font-type);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: transform .15s ease, background .15s ease;
+}
+
+.submitBtn:hover,
+.submitBtn:focus-visible {
+    transform: translateY(-1px);
+    background: #7B8CF1;
+}
+
+.form-error {
+    margin: 6px 0 0;
+    text-align: center;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+    color: #C0392B;
+}
+
+.form-error.is-success {
+    color: #1e7d4f;
+}
+
+@media (max-width: 780px) {
+    .submitForm__wrap {
+        grid-template-columns: 1fr;
+        row-gap: 10px;
+    }
+
+    .mail-modal { top: 80%; }
+    .letter-card { height: 90%; }
+    .mail-envelope .letter { top: -30%; }
+
+    .letter-close {
+        right: 8px;
+        top: 8px;
+    }
+}
+
+/* ---------- floating postbox ---------- */
+
+.postbox-fab {
+    position: fixed;
+    right: clamp(12px, 3vw, 28px);
+    bottom: 0;
+    z-index: 12010;
+    display: grid;
+    place-items: end center;
+    width: clamp(54px, 9vmin, 84px);
+    height: clamp(72px, 18vh, 136px);
+    border-radius: 16px;
+    background: transparent;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    transition: transform .15s ease, opacity .18s ease, filter .18s ease;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.postbox-fab img {
+    display: block;
+    width: auto;
+    max-width: none;
+    height: clamp(72px, 18vh, 136px);
+    filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .35));
+    -webkit-user-drag: none;
+    user-select: none;
+}
+
+.postbox-fab.on {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.postbox-fab:active {
+    transform: translateY(1px) scale(.98);
+}
+
+@media (max-width: 780px) {
+    .postbox-fab {
+        right: 30px;
+        height: 120px;
+    }
+}
+
+html.modal-open .postbox-fab {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1px) scale(.98);
+}

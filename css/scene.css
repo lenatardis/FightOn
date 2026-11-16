@@ -1,0 +1,560 @@
+/* ==========================================================================
+   Scene: sky intro + pinned horizontal street with the heroes
+   ========================================================================== */
+
+:root {
+    --intro-h: 120vh;
+    --stage-h: 108vh;
+    --ground-h: 40vh;
+    --snow-h: 50px;
+    --mountains-k: 0.85;
+    --sun-k: 0.90;
+    --sun-w: min(22vmax, 420px);
+    --char-drop: -33.25vh;
+    --char-scale: 1.3;
+    --first-char-extra-gap: 0px;       /* set by js/scene/heroes.js */
+    --top-h: clamp(110px, 11vmin, 160px);
+    --top-gap: 0px;
+    --top-font: clamp(16px, 2.2vmin, 24px);
+    --top-pad-x: 12px;
+}
+
+/* ---------- intro ---------- */
+
+.sky-gradient1 {
+    background: radial-gradient(900px 520px at 65% 10%, rgba(255, 255, 255, .18) 0, rgba(255, 255, 255, 0) 60%),
+    linear-gradient(180deg, #7B8CF1 0%, #6FA2FA 28%, #699BD8 100%);
+}
+
+.sky-gradient2 {
+    background: linear-gradient(180deg, #699BD8 0%, #82ABDD 28%, #ACBEB4 100%);
+}
+
+.intro {
+    position: relative;
+    height: var(--intro-h);
+    overflow: hidden;
+}
+
+.intro-logo {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 16vh;
+    z-index: 3;
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    pointer-events: none;
+}
+
+.intro-logo img {
+    width: min(48vmax, 760px);
+    height: auto;
+    filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+}
+
+.intro .cloud {
+    position: absolute;
+    z-index: 2;
+    filter: drop-shadow(0 6px 14px rgba(0, 0, 0, .12));
+}
+
+.intro .cloud img {
+    height: 22vh;
+    width: auto;
+    max-width: none;
+}
+
+.cloud--lt { left: 6vw; top: 22vh; }
+.cloud--rt { right: 6vw; top: 22vh; }
+.cloud--lb { left: 12vw; bottom: 40vh; }
+.cloud--rb { right: 12vw; bottom: 40vh; }
+
+/* ---------- stage shell ---------- */
+
+.stage {
+    position: relative;
+    height: var(--stage-h);
+    overflow: hidden;
+}
+
+.stage img {
+    max-width: none;
+}
+
+.layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.band {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 100%;
+    min-width: 100%;
+    display: flex;
+    align-items: flex-end;
+    white-space: nowrap;
+    will-change: transform;
+    transform: translateZ(0);
+}
+
+#sky { z-index: 1; }
+#sun { z-index: 2; }
+#mountains { z-index: 4; }
+#streetGround { z-index: 5; }
+#streetSnow { z-index: 6; }
+#houses { z-index: 7; }
+#chars { z-index: 8; }
+
+#sky::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 6vh;
+    transform: translateX(-50%);
+    width: 64vmin;
+    height: 64vmin;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, #fff 0 10%, #fff8 10% 26%, #fff3 26% 42%, transparent 60%);
+    filter: blur(16px);
+    opacity: .22;
+}
+
+.stage::after {
+    content: "";
+    position: absolute;
+    left: -5vw;
+    right: -5vw;
+    bottom: -6vh;
+    height: 18vh;
+    background: radial-gradient(120% 150% at 50% 115%, rgba(0, 0, 0, .35) 0%, rgba(0, 0, 0, .18) 38%, rgba(0, 0, 0, 0) 72%);
+    pointer-events: none;
+    z-index: 3;
+}
+
+/* ---------- sun / mountains / houses ---------- */
+
+.sunImg {
+    position: absolute;
+    left: 50%;
+    bottom: calc(var(--ground-h) * var(--sun-k) + 8vh);
+    width: var(--sun-w);
+    height: auto;
+    margin-left: calc(var(--sun-w) / -2);   /* centred without a transform, GSAP owns the transform */
+    opacity: .93;
+    filter: blur(.2px);
+}
+
+.mountainsImg {
+    height: 32vh;
+    width: auto;
+    margin: 0 0 10vh;
+}
+
+#mountainsBand {
+    bottom: calc(var(--ground-h) * var(--mountains-k));
+}
+
+#mountains .mountainsImg:nth-of-type(2) {
+    margin-left: -2px;
+}
+
+.houseImg {
+    height: 44vh;
+    width: auto;
+    margin: 0 36px 0;
+    filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+}
+
+#housesBand > :first-child {
+    margin-left: 0;
+}
+
+#housesBand {
+    bottom: var(--ground-h);
+}
+
+/* ---------- billboard (video) ---------- */
+
+.houseBillboard {
+    position: relative;
+    z-index: 50;
+    height: 44vh;
+    aspect-ratio: 16/9;
+    margin: 0 36px 0;
+    flex: 0 0 auto;
+    background: url("../assets/bigboard.svg") center/contain no-repeat;
+    filter: drop-shadow(0 10px 26px rgba(0, 0, 0, .28));
+    pointer-events: auto;
+}
+
+.billboard-screen {
+    position: absolute;
+    left: 12.5%;
+    top: 15%;
+    width: 75%;
+    height: 70%;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+}
+
+.billboard-screen iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+/* poster shown until the visitor presses play – the player itself loads on demand */
+.bb-poster {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: #000 center/cover no-repeat;
+    cursor: pointer;
+}
+
+.bb-poster::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, .45), transparent 35%);
+    pointer-events: none;
+}
+
+.bb-poster__play {
+    position: relative;
+    z-index: 1;
+    width: clamp(44px, 16%, 72px);
+    height: auto;
+    transition: transform .15s ease;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, .45));
+}
+
+.bb-poster:hover .bb-poster__play,
+.bb-poster:focus-visible .bb-poster__play {
+    transform: scale(1.08);
+}
+
+.bb-poster:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: -3px;
+}
+
+@media (max-width: 780px) {
+    .sunImg {
+        bottom: calc(var(--ground-h) * var(--sun-k) + 19vh);
+    }
+
+    .houseBillboard {
+        height: auto;
+        margin: 0 12px;
+        max-width: calc(100vw - 24px);
+        width: 100%;
+        max-height: 44vh;
+    }
+}
+
+/* ---------- street ---------- */
+
+#streetGroundBand {
+    background: url("../assets/street_ground.webp") left bottom / auto var(--ground-h) repeat-x;
+}
+
+.streetGroundSpacer {
+    width: 600vw;              /* real width is set by js/scene/stage.js */
+    height: var(--ground-h);
+}
+
+.snowLine {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: var(--ground-h);
+    height: var(--snow-h);
+    background: #fff;
+}
+
+.trafficLayer {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--ground-h);
+    pointer-events: none;
+}
+
+.vehicle {
+    position: absolute;
+    bottom: calc(var(--ground-h) * 0.25);
+    will-change: transform;
+    transform: translateX(-200px);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .35));
+}
+
+.vehicle.lane2 { bottom: calc(var(--ground-h) * 0.3); }
+
+.vehicle img {
+    display: block;
+    height: 20vh;
+    width: auto;
+}
+
+.vehicle.longcar img { height: 18vh; }
+.vehicle.bus img { height: 21vh; }
+.vehicle.flip img { transform: scaleX(-1); }
+
+/* ---------- heroes ---------- */
+
+.charImg {
+    position: relative;
+    display: inline-block;
+    width: 240px;
+    margin: 0 90px 0;
+    transform: translateY(var(--char-drop)) translateZ(0);
+    transform-origin: center bottom;
+    transition: transform .2s ease, filter .2s ease;
+    filter: drop-shadow(0 12px 34px rgba(0, 0, 0, .35));
+    vertical-align: bottom;
+    will-change: transform;
+    pointer-events: auto;      /* the layer itself is click-through, so the billboard behind stays usable */
+}
+
+img.charImg {
+    height: auto;              /* before JS wraps the image */
+}
+
+#charsBand > .charImg:first-child {
+    margin-left: calc(5vw + var(--first-char-extra-gap));
+}
+
+.charImg > img.base {
+    display: block;
+    width: 100%;
+    height: auto;
+    position: relative;
+    z-index: 2;
+}
+
+.charImg > img.hover {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    height: 100%;
+    width: auto;
+    margin: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .18s ease;
+    object-fit: contain;
+    object-position: center bottom;
+    z-index: 2;
+}
+
+.charImg:hover > img.hover,
+.charImg:focus-visible > img.hover,
+.charImg.is-touch > img.hover {
+    opacity: 1;
+}
+
+.charImg:hover,
+.charImg:focus-visible,
+.charImg.is-touch {
+    transform: translateY(var(--char-drop)) scale(var(--char-scale));
+    z-index: 20;
+}
+
+.charImg:focus-visible {
+    outline: none;
+}
+
+/* stats plate under a hero */
+.charPlate {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + 15px);
+    transform: translateX(-50%) scale(var(--plate-scale, 1));
+    transform-origin: center top;
+    z-index: 1;
+    pointer-events: none;
+    background: #111;
+    color: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 0 0 3px #fff, 0 8px 18px rgba(0, 0, 0, .35);
+    display: none;
+}
+
+.charPlate::before {
+    content: "";
+    position: absolute;
+    left: var(--plate-tip-x, 50%);
+    top: -13px;
+    transform: translateX(-50%);
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-bottom: 13px solid #fff;
+}
+
+.charPlate__inner {
+    display: flex;
+    column-gap: 15px;
+}
+
+.charPlate__col {
+    display: flex;
+    flex-direction: column;
+    row-gap: 12px;
+    width: 100%;
+    margin: 0;
+}
+
+.charPlate__row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px dashed #fff;
+}
+
+.charPlate dt {
+    font: 14px/1 var(--font-type);
+    text-transform: uppercase;
+}
+
+.charPlate dd {
+    margin: 0 0 0 10px;
+    font: 12px/12px 'Gotham', sans-serif;
+}
+
+.charImg:hover .charPlate,
+.charImg:focus-visible .charPlate,
+.charImg.is-touch .charPlate {
+    display: block;
+    --plate-scale: calc(1 / var(--char-scale));
+}
+
+#charsBand > .charImg:first-child .charPlate {
+    left: 20px;
+    right: auto;
+    transform: translateX(0) scale(var(--plate-scale, 1));
+    --plate-tip-x: 28px;
+}
+
+#charsBand > .charImg:last-child .charPlate {
+    left: auto;
+    right: 20px;
+    transform: translateX(0) scale(var(--plate-scale, 1));
+    --plate-tip-x: calc(100% - 28px);
+}
+
+/* name bubble above a hero */
+.charTop {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + var(--top-gap));
+    transform: translateX(-50%) translateY(6px) scale(var(--top-scale, 1));
+    transform-origin: center bottom;
+    z-index: 30;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .18s ease, transform .18s ease;
+}
+
+.charTop__img {
+    display: block;
+    height: var(--top-h);
+    width: auto;
+}
+
+.charTop__label {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    padding: 0 var(--top-pad-x);
+    transform: translate(-50%, -50%);
+    font: 700 var(--top-font)/1 var(--font-type);
+    text-transform: uppercase;
+    letter-spacing: .6px;
+    color: #2b1e1e;
+    white-space: nowrap;
+}
+
+.charImg:hover .charTop,
+.charImg:focus-visible .charTop,
+.charImg.is-touch .charTop {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(var(--top-scale, 1));
+    --top-scale: calc(1 / var(--char-scale));
+}
+
+@media (max-width: 780px) {
+    .charPlate {
+        padding: 10px 5px;
+        top: 100%;
+    }
+
+    .charPlate__inner {
+        flex-direction: column;
+        row-gap: 5px;
+    }
+
+    .charPlate__col {
+        row-gap: 5px;
+    }
+}
+
+/* ---------- loading gate (slow connections only) ---------- */
+
+#stageGate[hidden] {
+    display: none;
+}
+
+#stageGate {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: radial-gradient(900px 520px at 60% 15%, rgba(11, 16, 32, .65), rgba(11, 16, 32, .35));
+    z-index: 9000;
+    opacity: 0;
+    transition: opacity .22s ease;
+    backdrop-filter: blur(6px) saturate(120%);
+    -webkit-backdrop-filter: blur(6px) saturate(120%);
+}
+
+#stageGate.on {
+    opacity: 1;
+}
+
+.gate-card {
+    padding: 16px 18px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .18);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, .35);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--font-type);
+    letter-spacing: .2px;
+}
+
+.gate-spinner {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 3px solid rgba(255, 255, 255, .25);
+    border-top-color: #fff;
+    animation: spin .8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
