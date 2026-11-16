@@ -575,36 +575,39 @@
 </main>
 
 <!-- ===================== FEEDBACK MODAL ===================== -->
-<div class="mail-overlay" id="mailOverlay" lang="uk" hidden>
+<div class="mail-overlay" id="mailOverlay" hidden>
     <div class="mail-modal" role="dialog" aria-modal="true" aria-labelledby="mailTitle">
         <div class="mail-envelope">
             <img class="env-base" src="./assets/base.svg" alt="" width="690" height="368">
             <div class="letter">
                 <div class="letter-card">
-                    <button class="letter-close" type="button" aria-label="Закрити"></button>
-                    <h2 class="mailTitle" id="mailTitle">Зворотній зв'язок</h2>
-                    <p id="formError" class="form-error" role="status" data-success="Дякуємо! Повідомлення надіслано." hidden>*Заповніть коректно виділені поля.</p>
+                    <button class="letter-close" type="button" aria-label="Close"></button>
+                    <h2 class="mailTitle" id="mailTitle">Get in touch</h2>
+                    <p id="formError" class="form-error" role="status" data-success="Thank you! Your message has been sent." hidden>*Please fill in the highlighted fields correctly.</p>
                     <form class="submitForm" novalidate>
                         <div>
-                            <label for="topic">Тема</label>
+                            <label for="topic">Topic</label>
                             <select name="topic" id="topic">
-                                <option value="value1">Тема 1</option>
-                                <option value="value2">Тема 2</option>
-                                <option value="value3">Тема 3</option>
+                                <option value="partnership">Partnership &amp; collaboration</option>
+                                <option value="creators">Streamer &amp; creator program</option>
+                                <option value="gameplay">Gameplay question</option>
+                                <option value="payments">Payments &amp; withdrawals</option>
+                                <option value="bug">Report a bug</option>
+                                <option value="other">Something else</option>
                             </select>
                         </div>
                         <div class="submitForm__wrap">
                             <div>
-                                <label for="name">Ім'я</label>
-                                <input type="text" id="name" name="name" autocomplete="name" placeholder="Ваше ім'я">
+                                <label for="name">Name</label>
+                                <input type="text" id="name" name="name" autocomplete="name" placeholder="Your name">
                             </div>
                             <div>
                                 <label for="email">E-mail</label>
-                                <input type="email" id="email" name="email" autocomplete="email" placeholder="Ваш email">
+                                <input type="email" id="email" name="email" autocomplete="email" placeholder="Your email">
                             </div>
                         </div>
                         <div class="submitBtn__wrap">
-                            <button class="submitBtn" type="submit">Відправити</button>
+                            <button class="submitBtn" type="submit">Send</button>
                         </div>
                     </form>
                 </div>

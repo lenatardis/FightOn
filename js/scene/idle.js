@@ -13,6 +13,7 @@ const POSE = {
 const LEAN = {
     degPerScrollSpeed: 8 / 2500,     // degrees per px/s of scroll
     maxDeg: 8,
+    maxCatchUpFrames: 4,             // after a long stall, don't try to simulate the whole gap
 };
 
 const rand = (a, b) => a + Math.random() * (b - a);
@@ -58,7 +59,11 @@ function initLean(heroes, stageTrigger, isVisible) {
         if (!isVisible()) return;
         const scrollSpeed = stageTrigger.isActive ? stageTrigger.getVelocity() : 0;
         const target = clamp(scrollSpeed * LEAN.degPerScrollSpeed, LEAN.maxDeg);
-        const frames = gsap.ticker.deltaRatio(60);
+        // The spring is integrated in steps of at most one 60 fps frame: a single big step after a
+        // slow frame (or a throttled tab) would overshoot and make the spring blow up.
+        const frames = Math.min(gsap.ticker.deltaRatio(60), LEAN.maxCatchUpFrames);
+        const steps = Math.ceil(frames);
+        const step = frames / steps;
 
         springs.forEach((s) => {
             const goal = target * s.reach;
@@ -67,8 +72,11 @@ function initLean(heroes, stageTrigger, isVisible) {
                 if (s.angle !== 0) s.setAngle(s.angle = 0);
                 return;
             }
-            s.speed = (s.speed + (goal - s.angle) * s.stiffness * frames) * s.damping ** frames;
-            s.angle += s.speed * frames;
+            for (let i = 0; i < steps; i++) {
+                s.speed = (s.speed + (goal - s.angle) * s.stiffness * step) * s.damping ** step;
+                s.angle += s.speed * step;
+            }
+            s.angle = clamp(s.angle, LEAN.maxDeg * 1.5);
             s.setAngle(s.angle);
         });
     });
