@@ -4,8 +4,6 @@ name: Safari check
 
 on:
   workflow_dispatch:
-  push:
-    branches: ['1611_renovation']
 
 permissions:
   contents: write

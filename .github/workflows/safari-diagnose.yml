@@ -1,0 +1,146 @@
+# Diagnostic: why does desktop Safari on the CI Mac paint this page black?
+# Builds stripped-down copies of the page on the runner (nothing is committed) and
+# records how much of each one Safari actually paints.
+name: Safari diagnose
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['1611_renovation']
+    paths: ['.github/workflows/safari-diagnose.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    runs-on: macos-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Build variants
+        run: |
+          mkdir -p shots
+          git show origin/master:index.html > ci-old.html
+          python3 - <<'PY'
+          import re
+          new = open('index.html').read()
+          old = open('ci-old.html').read()
+          strip = lambda h: re.sub(r'<script\b.*?</script>', '', h, flags=re.S)
+          def cut(h, a, b):
+              i, j = h.index(a), h.index(b)
+              return h[i:j]
+          head = new[:new.index('<main>')]
+          intro = cut(new, '<!-- ===================== SKY INTRO', '<!-- ===================== STREET SCENE')
+          stage = cut(new, '<!-- ===================== STREET SCENE', '<!-- ===================== DECK')
+          deck = cut(new, '<!-- ===================== DECK', '</main>')
+          tail = new[new.index('<!-- ===================== ICON SPRITE'):]
+          page = lambda body, scripts=False: (head + '<main>' + body + '</main>' + (tail if scripts else strip(tail)))
+          inject = lambda h, css: h.replace('</head>', '<style>' + css + '</style></head>')
+          nofonts = lambda h: re.sub(r'<link[^>]*(fonts\.g|fonts/fonts\.css)[^>]*>', '', h)
+          V = {
+              'old_static': strip(old),
+              'new_static': strip(new),
+              'new_static_nofonts': nofonts(strip(new)),
+              'new_static_flat': inject(strip(new), '*,*::before,*::after{transform:none!important;will-change:auto!important;filter:none!important;-webkit-backdrop-filter:none!important;backdrop-filter:none!important;-webkit-mask-image:none!important;mask-image:none!important;animation:none!important;perspective:none!important}'),
+              'new_static_nolazy': strip(new).replace(' loading="lazy"', ''),
+              'intro_static': page(intro),
+              'intro_js': page(intro, True),
+              'stage_static': page(stage),
+              'stage_js': page(stage, True),
+              'deck_static': page(deck),
+              'deck_js': page(deck, True),
+              'intro_stage_static': page(intro + stage),
+              'intro_nocss': re.sub(r'<link[^>]*css/(mail|deck|deck-slides)\.css[^>]*>', '', page(intro)),
+              'intro_noimgs': re.sub(r'<img[^>]*>', '', page(intro)),
+              'm_black_body_text': '<!doctype html><body style="margin:0;background:#000;color:#fff"><h1 style="font:80px sans-serif;padding:80px">White on black</h1>',
+              'm_gradient': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"></div>',
+              'm_gradient_tall': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"></div><div style="height:16000px"></div>',
+              'm_gradient_png': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><img src="assets/fighton.png" width="512"></div>',
+              'm_gradient_svg': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><img src="assets/cloud_left_top.svg" height="200"></div>',
+              'm_gradient_svg_shadow': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><img src="assets/cloud_left_top.svg" height="200" style="filter:drop-shadow(0 6px 14px rgba(0,0,0,.12))"></div>',
+              'm_gradient_hero_svg': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><img src="assets/Sniper.svg" width="240"></div>',
+              'm_gradient_webp': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><img src="assets/house1.webp" height="300"></div>',
+              'm_gradient_gfont': '<!doctype html><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;700&display=swap"><body style="margin:0;background:#000;font-family:Outfit"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><h1>Outfit</h1></div>',
+              'm_gradient_localfont': '<!doctype html><link rel="stylesheet" href="assets/fonts/fonts.css"><body style="margin:0;background:#000;font-family:Lucznik"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><h1>Lucznik</h1></div>',
+              'm_gradient_willchange': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"><div style="width:300px;height:300px;background:red;will-change:transform;transform:translateZ(0)"></div></div>',
+              'm_gradient_backdrop': '<!doctype html><body style="margin:0;background:#000"><div style="height:120vh;background:linear-gradient(#7B8CF1,#699BD8)"></div><div style="position:fixed;inset:0;opacity:0;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)"></div>',
+          }
+          for k, h in V.items():
+              open('ci-%s.html' % k, 'w').write(h)
+          open('ci-variants.txt', 'w').write('\n'.join(V))
+          PY
+          python3 -m http.server 8765 >/dev/null 2>&1 &
+          sleep 2
+          curl -sf -o /dev/null http://localhost:8765/ci-new_static.html
+
+      - name: Measure in Safari
+        run: |
+          sw_vers
+          system_profiler SPDisplaysDataType | head -20 || true
+          sudo safaridriver --enable
+          python3 -m venv .venv && .venv/bin/pip -q install selenium
+          .venv/bin/python - <<'PY'
+          import json, time, subprocess
+          from selenium import webdriver
+
+          def painted(name):
+              """Share of the screenshot that is not (near) black, 0..1."""
+              png = 'shots/%s.png' % name
+              d.save_screenshot(png)
+              subprocess.run(['sips', '-s', 'format', 'bmp', '-z', '53', '90', png, '--out', '/tmp/x.bmp'], capture_output=True)
+              b = open('/tmp/x.bmp', 'rb').read()
+              off = int.from_bytes(b[10:14], 'little'); bpp = int.from_bytes(b[28:30], 'little') // 8
+              px = b[off:]; n = len(px) // bpp
+              lit = sum(1 for i in range(n) if max(px[i * bpp:i * bpp + 3]) > 40)
+              return round(lit / max(1, n), 3)
+
+          d = webdriver.Safari()
+          out = {}
+          try:
+              d.set_window_rect(0, 0, 1440, 900)
+              names = ['control'] + open('ci-variants.txt').read().split('\n') + ['old_full', 'new_full']
+              urls = {'control': None, 'old_full': 'ci-old.html', 'new_full': 'index.html'}
+              for n in names:
+                  if n == 'control':
+                      d.get('data:text/html,<body style="margin:0;background:white"><h1>control</h1>')
+                  else:
+                      d.get('http://localhost:8765/' + urls.get(n, 'ci-%s.html' % n))
+                  time.sleep(4)
+                  info = d.execute_script("""
+                      var e = document.querySelector('.intro') || document.body.firstElementChild || document.body;
+                      var r = e.getBoundingClientRect();
+                      return {vis: document.visibilityState, y: Math.round(scrollY),
+                              h: document.documentElement.scrollHeight,
+                              first: e.tagName + '.' + e.className + ' ' + Math.round(r.width) + 'x' + Math.round(r.height),
+                              imgs: document.images.length,
+                              broken: [].filter.call(document.images, function(i){return i.complete && !i.naturalWidth}).length};""")
+                  info['painted'] = painted(n)
+                  out[n] = info
+                  print(n.ljust(26), json.dumps(info), flush=True)
+
+              # does a repaint nudge help on the full page?
+              d.get('http://localhost:8765/index.html'); time.sleep(5)
+              d.set_window_rect(0, 0, 1300, 850); time.sleep(2)
+              out['new_full_after_resize'] = {'painted': painted('new_full_after_resize')}
+              d.execute_script('scrollTo(0, 300)'); time.sleep(2)
+              out['new_full_after_scroll'] = {'painted': painted('new_full_after_scroll')}
+              subprocess.run(['screencapture', '-x', 'shots/screen_new_full.png'])
+          finally:
+              json.dump(out, open('shots/diagnose.json', 'w'), indent=1)
+              d.quit()
+          PY
+
+      - name: Publish results
+        if: always()
+        run: |
+          cd shots
+          git init -q -b safari-diagnose-results
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "Safari diagnose for ${GITHUB_SHA}"
+          git push -f "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" safari-diagnose-results
